@@ -1,0 +1,9 @@
+.env
+*.yaml.dec
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+repomix-output.md
+*.gguf
+sealed-secret.yaml

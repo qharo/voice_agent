@@ -1,0 +1,27 @@
+domain: qharo-voice-agent.duckdns.org
+
+backend:
+  image:
+    repository: ghcr.io/qharo/voice-agent-backend
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+
+frontend:
+  image:
+    repository: ghcr.io/qharo/voice-agent-frontend
+    tag: latest
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
