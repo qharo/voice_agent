@@ -6,4 +6,3 @@ __pycache__/
 .DS_Store
 repomix-output.md
 *.gguf
-sealed-secret.yaml
