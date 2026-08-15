@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: backend
   namespace: voice-agent
+  labels:
+    app: backend
 spec:
   selector:
     app: backend
   ports:
-    - protocol: TCP
+    - name: http-metrics
+      protocol: TCP
       port: 8000
       targetPort: 8000

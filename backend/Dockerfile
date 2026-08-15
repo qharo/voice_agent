@@ -38,6 +38,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN wget -O /models/moonshine-streaming-tiny-Q8_0.gguf \
     https://huggingface.co/handy-computer/moonshine-streaming-tiny-gguf/resolve/main/moonshine-streaming-tiny-Q8_0.gguf
 
+# Pocket TTS 100M (soniqo ONNX INT8, fixed Alba voice) - streaming TTS engine
+RUN mkdir -p /models/pocket-tts && \
+    for f in config.json decoder.int8.onnx encoder.onnx lm_flow.int8.onnx \
+             lm_main.int8.onnx text_conditioner.onnx token_scores.json \
+             tokenizer.model vocab.json; do \
+        wget -O /models/pocket-tts/$f \
+            "https://huggingface.co/soniqo/Pocket-TTS-100M-ONNX-INT8/resolve/main/$f"; \
+    done
+
 RUN pip install --no-cache-dir huggingface_hub && \
     python -c "from huggingface_hub import snapshot_download; snapshot_download('owensong/Inflect-Nano-v2-ONNX', local_dir='/models/Inflect-Micro-v2-ONNX')" && \
     pip install --no-cache-dir -r /models/Inflect-Micro-v2-ONNX/onnx/requirements.txt && \

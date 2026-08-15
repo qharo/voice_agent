@@ -1,13 +1,22 @@
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from stt import STT
 from llm import LLMClient, SYSTEM_PROMPT
 from tts import TTSEngine
+from tts_pocket import PocketTTSStreamEngine, SAMPLE_RATE
 from sentence_buffer import SentenceBuffer
 from profiler import profiler
 from tools import registry as tool_registry
 import asyncio
 import traceback
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from metrics import (
+    stt_latency, llm_ttft, llm_total, tts_latency, tts_ttfa,
+    pipeline_total, tool_latency, tool_calls_total,
+    errors_total, requests_total, active_sessions
+)
+import time
 
 app = FastAPI()
 
@@ -20,7 +29,12 @@ app.add_middleware(
 
 stt = STT()
 llm = LLMClient()
-tts = TTSEngine()
+
+TTS_ENGINE = os.getenv("TTS_ENGINE", "pocket")
+if TTS_ENGINE == "pocket":
+    tts = PocketTTSStreamEngine(os.getenv("POCKET_TTS_DIR", "/models/pocket-tts"))
+else:
+    tts = TTSEngine()
 
 @app.get("/health")
 def health():
@@ -29,6 +43,7 @@ def health():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    active_sessions.inc()        # ← add this
     profiler.reset()
     profiler.mark("ws_connect")
     audio_buffer = bytearray()
@@ -85,6 +100,19 @@ async def websocket_endpoint(websocket: WebSocket):
                             await websocket.send_text("[ERROR: No speech detected]")
 
                         profiler.report()
+                        requests_total.inc()
+                        last_tts = ('tts_last_sentence' if 'tts_last_sentence' in profiler.markers
+                                    else 'tts_last_frame' if 'tts_last_frame' in profiler.markers else None)
+                        if 'speech_end' in profiler.markers and last_tts:
+                            pipeline_total.observe(profiler.elapsed('speech_end', last_tts))
+                        if 'speech_end' in profiler.markers and 'stt_end' in profiler.markers:
+                            stt_latency.observe(profiler.elapsed('speech_end', 'stt_end'))
+                        if 'stt_end' in profiler.markers and 'llm_first_token' in profiler.markers:
+                            llm_ttft.observe(profiler.elapsed('stt_end', 'llm_first_token'))
+                        if 'speech_end' in profiler.markers and 'llm_end' in profiler.markers:
+                            llm_total.observe(profiler.elapsed('speech_end', 'llm_end'))
+                        if 'tts_first_sentence' in profiler.markers and 'tts_last_sentence' in profiler.markers:
+                            tts_latency.observe(profiler.elapsed('tts_first_sentence', 'tts_last_sentence'))
                         await websocket.send_text("[END]")
 
                     session = None
@@ -96,9 +124,16 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
         print(traceback.format_exc())
     finally:
+        active_sessions.dec()    # ← add this
         if stream_task and not stream_task.done():
             stream_task.cancel()
 
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from fastapi.responses import Response
+
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 async def process_voice_query(text: str, websocket: WebSocket, history: list[dict] | None = None) -> str:
     tool_schemas = tool_registry.get_schemas()
@@ -135,6 +170,14 @@ async def process_voice_query(text: str, websocket: WebSocket, history: list[dic
             })
 
             for tc in msg.tool_calls:
+                for tc in msg.tool_calls:
+                    tool_start = time.time()
+                    profiler.mark(f"tool_{tc.function.name}")
+                    result = await tool_registry.execute(tc.function.name, tc.function.arguments)
+                    tool_duration = (time.time() - tool_start) * 1000
+                    tool_latency.labels(tool_name=tc.function.name).observe(tool_duration)
+                    tool_calls_total.labels(tool_name=tc.function.name).inc()
+
                 profiler.mark(f"tool_{tc.function.name}")
                 result = await tool_registry.execute(tc.function.name, tc.function.arguments)
                 query_msgs.append({
@@ -148,53 +191,80 @@ async def process_voice_query(text: str, websocket: WebSocket, history: list[dic
     else:
         final_text = "I'm sorry, I wasn't able to process that request."
 
-    full_response = []
-    llm_started = False
+    profiler.mark("llm_end")
 
-    async def on_token(token: str):
-        nonlocal llm_started
-        if not llm_started:
-            profiler.mark("llm_first_token")
-            llm_started = True
-        await websocket.send_text(f"[STREAM:{token}]")
+    if TTS_ENGINE == "pocket":
+        profiler.mark("llm_first_token")
+        await websocket.send_text(f"[STREAM:{final_text}]")
+        await _stream_pocket(final_text, websocket)
+    else:
+        full_response = []
+        llm_started = False
 
-    tts_queue = asyncio.Queue()
+        async def on_token(token: str):
+            nonlocal llm_started
+            if not llm_started:
+                profiler.mark("llm_first_token")
+                llm_started = True
+            await websocket.send_text(f"[STREAM:{token}]")
 
-    async def tts_worker():
-        while True:
-            sentence = await tts_queue.get()
-            try:
-                if sentence is None:
-                    break
-                audio = await tts.synthesize(sentence)
-                if "tts_first_sentence" not in profiler.markers:
-                    profiler.mark("tts_first_sentence")
-                profiler.mark("tts_last_sentence")
-                await websocket.send_bytes(audio)
-            except Exception as e:
-                error_msg = f"[ERROR: TTS failed - {str(e)}]"
-                await websocket.send_text(error_msg)
-            finally:
-                tts_queue.task_done()
+        tts_queue = asyncio.Queue()
 
-    worker = asyncio.create_task(tts_worker())
+        async def tts_worker():
+            while True:
+                sentence = await tts_queue.get()
+                try:
+                    if sentence is None:
+                        break
+                    audio = await tts.synthesize(sentence)
+                    if "tts_first_sentence" not in profiler.markers:
+                        profiler.mark("tts_first_sentence")
+                    profiler.mark("tts_last_sentence")
+                    await websocket.send_bytes(audio)
+                except Exception as e:
+                    error_msg = f"[ERROR: TTS failed - {str(e)}]"
+                    await websocket.send_text(error_msg)
+                finally:
+                    tts_queue.task_done()
 
-    async def speak_sentence(sentence: str):
-        await tts_queue.put(sentence)
+        worker = asyncio.create_task(tts_worker())
 
+        async def speak_sentence(sentence: str):
+            await tts_queue.put(sentence)
+
+        try:
+            buffer = SentenceBuffer(speak_sentence, on_token)
+            await buffer.add_token(final_text)
+            await buffer.finalize()
+            full_response = [final_text]
+        except Exception as e:
+            error_msg = f"[ERROR: Processing failed - {str(e)}]"
+            await websocket.send_text(error_msg)
+            print(traceback.format_exc())
+        finally:
+            await tts_queue.put(None)
+            await worker
+
+        return "".join(full_response)
+
+    return final_text
+
+
+async def _stream_pocket(text: str, websocket: WebSocket):
+    await websocket.send_text(f"[AUDIO_BEGIN:{SAMPLE_RATE}:1:int16]")
+    first = True
+    started = time.time()
     try:
-        buffer = SentenceBuffer(speak_sentence, on_token)
-        await buffer.add_token(final_text)
-        await buffer.finalize()
-        profiler.mark("llm_end")
-        full_response = [final_text]
-
+        async for pcm16 in tts.stream_int16(text):
+            if first:
+                tts_ttfa.observe((time.time() - started) * 1000)
+                profiler.mark("tts_first_frame")
+                first = False
+            await websocket.send_bytes(pcm16)
+        profiler.mark("tts_last_frame")
     except Exception as e:
-        error_msg = f"[ERROR: Processing failed - {str(e)}]"
+        error_msg = f"[ERROR: TTS failed - {str(e)}]"
         await websocket.send_text(error_msg)
         print(traceback.format_exc())
     finally:
-        await tts_queue.put(None)
-        await worker
-
-    return "".join(full_response)
+        await websocket.send_text("[AUDIO_END]")

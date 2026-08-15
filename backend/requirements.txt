@@ -8,3 +8,4 @@ transcribe-cpp
 onnxruntime
 soundfile
 httpx
+prometheus-client==0.20.0

@@ -46,7 +46,7 @@ class LLMClient:
         stream = await loop.run_in_executor(
             None,
             lambda: self.client.chat.completions.create(
-                model="qwen/qwen3.6-27b",
+                model="llama-3.1-8b-instant",
                 messages=messages,
                 stream=True,
                 max_tokens=512,

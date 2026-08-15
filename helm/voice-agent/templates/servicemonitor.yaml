@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: voice-agent-backend
+  namespace: voice-agent
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  endpoints:
+    - port: http-metrics
+      path: /metrics
+      interval: 15s
+  namespaceSelector:
+    matchNames:
+      - voice-agent

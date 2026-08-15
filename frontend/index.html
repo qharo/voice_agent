@@ -1,275 +1,372 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <title>Voice Agent</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            text-align: center;
-            background: #fafafa;
-        }
-        h1 {
-            color: #333;
-        }
-        #recordBtn {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: none;
-            background: #e74c3c;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
-        #recordBtn:active, #recordBtn.recording {
-            transform: scale(1.1);
-            background: #27ae60;
-            box-shadow: 0 4px 20px rgba(39, 174, 96, 0.6);
-        }
-        #status {
-            margin-top: 20px;
-            color: #666;
-            font-size: 16px;
-        }
-        #conversation {
-            margin-top: 30px;
-            text-align: left;
-            min-height: 200px;
-        }
-        .message {
-            padding: 12px 16px;
-            margin: 8px 0;
-            border-radius: 12px;
-            max-width: 80%;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-        .user-msg {
-            background: #3498db;
-            color: white;
-            margin-left: auto;
-        }
-        .agent-msg {
-            background: #ecf0f1;
-            color: #333;
-        }
-        .streaming-msg {
-            background: #ecf0f1;
-            color: #333;
-            border: 2px dashed #bdc3c7;
-            min-height: 24px;
-        }
-        .error-msg {
-            background: #f8d7da;
-            color: #721c24;
-            margin-left: auto;
-            margin-right: auto;
-            max-width: 90%;
-        }
-    </style>
-</head>
-<body>
-    <h1>Voice Agent</h1>
-    <button id="recordBtn">Hold to Talk</button>
-    <div id="status">Press and hold the button to speak</div>
-    <div id="conversation"></div>
-
-    <script>
-        const recordBtn = document.getElementById('recordBtn');
-        const status = document.getElementById('status');
-        const conversation = document.getElementById('conversation');
-
-        let ws = null;
-        let audioContext = null;
-        let processor = null;
-        let stream = null;
-        let isRecording = false;
-        let streamingDiv = null;
-        let liveTransDiv = null;
-        let isProcessing = false;
-        let audioQueue = [];
-        let isPlayingAudio = false;
-        let shouldReconnect = true;
-
-        function connectWebSocket() {
-            ws = new WebSocket(`ws://${window.location.hostname}/ws`);
-            ws.binaryType = 'arraybuffer';
-
-            status.textContent = 'Connecting...';
-
-            ws.onopen = () => {
-                if (!isRecording) {
-                    status.textContent = 'Press and hold the button to speak';
-                }
-            };
-
-            ws.onclose = () => {
-                if (shouldReconnect && !isRecording) {
-                    status.textContent = 'Disconnected. Reconnecting...';
-                    setTimeout(connectWebSocket, 1000);
-                }
-            };
-
-            ws.onmessage = (event) => {
-                if (event.data instanceof ArrayBuffer) {
-                    const blob = new Blob([event.data], { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(blob);
-                    
-                    if (isPlayingAudio) {
-                        audioQueue.push(audioUrl);
-                    } else {
-                        playAudio(audioUrl);
-                    }
-                } else {
-                    const text = event.data;
-                    
-                    if (text === '[END]') {
-                        status.textContent = 'Press and hold the button to speak';
-                        if (streamingDiv) {
-                            streamingDiv.classList.remove('streaming-msg');
-                            streamingDiv.classList.add('agent-msg');
-                            streamingDiv = null;
-                        }
-                        if (liveTransDiv) {
-                            liveTransDiv.remove();
-                            liveTransDiv = null;
-                        }
-                        isProcessing = false;
-                    } else if (text.startsWith('[TRANS:')) {
-                        const liveText = text.substring(7, text.length - 1);
-                        if (!liveTransDiv) {
-                            liveTransDiv = document.createElement('div');
-                            liveTransDiv.className = 'message user-msg';
-                            conversation.appendChild(liveTransDiv);
-                        }
-                        liveTransDiv.textContent = liveText;
-                        conversation.scrollTop = conversation.scrollHeight;
-                    } else if (text.startsWith('[STREAM:')) {
-                        const token = text.substring(8, text.length - 1);
-                        if (!streamingDiv) {
-                            streamingDiv = document.createElement('div');
-                            streamingDiv.className = 'message streaming-msg';
-                            conversation.appendChild(streamingDiv);
-                            conversation.scrollTop = conversation.scrollHeight;
-                        }
-                        streamingDiv.textContent += token;
-                        conversation.scrollTop = conversation.scrollHeight;
-                    } else if (text.startsWith('[ERROR:')) {
-                        addMessage(text, 'error');
-                    } else {
-                        if (liveTransDiv) {
-                            liveTransDiv.remove();
-                            liveTransDiv = null;
-                        }
-                        addMessage(text, text.startsWith('You:') ? 'user' : 'agent');
-                    }
-                }
-            };
-        }
-
-        connectWebSocket();
-
-        function playAudio(url) {
-            isPlayingAudio = true;
-            const audio = new Audio(url);
-            
-            audio.onended = () => {
-                URL.revokeObjectURL(url);
-                if (audioQueue.length > 0) {
-                    playAudio(audioQueue.shift());
-                } else {
-                    isPlayingAudio = false;
-                }
-            };
-            
-            audio.play();
-        }
-
-        function addMessage(text, sender) {
-            const div = document.createElement('div');
-            div.className = `message ${sender}-msg`;
-            div.textContent = text;
-            conversation.appendChild(div);
-            conversation.scrollTop = conversation.scrollHeight;
-        }
-
-        async function startRecording() {
-            if (isProcessing) return;
-            if (liveTransDiv) {
-                liveTransDiv.remove();
-                liveTransDiv = null;
+    <head>
+        <title>Voice Agent</title>
+        <style>
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                max-width: 600px;
+                margin: 50px auto;
+                text-align: center;
+                background: #fafafa;
             }
-            try {
-                if (!ws || ws.readyState !== WebSocket.OPEN) {
-                    status.textContent = 'Still connecting...';
-                    return;
-                }
+            h1 {
+                color: #333;
+            }
+            #recordBtn {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                border: none;
+                background: #e74c3c;
+                color: white;
+                font-size: 18px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.2s;
+                box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            }
+            #recordBtn:active,
+            #recordBtn.recording {
+                transform: scale(1.1);
+                background: #27ae60;
+                box-shadow: 0 4px 20px rgba(39, 174, 96, 0.6);
+            }
+            #status {
+                margin-top: 20px;
+                color: #666;
+                font-size: 16px;
+            }
+            #conversation {
+                margin-top: 30px;
+                text-align: left;
+                min-height: 200px;
+            }
+            .message {
+                padding: 12px 16px;
+                margin: 8px 0;
+                border-radius: 12px;
+                max-width: 80%;
+                word-wrap: break-word;
+                white-space: pre-wrap;
+            }
+            .user-msg {
+                background: #3498db;
+                color: white;
+                margin-left: auto;
+            }
+            .agent-msg {
+                background: #ecf0f1;
+                color: #333;
+            }
+            .streaming-msg {
+                background: #ecf0f1;
+                color: #333;
+                border: 2px dashed #bdc3c7;
+                min-height: 24px;
+            }
+            .error-msg {
+                background: #f8d7da;
+                color: #721c24;
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 90%;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Voice Agent</h1>
+        <button id="recordBtn">Hold to Talk</button>
+        <div id="status">Press and hold the button to speak</div>
+        <div id="conversation"></div>
 
-                stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { sampleRate: 16000, channelCount: 1 }
-                });
+        <script>
+            const recordBtn = document.getElementById("recordBtn");
+            const status = document.getElementById("status");
+            const conversation = document.getElementById("conversation");
 
-                audioContext = new AudioContext({ sampleRate: 16000 });
-                const source = audioContext.createMediaStreamSource(stream);
-                processor = audioContext.createScriptProcessor(4096, 1, 1);
+            let ws = null;
+            let audioContext = null;
+            let processor = null;
+            let stream = null;
+            let isRecording = false;
+            let streamingDiv = null;
+            let liveTransDiv = null;
+            let isProcessing = false;
+            let audioQueue = [];
+            let isPlayingAudio = false;
+            let shouldReconnect = true;
 
-                processor.onaudioprocess = (e) => {
-                    if (ws.readyState === WebSocket.OPEN) {
-                        const inputData = e.inputBuffer.getChannelData(0);
-                        const pcm16 = new Int16Array(inputData.length);
-                        for (let i = 0; i < inputData.length; i++) {
-                            pcm16[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF;
+            const player = {
+                ctx: null,
+                active: false,
+                sampleRate: 24000,
+                nextPlayTime: 0,
+                sources: [],
+                start(sr) {
+                    if (!this.ctx) {
+                        this.ctx = new (window.AudioContext ||
+                            window.webkitAudioContext)();
+                    }
+                    this.ctx.resume();
+                    this.sampleRate = sr;
+                    this.active = true;
+                    this.sources = [];
+                    this.nextPlayTime = this.ctx.currentTime + 0.15;
+                    isPlayingAudio = true;
+                },
+                push(buffer) {
+                    if (!this.active) return;
+                    const n = buffer.byteLength / 2;
+                    const i16 = new Int16Array(buffer);
+                    const f32 = new Float32Array(n);
+                    for (let i = 0; i < n; i++) {
+                        f32[i] = Math.max(-1, Math.min(1, i16[i] / 32768));
+                    }
+                    const audioBuffer = this.ctx.createBuffer(
+                        1,
+                        n,
+                        this.sampleRate,
+                    );
+                    audioBuffer.copyToChannel(f32, 0);
+                    const src = this.ctx.createBufferSource();
+                    src.buffer = audioBuffer;
+                    src.connect(this.ctx.destination);
+                    const when = Math.max(
+                        this.nextPlayTime,
+                        this.ctx.currentTime,
+                    );
+                    src.start(when);
+                    this.nextPlayTime = when + n / this.sampleRate;
+                    this.sources.push(src);
+                    src.onended = () => {
+                        this.sources.shift();
+                        if (!this.active && this.sources.length === 0) {
+                            isPlayingAudio = false;
                         }
-                        ws.send(pcm16.buffer);
+                    };
+                },
+                end() {
+                    this.active = false;
+                    if (this.sources.length === 0) {
+                        isPlayingAudio = false;
+                    }
+                },
+            };
+
+            function connectWebSocket() {
+                const protocol =
+                    window.location.protocol === "https:" ? "wss:" : "ws:";
+                ws = new WebSocket(
+                    `${protocol}//${window.location.hostname}/ws`,
+                );
+                ws.binaryType = "arraybuffer";
+
+                status.textContent = "Connecting...";
+
+                ws.onopen = () => {
+                    if (!isRecording) {
+                        status.textContent =
+                            "Press and hold the button to speak";
                     }
                 };
 
-                source.connect(processor);
-                processor.connect(audioContext.destination);
+                ws.onclose = () => {
+                    if (shouldReconnect && !isRecording) {
+                        status.textContent = "Disconnected. Reconnecting...";
+                        setTimeout(connectWebSocket, 1000);
+                    }
+                };
 
-                isRecording = true;
-                recordBtn.classList.add('recording');
-                status.textContent = 'Recording... release to send';
+                ws.onmessage = (event) => {
+                    if (event.data instanceof ArrayBuffer) {
+                        if (player.active) {
+                            player.push(event.data);
+                        } else {
+                            const blob = new Blob([event.data], {
+                                type: "audio/wav",
+                            });
+                            const audioUrl = URL.createObjectURL(blob);
 
-            } catch (err) {
-                status.textContent = 'Error: ' + err.message;
-            }
-        }
+                            if (isPlayingAudio) {
+                                audioQueue.push(audioUrl);
+                            } else {
+                                playAudio(audioUrl);
+                            }
+                        }
+                    } else {
+                        const text = event.data;
 
-        function stopRecording() {
-            if (!isRecording) return;
-            
-            if (processor) {
-                processor.disconnect();
-                processor = null;
+                        if (text.startsWith("[AUDIO_BEGIN:")) {
+                            const meta = text.substring(
+                                "[AUDIO_BEGIN:".length,
+                                text.length - 1,
+                            );
+                            const sr = parseInt(meta.split(":")[0], 10);
+                            player.start(sr);
+                        } else if (text === "[AUDIO_END]") {
+                            player.end();
+                        } else if (text === "[END]") {
+                            status.textContent =
+                                "Press and hold the button to speak";
+                            if (streamingDiv) {
+                                streamingDiv.classList.remove("streaming-msg");
+                                streamingDiv.classList.add("agent-msg");
+                                streamingDiv = null;
+                            }
+                            if (liveTransDiv) {
+                                liveTransDiv.remove();
+                                liveTransDiv = null;
+                            }
+                            isProcessing = false;
+                        } else if (text.startsWith("[TRANS:")) {
+                            const liveText = text.substring(7, text.length - 1);
+                            if (!liveTransDiv) {
+                                liveTransDiv = document.createElement("div");
+                                liveTransDiv.className = "message user-msg";
+                                conversation.appendChild(liveTransDiv);
+                            }
+                            liveTransDiv.textContent = liveText;
+                            conversation.scrollTop = conversation.scrollHeight;
+                        } else if (text.startsWith("[STREAM:")) {
+                            const token = text.substring(8, text.length - 1);
+                            if (!streamingDiv) {
+                                streamingDiv = document.createElement("div");
+                                streamingDiv.className =
+                                    "message streaming-msg";
+                                conversation.appendChild(streamingDiv);
+                                conversation.scrollTop =
+                                    conversation.scrollHeight;
+                            }
+                            streamingDiv.textContent += token;
+                            conversation.scrollTop = conversation.scrollHeight;
+                        } else if (text.startsWith("[ERROR:")) {
+                            addMessage(text, "error");
+                        } else {
+                            if (liveTransDiv) {
+                                liveTransDiv.remove();
+                                liveTransDiv = null;
+                            }
+                            addMessage(
+                                text,
+                                text.startsWith("You:") ? "user" : "agent",
+                            );
+                        }
+                    }
+                };
             }
-            if (audioContext) {
-                audioContext.close();
-                audioContext = null;
-            }
-            if (stream) {
-                stream.getTracks().forEach(t => t.stop());
-                stream = null;
-            }
-            isRecording = false;
-            isProcessing = true;
-            recordBtn.classList.remove('recording');
-            status.textContent = 'Processing...';
 
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send('stop');
-            }
-        }
+            connectWebSocket();
 
-        recordBtn.addEventListener('mousedown', startRecording);
-        recordBtn.addEventListener('mouseup', stopRecording);
-        recordBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startRecording(); });
-        recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); stopRecording(); });
-    </script>
-</body>
+            function playAudio(url) {
+                isPlayingAudio = true;
+                const audio = new Audio(url);
+
+                audio.onended = () => {
+                    URL.revokeObjectURL(url);
+                    if (audioQueue.length > 0) {
+                        playAudio(audioQueue.shift());
+                    } else {
+                        isPlayingAudio = false;
+                    }
+                };
+
+                audio.play();
+            }
+
+            function addMessage(text, sender) {
+                const div = document.createElement("div");
+                div.className = `message ${sender}-msg`;
+                div.textContent = text;
+                conversation.appendChild(div);
+                conversation.scrollTop = conversation.scrollHeight;
+            }
+
+            async function startRecording() {
+                if (isProcessing) return;
+                if (liveTransDiv) {
+                    liveTransDiv.remove();
+                    liveTransDiv = null;
+                }
+                try {
+                    if (!ws || ws.readyState !== WebSocket.OPEN) {
+                        status.textContent = "Still connecting...";
+                        return;
+                    }
+
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        audio: { sampleRate: 16000, channelCount: 1 },
+                    });
+
+                    audioContext = new AudioContext({ sampleRate: 16000 });
+
+                    if (player.ctx && player.ctx.state === "suspended") {
+                        player.ctx.resume();
+                    }
+
+                    const source = audioContext.createMediaStreamSource(stream);
+                    processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+                    processor.onaudioprocess = (e) => {
+                        if (ws.readyState === WebSocket.OPEN) {
+                            const inputData = e.inputBuffer.getChannelData(0);
+                            const pcm16 = new Int16Array(inputData.length);
+                            for (let i = 0; i < inputData.length; i++) {
+                                pcm16[i] =
+                                    Math.max(-1, Math.min(1, inputData[i])) *
+                                    0x7fff;
+                            }
+                            ws.send(pcm16.buffer);
+                        }
+                    };
+
+                    source.connect(processor);
+                    processor.connect(audioContext.destination);
+
+                    isRecording = true;
+                    recordBtn.classList.add("recording");
+                    status.textContent = "Recording... release to send";
+                } catch (err) {
+                    status.textContent = "Error: " + err.message;
+                }
+            }
+
+            function stopRecording() {
+                if (!isRecording) return;
+
+                if (processor) {
+                    processor.disconnect();
+                    processor = null;
+                }
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                }
+                if (stream) {
+                    stream.getTracks().forEach((t) => t.stop());
+                    stream = null;
+                }
+                isRecording = false;
+                isProcessing = true;
+                recordBtn.classList.remove("recording");
+                status.textContent = "Processing...";
+
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send("stop");
+                }
+            }
+
+            recordBtn.addEventListener("mousedown", startRecording);
+            recordBtn.addEventListener("mouseup", stopRecording);
+            recordBtn.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                startRecording();
+            });
+            recordBtn.addEventListener("touchend", (e) => {
+                e.preventDefault();
+                stopRecording();
+            });
+        </script>
+    </body>
 </html>
