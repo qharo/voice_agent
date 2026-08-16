@@ -1,0 +1,204 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: voice-agent-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  voice-agent.json: |
+    {
+      "__inputs": [],
+      "__requires": [],
+      "annotations": { "list": [] },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "title": "Live State",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 3 },
+                  { "color": "red", "value": 5 }
+                ]
+              },
+              "unit": "none",
+              "mappings": []
+            }
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+          "id": 1,
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" },
+          "title": "Active Sessions",
+          "type": "stat",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "voice_active_sessions", "legendFormat": "sessions" }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 2 },
+                  { "color": "red", "value": 4 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+          "id": 2,
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+          "title": "Queue Depth",
+          "type": "stat",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "voice_queue_depth", "legendFormat": "queued" }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "blue", "value": null } ] }, "unit": "none" }
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+          "id": 3,
+          "options": { "reduceOptions": { "calcs": ["increase"] }, "colorMode": "background" },
+          "title": "Requests (last 1h)",
+          "type": "stat",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "increase(voice_requests_total[1h])", "legendFormat": "requests" }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 3000 }, { "color": "red", "value": 6000 } ] }, "unit": "ms" }
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+          "id": 4,
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+          "title": "Pipeline p95 (last 5m)",
+          "type": "stat",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_pipeline_total_ms_bucket[5m]))", "legendFormat": "p95" }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "id": 101,
+          "title": "Pipeline Latency",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "unit": "ms", "color": { "mode": "palette-classic" } },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "id": 5,
+          "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+          "title": "End-to-End Pipeline Latency",
+          "type": "timeseries",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.50, rate(voice_pipeline_total_ms_bucket[5m]))", "legendFormat": "p50" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_pipeline_total_ms_bucket[5m]))", "legendFormat": "p95" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.99, rate(voice_pipeline_total_ms_bucket[5m]))", "legendFormat": "p99" }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "unit": "ms", "color": { "mode": "palette-classic" } }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "id": 6,
+          "title": "Per-Stage Latency p95",
+          "type": "timeseries",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_stt_latency_ms_bucket[5m]))", "legendFormat": "STT" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_llm_time_to_first_token_ms_bucket[5m]))", "legendFormat": "LLM TTFT" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_llm_total_latency_ms_bucket[5m]))", "legendFormat": "LLM Total" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_tts_latency_ms_bucket[5m]))", "legendFormat": "TTS" }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "unit": "ms", "color": { "mode": "palette-classic" } }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+          "id": 7,
+          "title": "Time to First Audio (TTS TTFA)",
+          "type": "timeseries",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.50, rate(voice_tts_time_to_first_audio_ms_bucket[5m]))", "legendFormat": "p50" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_tts_time_to_first_audio_ms_bucket[5m]))", "legendFormat": "p95" }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "id": 102,
+          "title": "Tools",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "unit": "none", "color": { "mode": "palette-classic" } }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+          "id": 8,
+          "title": "Tool Call Rate",
+          "type": "timeseries",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "rate(voice_tool_calls_total[5m])", "legendFormat": "{{tool_name}}" }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": { "unit": "ms", "color": { "mode": "palette-classic" } }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+          "id": 9,
+          "title": "Tool Latency p95",
+          "type": "timeseries",
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, rate(voice_tool_latency_ms_bucket[5m]))", "legendFormat": "{{tool_name}}" }
+          ]
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 38,
+      "tags": ["voice-agent"],
+      "templating": { "list": [] },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Voice Agent",
+      "uid": "voice-agent-001",
+      "version": 1
+    }
