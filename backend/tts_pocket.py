@@ -22,7 +22,7 @@ class PocketTTSStreamEngine:
     sample_rate = SAMPLE_RATE
     num_channels = 1
 
-    def __init__(self, model_dir: str = "/models/pocket-tts", threads: int = 2):
+    def __init__(self, model_dir: str = "/models/pocket-tts", threads: int = 4):
         self.engine = PocketInferenceEngine(model_dir, threads=threads)
 
     @staticmethod

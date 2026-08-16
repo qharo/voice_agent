@@ -3,6 +3,8 @@ services:
     build: ./backend
     env_file:
       - .env
+    environment:
+      - TTS_ENGINE=piper
     ports:
       - "8000:8000"
     volumes:

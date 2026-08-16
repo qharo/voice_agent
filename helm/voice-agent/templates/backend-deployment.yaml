@@ -25,6 +25,8 @@ spec:
                 secretKeyRef:
                   name: voice-agent-secrets
                   key: GROQ_API_KEY
+            - name: TTS_ENGINE
+              value: piper
           resources:
             requests:
               memory: {{ .Values.backend.resources.requests.memory }}

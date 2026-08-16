@@ -2,100 +2,137 @@
 <html>
     <head>
         <title>Voice Agent</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
         <style>
+            :root {
+                --green: #a5d6a7;
+                --black: #000000;
+                --white: #ffffff;
+                --user-text: var(--black);
+            }
+            * {
+                box-sizing: border-box;
+            }
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+            }
             body {
                 font-family:
-                    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                max-width: 600px;
-                margin: 50px auto;
-                text-align: center;
-                background: #fafafa;
+                    "Roboto",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    sans-serif;
+                background: var(--green);
+                color: var(--black);
+                transition: background-color 0.6s ease;
+                overflow: hidden;
             }
-            h1 {
-                color: #333;
+            body.active {
+                background: var(--black);
+                color: var(--white);
+                --user-text: var(--green);
             }
-            #recordBtn {
-                width: 120px;
-                height: 120px;
-                border-radius: 50%;
-                border: none;
-                background: #e74c3c;
-                color: white;
-                font-size: 18px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: all 0.2s;
-                box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-            }
-            #recordBtn:active,
-            #recordBtn.recording {
-                transform: scale(1.1);
-                background: #27ae60;
-                box-shadow: 0 4px 20px rgba(39, 174, 96, 0.6);
-            }
-            #status {
-                margin-top: 20px;
-                color: #666;
-                font-size: 16px;
+            #app {
+                position: relative;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
             }
             #conversation {
-                margin-top: 30px;
-                text-align: left;
-                min-height: 200px;
+                flex: 1;
+                width: min(60%, 760px);
+                margin: 0 auto;
+                padding: 28px 0;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                scrollbar-width: none;
+            }
+            #conversation::-webkit-scrollbar {
+                display: none;
+            }
+            @media (max-width: 768px) {
+                #conversation {
+                    width: 90%;
+                }
             }
             .message {
-                padding: 12px 16px;
-                margin: 8px 0;
-                border-radius: 12px;
-                max-width: 80%;
-                word-wrap: break-word;
                 white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 20px;
+                line-height: 1.55;
+                width: 100%;
+                max-width: none;
             }
             .user-msg {
-                background: #3498db;
-                color: white;
-                margin-left: auto;
+                align-self: flex-end;
+                color: var(--user-text);
+                text-align: right;
+            }
+            .tool-icon {
+                align-self: flex-start;
+                font-size: 22px;
+                color: var(--white);
+                line-height: 1.2;
             }
             .agent-msg {
-                background: #ecf0f1;
-                color: #333;
+                align-self: flex-start;
+                color: var(--white);
+                text-align: left;
             }
             .streaming-msg {
-                background: #ecf0f1;
-                color: #333;
-                border: 2px dashed #bdc3c7;
-                min-height: 24px;
+                align-self: flex-start;
+                color: var(--white);
             }
             .error-msg {
-                background: #f8d7da;
-                color: #721c24;
-                margin-left: auto;
-                margin-right: auto;
-                max-width: 90%;
+                align-self: center;
+                color: #ffd6d6;
+            }
+            #idlePrompt {
+                flex-shrink: 0;
+                padding: 0 0 42px;
+                text-align: center;
+                font-size: 20px;
+                font-weight: 500;
+                letter-spacing: 0.3px;
+                color: var(--black);
+            }
+            body.active #idlePrompt {
+                display: none;
             }
         </style>
     </head>
     <body>
-        <h1>Voice Agent</h1>
-        <button id="recordBtn">Hold to Talk</button>
-        <div id="status">Press and hold the button to speak</div>
-        <div id="conversation"></div>
+        <div id="app">
+            <div id="conversation"></div>
+            <div id="idlePrompt">press space to speak now</div>
+        </div>
 
         <script>
-            const recordBtn = document.getElementById("recordBtn");
-            const status = document.getElementById("status");
             const conversation = document.getElementById("conversation");
+            const idlePrompt = document.getElementById("idlePrompt");
 
             let ws = null;
             let audioContext = null;
             let processor = null;
             let stream = null;
             let isRecording = false;
+            let state = "idle"; // idle | recording | processing | agent
             let streamingDiv = null;
             let liveTransDiv = null;
-            let isProcessing = false;
             let audioQueue = [];
+            let currentAudio = null;
             let isPlayingAudio = false;
+            let discardTurn = false;
             let shouldReconnect = true;
 
             const player = {
@@ -105,11 +142,13 @@
                 nextPlayTime: 0,
                 sources: [],
                 start(sr) {
-                    if (!this.ctx) {
+                    if (this.ctx) {
+                        if (this.ctx.state === "suspended") this.ctx.resume();
+                    } else {
                         this.ctx = new (window.AudioContext ||
                             window.webkitAudioContext)();
+                        this.ctx.resume();
                     }
-                    this.ctx.resume();
                     this.sampleRate = sr;
                     this.active = true;
                     this.sources = [];
@@ -144,6 +183,7 @@
                         this.sources.shift();
                         if (!this.active && this.sources.length === 0) {
                             isPlayingAudio = false;
+                            if (state === "agent") returnIdle();
                         }
                     };
                 },
@@ -151,9 +191,40 @@
                     this.active = false;
                     if (this.sources.length === 0) {
                         isPlayingAudio = false;
+                        if (state === "agent") returnIdle();
                     }
                 },
+                stop() {
+                    this.active = false;
+                    this.sources.forEach((src) => {
+                        try {
+                            src.stop();
+                        } catch (e) {}
+                    });
+                    this.sources = [];
+                    isPlayingAudio = false;
+                },
             };
+
+            function setActive(on) {
+                document.body.classList.toggle("active", on);
+            }
+
+            function stopAllAudio() {
+                player.stop();
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                audioQueue.forEach((url) => URL.revokeObjectURL(url));
+                audioQueue = [];
+                isPlayingAudio = false;
+            }
+
+            function returnIdle() {
+                state = "idle";
+                setActive(false);
+            }
 
             function connectWebSocket() {
                 const protocol =
@@ -163,24 +234,22 @@
                 );
                 ws.binaryType = "arraybuffer";
 
-                status.textContent = "Connecting...";
-
                 ws.onopen = () => {
-                    if (!isRecording) {
-                        status.textContent =
-                            "Press and hold the button to speak";
+                    if (!isRecording && !isPlayingAudio) {
+                        idlePrompt.textContent = "press space to speak now";
                     }
                 };
 
                 ws.onclose = () => {
-                    if (shouldReconnect && !isRecording) {
-                        status.textContent = "Disconnected. Reconnecting...";
+                    if (shouldReconnect) {
+                        idlePrompt.textContent = "reconnecting...";
                         setTimeout(connectWebSocket, 1000);
                     }
                 };
 
                 ws.onmessage = (event) => {
                     if (event.data instanceof ArrayBuffer) {
+                        if (discardTurn) return;
                         if (player.active) {
                             player.push(event.data);
                         } else {
@@ -188,7 +257,6 @@
                                 type: "audio/wav",
                             });
                             const audioUrl = URL.createObjectURL(blob);
-
                             if (isPlayingAudio) {
                                 audioQueue.push(audioUrl);
                             } else {
@@ -199,29 +267,42 @@
                         const text = event.data;
 
                         if (text.startsWith("[AUDIO_BEGIN:")) {
+                            if (discardTurn) return;
                             const meta = text.substring(
                                 "[AUDIO_BEGIN:".length,
                                 text.length - 1,
                             );
                             const sr = parseInt(meta.split(":")[0], 10);
+                            state = "agent";
+                            setActive(true);
                             player.start(sr);
                         } else if (text === "[AUDIO_END]") {
                             player.end();
                         } else if (text === "[END]") {
-                            status.textContent =
-                                "Press and hold the button to speak";
                             if (streamingDiv) {
-                                streamingDiv.classList.remove("streaming-msg");
+                                streamingDiv.classList.remove(
+                                    "streaming-msg",
+                                );
                                 streamingDiv.classList.add("agent-msg");
                                 streamingDiv = null;
                             }
-                            if (liveTransDiv) {
-                                liveTransDiv.remove();
-                                liveTransDiv = null;
+                            if (discardTurn) {
+                                discardTurn = false;
+                            } else {
+                                if (liveTransDiv) {
+                                    liveTransDiv.remove();
+                                    liveTransDiv = null;
+                                }
+                                if (!isRecording) {
+                                    returnIdle();
+                                }
                             }
-                            isProcessing = false;
                         } else if (text.startsWith("[TRANS:")) {
-                            const liveText = text.substring(7, text.length - 1);
+                            if (discardTurn) return;
+                            const liveText = text.substring(
+                                7,
+                                text.length - 1,
+                            );
                             if (!liveTransDiv) {
                                 liveTransDiv = document.createElement("div");
                                 liveTransDiv.className = "message user-msg";
@@ -230,17 +311,21 @@
                             liveTransDiv.textContent = liveText;
                             conversation.scrollTop = conversation.scrollHeight;
                         } else if (text.startsWith("[STREAM:")) {
+                            if (discardTurn) return;
                             const token = text.substring(8, text.length - 1);
                             if (!streamingDiv) {
                                 streamingDiv = document.createElement("div");
                                 streamingDiv.className =
                                     "message streaming-msg";
                                 conversation.appendChild(streamingDiv);
-                                conversation.scrollTop =
-                                    conversation.scrollHeight;
                             }
                             streamingDiv.textContent += token;
                             conversation.scrollTop = conversation.scrollHeight;
+                        } else if (text.startsWith("[TOOL:")) {
+                            if (discardTurn) return;
+                            showToolIcon(
+                                text.substring("[TOOL:".length, text.length - 1),
+                            );
                         } else if (text.startsWith("[ERROR:")) {
                             addMessage(text, "error");
                         } else {
@@ -248,10 +333,9 @@
                                 liveTransDiv.remove();
                                 liveTransDiv = null;
                             }
-                            addMessage(
-                                text,
-                                text.startsWith("You:") ? "user" : "agent",
-                            );
+                            const isUser = text.startsWith("You:");
+                            const clean = isUser ? text.substring(5) : text;
+                            addMessage(clean, isUser ? "user" : "agent");
                         }
                     }
                 };
@@ -259,19 +343,31 @@
 
             connectWebSocket();
 
+            const TOOL_ICONS = { get_weather: "🌤️", calculator: "🧮" };
+
+            function showToolIcon(name) {
+                const icon = TOOL_ICONS[name] || "🛠️";
+                const div = document.createElement("div");
+                div.className = "message tool-icon";
+                div.textContent = icon;
+                conversation.appendChild(div);
+                conversation.scrollTop = conversation.scrollHeight;
+            }
+
             function playAudio(url) {
                 isPlayingAudio = true;
                 const audio = new Audio(url);
-
+                currentAudio = audio;
                 audio.onended = () => {
                     URL.revokeObjectURL(url);
+                    if (currentAudio === audio) currentAudio = null;
                     if (audioQueue.length > 0) {
                         playAudio(audioQueue.shift());
                     } else {
                         isPlayingAudio = false;
+                        if (state === "agent") returnIdle();
                     }
                 };
-
                 audio.play();
             }
 
@@ -284,14 +380,31 @@
             }
 
             async function startRecording() {
-                if (isProcessing) return;
+                if (isRecording) return;
+                if (isPlayingAudio) {
+                    // interrupt ongoing assistant playback
+                    stopAllAudio();
+                    discardTurn = true;
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send("CANCEL");
+                    }
+                }
                 if (liveTransDiv) {
                     liveTransDiv.remove();
                     liveTransDiv = null;
                 }
+                if (streamingDiv) {
+                    streamingDiv.classList.remove("streaming-msg");
+                    streamingDiv.classList.add("agent-msg");
+                    streamingDiv = null;
+                }
+                state = "recording";
+                setActive(true);
                 try {
                     if (!ws || ws.readyState !== WebSocket.OPEN) {
-                        status.textContent = "Still connecting...";
+                        idlePrompt.textContent = "still connecting...";
+                        setActive(false);
+                        state = "idle";
                         return;
                     }
 
@@ -325,10 +438,14 @@
                     processor.connect(audioContext.destination);
 
                     isRecording = true;
-                    recordBtn.classList.add("recording");
-                    status.textContent = "Recording... release to send";
                 } catch (err) {
-                    status.textContent = "Error: " + err.message;
+                    state = "idle";
+                    setActive(false);
+                    idlePrompt.textContent =
+                        "mic error: " +
+                        (navigator.mediaDevices
+                            ? err.message
+                            : "requires https or localhost");
                 }
             }
 
@@ -348,24 +465,25 @@
                     stream = null;
                 }
                 isRecording = false;
-                isProcessing = true;
-                recordBtn.classList.remove("recording");
-                status.textContent = "Processing...";
+                state = "processing";
+                setActive(true);
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send("stop");
                 }
             }
 
-            recordBtn.addEventListener("mousedown", startRecording);
-            recordBtn.addEventListener("mouseup", stopRecording);
-            recordBtn.addEventListener("touchstart", (e) => {
-                e.preventDefault();
-                startRecording();
+            document.addEventListener("keydown", (e) => {
+                if (e.code === "Space") {
+                    e.preventDefault();
+                    if (!e.repeat) startRecording();
+                }
             });
-            recordBtn.addEventListener("touchend", (e) => {
-                e.preventDefault();
-                stopRecording();
+            document.addEventListener("keyup", (e) => {
+                if (e.code === "Space") {
+                    e.preventDefault();
+                    stopRecording();
+                }
             });
         </script>
     </body>
