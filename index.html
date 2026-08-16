@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>voice_agent — a voice agent built for Kubernetes</title>
+<meta name="description" content="A production-grade voice agent built on Kubernetes — speech to text, LLM with tool use, text to speech, end to end in under two seconds." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+    :root {
+        --bg: #0a0a0a;
+        --bg-soft: #111113;
+        --panel: #1a1a1d;
+        --panel-2: #202024;
+        --line: #2c2c30;
+        --text: #f4f4f5;
+        --muted: #9a9aa2;
+        --green: #a5d6a7;
+        --green-dim: #4a6b4c;
+        --white: #ffffff;
+        --maxw: 1120px;
+        --radius: 14px;
+        --shadow: 0 10px 40px rgba(0,0,0,.45);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+    }
+
+    h1, h2, h3, .nav-brand { font-family: "Space Grotesk", system-ui, sans-serif; }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    section { padding: 96px 0; }
+    section:nth-of-type(even) { background: var(--bg-soft); }
+
+    .tag {
+        display: inline-block;
+        font-size: 13px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--green);
+        border: 1px solid var(--green-dim);
+        padding: 6px 14px;
+        border-radius: 999px;
+        margin-bottom: 18px;
+    }
+
+    h2.sec-title { font-size: clamp(30px, 4vw, 42px); line-height: 1.12; margin-bottom: 14px; }
+    .sec-sub { color: var(--muted); font-size: 17px; max-width: 680px; margin-bottom: 44px; }
+    .center { text-align: center; }
+    .center .sec-sub { margin-left: auto; margin-right: auto; }
+
+    a { color: var(--green); text-decoration: none; }
+
+    /* ---------- nav ---------- */
+    nav {
+        position: sticky; top: 0; z-index: 50;
+        background: rgba(10,10,10,.82);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        height: 64px;
+    }
+    .nav-brand { font-weight: 700; font-size: 18px; color: var(--text); }
+    .nav-brand em { font-style: normal; color: var(--green); }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a:not(.btn) { color: var(--muted); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover:not(.btn) { color: var(--text); }
+    .nav-cta { display: flex; gap: 10px; }
+    @media (max-width: 820px) {
+        .nav-links .hide-m { display: none; }
+    }
+
+    /* ---------- buttons ---------- */
+    .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 20px; border-radius: 9px;
+        font-weight: 600; font-size: 15px; cursor: pointer;
+        border: 1px solid transparent; transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+        white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--green); color: #0a0a0a; }
+    .btn-primary:hover { box-shadow: 0 8px 28px rgba(165,214,167,.35); background: #bde3bf; }
+    .btn-ghost { border-color: var(--line); color: var(--text); background: transparent; }
+    .btn-ghost:hover { border-color: var(--green-dim); background: var(--panel); }
+
+    /* ---------- hero ---------- */
+    .hero { padding: 96px 0 70px; text-align: center; }
+    .hero .kicker { color: var(--muted); font-size: 14px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 22px; }
+    .hero h1 { font-size: clamp(36px, 6.4vw, 64px); line-height: 1.06; letter-spacing: -.02em; max-width: 900px; margin: 0 auto 22px; }
+    .hero h1 .accent { color: var(--green); }
+    .hero .sub { font-size: clamp(17px, 2.2vw, 20px); color: var(--muted); max-width: 680px; margin: 0 auto 34px; }
+    .hero .stack-line { font-size: 13px; color: var(--green-dim); margin-top: 26px; }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* demo media slot */
+    .demo {
+        margin-top: 52px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        position: relative;
+        aspect-ratio: 16 / 9;
+    }
+    .demo video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .demo .demo-note {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 14px; color: var(--muted); font-size: 14px;
+    }
+    .demo .demo-note .pulse {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: var(--green);
+        animation: breathe 2.4s ease-in-out infinite;
+    }
+    .demo .demo-note code {
+        background: var(--panel-2); border: 1px solid var(--line);
+        padding: 3px 8px; border-radius: 6px; color: var(--green); font-size: 13px;
+    }
+    @keyframes breathe {
+        0%,100% { box-shadow: 0 0 0 0 rgba(165,214,167,.45), 0 0 30px rgba(165,214,167,.5); }
+        50% { box-shadow: 0 0 0 18px rgba(165,214,167,0), 0 0 40px rgba(165,214,167,.7); }
+    }
+
+    /* ---------- architecture ---------- */
+    .pipe { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
+    .stage {
+        flex: 1 1 0; min-width: 118px;
+        background: var(--panel); border: 1px solid var(--line);
+        border-radius: 10px; padding: 16px 12px;
+        text-align: center;
+    }
+    .stage .s-icon { font-size: 22px; display: block; margin-bottom: 8px; }
+    .stage .s-name { font-weight: 600; font-size: 14px; }
+    .stage .s-sub { color: var(--muted); font-size: 11.5px; margin-top: 4px; line-height: 1.35; }
+    .arrow { align-self: center; color: var(--green-dim); font-size: 18px; flex: 0 0 auto; }
+
+    .pipeline-gate { margin-top: 24px; }
+    .gate-label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display:flex; justify-content:center; }
+    .gate-label::before, .gate-label::after { content: ""; flex: 1; max-width: 90px; height:1px; background: var(--line); align-self:center; margin: 0 14px; }
+    .plat {
+        display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+        border: 1px solid var(--line); border-radius: var(--radius);
+        background: var(--panel-2); padding: 20px;
+    }
+    .plat span {
+        background: var(--bg-soft); border: 1px solid var(--line);
+        padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 500;
+    }
+
+    .diagram-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 26px; box-shadow: var(--shadow); }
+    .diagram-note { display: flex; gap: 12px; align-items: center; margin-top: 22px; font-size: 13.5px; color: var(--muted); }
+    .diagram-note .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex: 0 0 auto; }
+    .diagram-note b { color: var(--text); font-weight: 600; }
+    .diagram-note code { color: var(--green); }
+
+    /* ---------- how it works ---------- */
+    .how { display: grid; gap: 22px; }
+    .how-item { display: grid; grid-template-columns: 52px 1fr; gap: 20px; }
+    .how-num {
+        width: 52px; height: 52px; border-radius: 12px;
+        border: 1px solid var(--green-dim); background: rgba(165,214,167,.06);
+        color: var(--green); font-weight: 700; font-size: 20px; font-family: "Space Grotesk", sans-serif;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .how-title { font-size: 19px; margin-bottom: 6px; }
+    .how-body { color: var(--muted); }
+    .how-body b { color: var(--text); font-weight: 600; }
+
+    /* ---------- tools ---------- */
+    .grid-tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+    .tool {
+        background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 22px; transition: transform .15s ease, border-color .15s ease;
+    }
+    .tool:hover { transform: translateY(-3px); border-color: var(--green-dim); }
+    .tool-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .tool .t-icon { font-size: 24px; }
+    .tool h3 { font-size: 17px; }
+    .tool p { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+    .tool .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--bg-soft); }
+    .chip.green { border-color: var(--green-dim); color: var(--green); }
+
+    /* ---------- metrics ---------- */
+    .metric-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 26px; }
+    .stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+    .stat .value { font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 4vw, 40px); font-weight: 700; color: var(--green); line-height: 1; }
+    .stat .label { color: var(--muted); font-size: 14px; margin-top: 10px; }
+    .stat .label b { color: var(--text); }
+
+    .grafana { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel-2); box-shadow: var(--shadow); }
+    .grafana img { width: 100%; display: block; }
+    .grafana .ph {
+        padding: 60px 24px; text-align: center; color: var(--muted); font-size: 14px;
+        display: flex; flex-direction: column; gap: 12px; align-items: center;
+    }
+    .grafana .ph .bars { display: flex; align-items: flex-end; gap: 10px; height: 90px; margin-bottom: 6px; }
+    .grafana .ph .bars span { width: 26px; background: var(--green-dim); border-radius: 5px 5px 0 0; }
+    .grafana .ph code { color: var(--green); background: var(--panel); border: 1px solid var(--line); padding: 3px 8px; border-radius: 6px; }
+    .metric-note { display: flex; gap: 10px; margin-top: 16px; font-size: 13.5px; color: var(--muted); }
+    .metric-note svg { flex: 0 0 auto; margin-top: 2px; }
+
+    /* ---------- infra ---------- */
+    .grid-infra { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    .infra { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+    .infra .i-icon { font-size: 24px; margin-bottom: 12px; }
+    .infra h3 { font-size: 17px; margin-bottom: 8px; }
+    .infra p { color: var(--muted); font-size: 14px; }
+    .infra code { color: var(--green); font-size: 12.5px; background: var(--bg-soft); border: 1px solid var(--line); padding: 2px 6px; border-radius: 5px; }
+
+    /* ---------- decisions ---------- */
+    .grid-decision { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 760px) { .grid-decision { grid-template-columns: 1fr; } }
+    .decision { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+    .decision h3 { font-size: 18px; margin-bottom: 10px; }
+    .decision h3 span { color: var(--green); }
+    .decision p { color: var(--muted); font-size: 14.5px; }
+
+    /* ---------- stack ---------- */
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .stack-item {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+        padding: 18px; text-align: center; font-family: "Space Grotesk", sans-serif; font-weight: 600;
+        font-size: 16px; transition: transform .15s ease, border-color .15s ease;
+    }
+    .stack-item:hover { transform: translateY(-3px); border-color: var(--green-dim); }
+    .stack-item small { display: block; font-family: "Inter", sans-serif; font-weight: 400; color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+    /* ---------- footer ---------- */
+    footer { border-top: 1px solid var(--line); padding: 40px 0; background: var(--bg-soft); }
+    .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .foot-inner .name { font-family: "Space Grotesk", sans-serif; font-weight: 700; }
+    .foot-links { display: flex; gap: 18px; align-items: center; }
+    .foot-links a { color: var(--muted); font-size: 14px; }
+    .foot-links a:hover { color: var(--text); }
+    .foot-note { width: 100%; text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 22px; }
+
+    /* reveal */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.show { opacity: 1; transform: none; }
+
+    @media (max-width: 640px) {
+        section { padding: 64px 0; }
+        .hero { padding: 64px 0 44px; }
+        .arrow { display: none; }
+        .pipe { flex-direction: column; }
+        .stage { min-width: 0; }
+    }
+</style>
+</head>
+<body>
+
+<nav>
+    <div class="wrap nav-inner">
+        <a class="nav-brand" href="#top"><em>voice</em>_agent</a>
+        <div class="nav-links">
+            <a href="#architecture">Architecture</a>
+            <a href="#how">How it works</a>
+            <a href="#tools" class="hide-m">Tools</a>
+            <a href="#metrics" class="hide-m">Metrics</a>
+            <div class="nav-cta">
+                <a class="btn btn-primary" href="https://qharo-voice-agent.duckdns.org" target="_blank" rel="noopener">Try it live</a>
+                <a class="btn btn-ghost" href="https://github.com/qharo/voice_agent" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<header class="hero" id="top">
+    <div class="wrap">
+        <div class="kicker">Speech → tools → speech · Kubernetes</div>
+        <h1>A voice agent that listens, thinks with tools, and <span class="accent">answers out loud</span>.</h1>
+        <p class="sub">A production-grade voice assistant built on Kubernetes — speech to text, LLM with tool use, text to speech — running a full turn in well under two seconds.</p>
+        <div class="hero-cta">
+            <a class="btn btn-primary" href="https://qharo-voice-agent.duckdns.org" target="_blank" rel="noopener">Try it live ↗</a>
+            <a class="btn btn-ghost" href="https://github.com/qharo/voice_agent" target="_blank" rel="noopener">View on GitHub ↗</a>
+        </div>
+        <div class="stack-line">Press <b>space</b> to talk · watch it flip from green to black as it responds</div>
+
+        <div class="demo">
+            <video id="demoVid" muted loop playsinline preload="metadata">
+                <source src="assets/demo.mp4" type="video/mp4" />
+            </video>
+            <div class="demo-note" id="demoNote">
+                <div class="pulse"></div>
+                <span>Drop your screen recording at <code>assets/demo.mp4</code> to show it here</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+    <div class="wrap">
+        <div class="center reveal">
+            <span class="tag">Architecture</span>
+            <h2 class="sec-title">One websocket, four stages, zero gluing.</h2>
+            <p class="sec-sub">Every turn flows through the same pipeline. The browser holds one live connection; the backend streams each stage into the next.</p>
+        </div>
+
+        <div class="diagram-card reveal">
+            <div class="pipe">
+                <div class="stage"><span class="s-icon">🖥️</span><span class="s-name">Browser</span><span class="s-sub">space to talk · live transcription</span></div>
+                <div class="arrow">→</div>
+                <div class="stage"><span class="s-icon">🔌</span><span class="s-name">WebSocket</span><span class="s-sub">16 kHz PCM in · audio + text out</span></div>
+                <div class="arrow">→</div>
+                <div class="stage"><span class="s-icon">🎙️</span><span class="s-name">STT</span><span class="s-sub">Moonshine streaming tiny · local, Q8 GGUF</span></div>
+                <div class="arrow">→</div>
+                <div class="stage"><span class="s-icon">🧠</span><span class="s-name">LLM</span><span class="s-sub">Groq · qwen/qwen3.6-27b · tool calls</span></div>
+                <div class="arrow">→</div>
+                <div class="stage"><span class="s-icon">🧰</span><span class="s-name">Tool Registry</span><span class="s-sub">6 tools, auto-discovered</span></div>
+                <div class="arrow">→</div>
+                <div class="stage"><span class="s-icon">🔊</span><span class="s-name">TTS</span><span class="s-sub">Piper en_US-amy · raw PCM stream</span></div>
+                <div class="arrow">→</div>
+                <div class="stage"><span class="s-icon">🖥️</span><span class="s-name">Browser</span><span class="s-sub">gapless playback · barge-in</span></div>
+            </div>
+
+            <div class="pipeline-gate">
+                <div class="gate-label">runs on</div>
+                <div class="plat">
+                    <span>K3s</span><span>ingress-nginx</span><span>cert-manager</span><span>Sealed Secrets</span><span>Prometheus</span><span>Grafana</span><span>GHCR</span><span>GitHub Actions</span><span>Hetzner</span><span>DuckDNS</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-note reveal">
+            <span class="dot"></span>
+            <div><b>Worth the scroll:</b> the LLM decides when to call a tool, executes it through a local registry, and only then hands the answer to TTS. Max <code>5</code> tool rounds · up to <code>4</code> concurrent sessions, with queue position streamed to waiting users.</div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+    <div class="wrap">
+        <div class="reveal">
+            <span class="tag">How it works</span>
+            <h2 class="sec-title">A turn, from the ground up</h2>
+            <p class="sec-sub">Conversational, but exact.</p>
+        </div>
+
+        <div class="how">
+            <div class="how-item reveal">
+                <div class="how-num">1</div>
+                <div>
+                    <h3 class="how-title">Capture</h3>
+                    <p class="how-body">Hold <b>space</b>. The browser grabs 16&nbsp;kHz mono audio from the mic and ships it over a single websocket as raw PCM — no upload-and-wait, no files. Release to send.</p>
+                </div>
+            </div>
+            <div class="how-item reveal">
+                <div class="how-num">2</div>
+                <div>
+                    <h3 class="how-title">Speech to text</h3>
+                    <p class="how-body"><b>Moonshine streaming (tiny)</b> runs on the box — a quantised GGUF model loaded once and kept in memory. It emits partial transcriptions every <b>200&nbsp;ms</b>, so you see your words appear as you say them.</p>
+                </div>
+            </div>
+            <div class="how-item reveal">
+                <div class="how-num">3</div>
+                <div>
+                    <h3 class="how-title">Think with tools</h3>
+                    <p class="how-body"><b>qwen 3.6-27b on Groq</b> turns your words into intent. When a question needs real data it emits a tool call; the tool runs locally, its result feeds back in, and generation continues — up to <b>five</b> rounds for things like weather then a currency conversion.</p>
+                </div>
+            </div>
+            <div class="how-item reveal">
+                <div class="how-num">4</div>
+                <div>
+                    <h3 class="how-title">Text to speech</h3>
+                    <p class="how-body"><b>Piper</b> synthesises the whole answer as one streaming pass and emits raw PCM in 8&nbsp;KB chunks. Markdown and formatting are stripped server-side first, so only clean plain text ever reaches the voice.</p>
+                </div>
+            </div>
+            <div class="how-item reveal">
+                <div class="how-num">5</div>
+                <div>
+                    <h3 class="how-title">Stream back</h3>
+                    <p class="how-body">The browser schedules audio chunks back-to-back on a low-latency <b>Web Audio</b> clock for gapless speech — the green screen flips to black the moment it starts talking. Pressing space mid-answer triggers <b>barge-in</b> to cut in instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+    <div class="wrap">
+        <div class="center reveal">
+            <span class="tag">Tools</span>
+            <h2 class="sec-title">Six tools. All free, none need a key.</h2>
+            <p class="sec-sub">The LLM picks a tool from JSON schemas the backend advertises. Each tool is a <code>schema</code> + <code>execute()</code> pair, auto-discovered at startup.</p>
+        </div>
+
+        <div class="grid-tools">
+            <div class="tool reveal"><div class="tool-head"><span class="t-icon">🌤️</span><h3>Weather</h3></div><p>Current temperature, conditions and wind for any city, resolved through geocoding.</p><div class="meta"><span class="chip">open-meteo.com</span><span class="chip">geocoding</span><span class="chip green">free · no key</span></div></div>
+
+            <div class="tool reveal"><div class="tool-head"><span class="t-icon">🧮</span><h3>Calculator</h3></div><p>Evaluates math safely via the Python AST — no <code>eval</code> of raw strings, no risk.</p><div class="meta"><span class="chip">local · AST-safe</span><span class="chip green">free · no key</span></div></div>
+
+            <div class="tool reveal"><div class="tool-head"><span class="t-icon">📖</span><h3>Wikipedia</h3></div><p>Search plus a cleaned plain-text intro for factual, date-anchored answers.</p><div class="meta"><span class="chip">en.wikipedia.org</span><span class="chip green">free · no key</span></div></div>
+
+            <div class="tool reveal"><div class="tool-head"><span class="t-icon">💱</span><h3>Exchange rate</h3></div><p>Convert any amount between currencies at today's ECB-backed rates.</p><div class="meta"><span class="chip">api.frankfurter.dev</span><span class="chip green">free · no key</span></div></div>
+
+            <div class="tool reveal"><div class="tool-head"><span class="t-icon">🕐</span><h3>World time</h3></div><p>"What time is it in Tokyo?" — geocode to a timezone, then fetch local wall time.</p><div class="meta"><span class="chip">timeapi.io</span><span class="chip">open-meteo</span><span class="chip green">free · no key</span></div></div>
+
+            <div class="tool reveal"><div class="tool-head"><span class="t-icon">📚</span><h3>Dictionary</h3></div><p>Definitions and part of speech, phrased so it reads naturally out loud.</p><div class="meta"><span class="chip">api.datamuse.com</span><span class="chip green">free · no key</span></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- METRICS -->
+<!--
+  METRICS — EDIT ME
+  Swap the sample values below for your live Grafana numbers, or leave them:
+  the dashboard reads directly from this MI and the markup needs no changes.
+-->
+<section id="metrics">
+    <div class="wrap">
+        <div class="reveal">
+            <span class="tag">Performance</span>
+            <h2 class="sec-title">Measured, not promised.</h2>
+            <p class="sec-sub">Every stage records a Prometheus histogram; Grafana plots p50 / p95 / p99 per stage and end to end.</p>
+        </div>
+
+        <div class="metric-stats" id="metricsRoot"><!-- filled from MI below --></div>
+
+        <div class="grafana reveal">
+            <!-- <img src="assets/grafana.png" alt="Grafana 'Voice Agent' dashboard" /> -->
+            <div class="ph" id="grafanaPh">
+                <div class="bars">
+                    <span style="height:42px"></span>
+                    <span style="height:70px"></span>
+                    <span style="height:55px"></span>
+                    <span style="height:82px"></span>
+                    <span style="height:64px"></span>
+                    <span style="height:38px"></span>
+                </div>
+                <span>Drop your dashboard screenshot at <code>assets/grafana.png</code> to show it here</span>
+            </div>
+        </div>
+
+        <div class="metric-note reveal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a5d6a7" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+            <span>Fifteen metrics are exported from <code>backend/metrics.py</code> — request counts, per-tool latency, queue depth, active sessions, and stage timings — exposed on <code>/metrics</code> and scraped by a Prometheus ServiceMonitor.</span>
+        </div>
+    </div>
+</section>
+
+<!-- INFRA -->
+<section id="infra">
+    <div class="wrap">
+        <div class="reveal">
+            <span class="tag">Infrastructure</span>
+            <h2 class="sec-title">Wired the way production is wired.</h2>
+            <p class="sec-sub">TLS to telemetry, from cert to dashboard — all declared as code.</p>
+        </div>
+
+        <div class="grid-infra">
+            <div class="infra reveal"><div class="i-icon">🔐</div><h3>End-to-end TLS</h3><p>cert-manager mints Let's Encrypt certs for <code>qharo-voice-agent.duckdns.org</code>; ingress-nginx terminates with the ACME <code>http01</code> solver and long websocket timeouts.</p></div>
+
+            <div class="infra reveal"><div class="i-icon">🗝️</div><h3>Sealed Secrets</h3><p>The Groq API key lives encrypted in the repo as a SealedSecret. It decrypts only inside the cluster — safe to commit, never in plaintext.</p></div>
+
+            <div class="infra reveal"><div class="i-icon">🚀</div><h3>CI/CD on push</h3><p>GitHub Actions builds both images with BuildKit, caches to GHCR, then runs <code>helm upgrade</code> and a rolling restart straight from the workflow.</p></div>
+
+            <div class="infra reveal"><div class="i-icon">📈</div><h3>Prometheus + Grafana</h3><p>A ServiceMonitor scrapes <code>/metrics</code>; a versioned Grafana dashboard ships as a ConfigMap from the Helm chart — dashboard lives with the app.</p></div>
+
+            <div class="infra reveal"><div class="i-icon">🚦</div><h3>Fair-queue sessions</h3><p>Counter <b>caps concurrency at 4</b>. New joins are queued and told their position (<code>[QUEUE:pos]</code>) so nobody talks into the void.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- DECISIONS -->
+<section id="decisions">
+    <div class="wrap">
+        <div class="reveal">
+            <span class="tag">Decisions</span>
+            <h2 class="sec-title">Trade-offs I actually weighed.</h2>
+        </div>
+        <div class="grid-decision">
+            <div class="decision reveal">
+                <h3><span>Piper</span> over Pocket TTS</h3>
+                <p>This box is CPU-bound and answers must <em>start</em> fast. Piper streams raw PCM straight from a subprocess with end-of-speech on pipe EOF, hitting time-to-first-audio in the low hundreds of milliseconds. Pocket (an ONNX INT8 model) is built in and sounds great, but its frame-by-frame generation couldn't hit the same real-time budget on shared CPU — so Piper is the default.</p>
+            </div>
+            <div class="decision reveal">
+                <h3><span>K3s</span> over Docker Compose</h3>
+                <p>Compose is fine for one machine, but this became a deployment story. K3s brings a real scheduler: liveness and readiness probes route traffic to healthy pods, updates roll without downtime, and the Helm chart lets the whole stack — ingress, certs, secrets, dashboards — live in version control and redeploy on push.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+    <div class="wrap">
+        <div class="center reveal">
+            <span class="tag">Stack</span>
+            <h2 class="sec-title">Built with</h2>
+        </div>
+        <div class="stack-grid" id="stackRoot"><!-- filled from MI below --></div>
+    </div>
+</section>
+
+<footer>
+    <div class="wrap foot-inner">
+        <div class="name">Aditya Yogesh Nair</div>
+        <div class="foot-links">
+            <a href="https://github.com/qharo" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/qharo/voice_agent" target="_blank" rel="noopener">voice_agent ↗</a>
+            <a href="https://qharo-voice-agent.duckdns.org" target="_blank" rel="noopener">Live demo</a>
+        </div>
+        <div class="foot-note">Architected, coded and deployed end to end.</div>
+    </div>
+</footer>
+
+<script>
+    /* =====================================================================
+       EDIT ME — real numbers & links
+       Update these value for your live dashboard, then done.
+       ==================================================================== */
+    const METRICS = {
+        stt:     { value: "<180",  unit: "ms",  label: "STT latency",  note: "partial transcription cadence" },
+        ttft:    { value: "<400",  unit: "ms",  label: "LLM time to first token", note: "STT end → first audio" },
+        pipeline:{ value: "<1.2",  unit: "s",   label: "Pipeline p95", note: "speech end → speech starts" },
+        ttfa:    { value: "<120",  unit: "ms",  label: "Time to first audio", note: "TTS first PCM frame" },
+    };
+
+    const STACK = [
+        ["Python", "application"], ["FastAPI", "API server"], ["Kubernetes", "K3s"],
+        ["Helm", "deployment"], ["Prometheus", "metrics"], ["Grafana", "dashboards"],
+        ["Groq", "inference"], ["GitHub Actions", "CI/CD"], ["Hetzner", "hosting"], ["DuckDNS", "domain"],
+    ];
+
+    const GITHUB = "https://github.com/qharo/voice_agent";
+    /* ================================================================== */
+
+    // metrics
+    const root = document.getElementById("metricsRoot");
+    for (const k of ["pipeline", "stt", "ttft", "ttfa"]) {
+        const m = METRICS[k];
+        const el = document.createElement("div");
+        el.className = "stat";
+        el.innerHTML = `<div class="value">${m.value}<span style="font-size:18px">${m.unit}</span></div>` +
+                       `<div class="label"><b>${m.label}</b> · ${m.note}</div>`;
+        root.appendChild(el);
+    }
+
+    // stack
+    const sroot = document.getElementById("stackRoot");
+    for (const [name, note] of STACK) {
+        const el = document.createElement("div");
+        el.className = "stack-item";
+        el.innerHTML = `${name}<small>${note}</small>`;
+        sroot.appendChild(el);
+    }
+
+    // reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) { e.target.classList.add("show"); io.unobserve(e.target); }
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+    // demo media: hide the placeholder note once the video frame is available
+    const vid = document.getElementById("demoVid");
+    const note = document.getElementById("demoNote");
+    if (vid) {
+        const showNote = () => (note.style.display = "flex");
+        vid.addEventListener("loadeddata", () => {
+            note.style.display = "none";
+            vid.classList.remove("demo-fallback");
+            try { vid.play(); } catch (e) {}
+        });
+        vid.addEventListener("error", showNote, { once: true });
+    }
+</script>
+</body>
+</html>
