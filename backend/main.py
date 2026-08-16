@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from stt import STT
-from llm import LLMClient, SYSTEM_PROMPT
+from llm import LLMClient, SYSTEM_PROMPT, strip_markdown
 from tts import TTSEngine
 from tts_pocket import PocketTTSStreamEngine, SAMPLE_RATE
 from sentence_buffer import SentenceBuffer
@@ -235,7 +235,7 @@ async def process_voice_query(text: str, websocket: WebSocket, history: list[dic
                     "content": result,
                 })
         else:
-            final_text = msg.content or ""
+            final_text = strip_markdown(msg.content or "")
             break
     else:
         final_text = "I'm sorry, I wasn't able to process that request."

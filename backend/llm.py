@@ -1,7 +1,31 @@
 import os
+import re
+
 from groq import Groq
 from typing import AsyncGenerator
 import asyncio
+
+
+def strip_markdown(text: str) -> str:
+    # Remove bold/italic markers
+    text = re.sub(r'\*{1,3}([^*]+)\*{1,3}', r'\1', text)
+    # Remove headers
+    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+    # Remove bullet points and dashes
+    text = re.sub(r'^\s*[-*•]\s+', '', text, flags=re.MULTILINE)
+    # Remove numbered lists
+    text = re.sub(r'^\s*\d+\.\s+', '', text, flags=re.MULTILINE)
+    # Remove emoji and symbol characters (keep accented letters)
+    text = re.sub(r'[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\u20E3]', '', text)
+    # Remove control characters (keep tabs and newlines)
+    text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', text)
+    # Remove markdown links
+    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    # Remove inline code
+    text = re.sub(r'`([^`]+)`', r'\1', text)
+    # Collapse multiple blank lines
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
 
 # SYSTEM_PROMPT = (
 #     "You are a helpful voice assistant. Your answers are read aloud to the user by "
