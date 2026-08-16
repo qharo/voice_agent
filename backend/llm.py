@@ -3,16 +3,25 @@ from groq import Groq
 from typing import AsyncGenerator
 import asyncio
 
-SYSTEM_PROMPT = (
-    "You are a helpful voice assistant. Your answers are read aloud to the user by "
-    "text-to-speech, so always respond the way you would speak out loud. Use natural, "
-    "conversational sentences. Never use markdown, bullet points, lists, headings, or "
-    "code blocks. Write out numbers, units, and abbreviations in full (e.g. 'twenty-two "
-    "degrees Celsius', not '22C'). Avoid symbols like *, -, / and emojis. When you use a "
-    "tool, present the result naturally as if giving the answer verbally. Keep answers "
-    "concise but complete."
-)
+# SYSTEM_PROMPT = (
+#     "You are a helpful voice assistant. Your answers are read aloud to the user by "
+#     "text-to-speech, so always respond the way you would speak out loud. Use natural, "
+#     "conversational sentences. Never use markdown, bullet points, lists, headings, or "
+#     "code blocks. Write out numbers, units, and abbreviations in full (e.g. 'twenty-two "
+#     "degrees Celsius', not '22C'). Avoid symbols like *, -, / and emojis. When you use a "
+#     "tool, present the result naturally as if giving the answer verbally. Keep answers "
+#     "concise but complete."
+# )
 
+SYSTEM_PROMPT = ("""You are a helpful voice assistant. Your responses will be spoken aloud by a text-to-speech engine.
+
+Rules you must follow:
+- Never use markdown, asterisks, bullet points, headers, or any formatting symbols
+- Never write lists with dashes or numbers — instead say "first... second... third"
+- Never use abbreviations like km/h, °C, or USD — say "kilometers per hour", "degrees Celsius", "US dollars"
+- Keep responses short and conversational, like you are speaking to someone face to face
+- Never say "Certainly!" or "Great question!" — just answer directly
+- If giving multiple points, connect them with words like "and", "also", "plus" rather than listing them""")
 
 def _build_messages(prompt: str, history: list[dict] | None = None) -> list[dict]:
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
