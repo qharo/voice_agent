@@ -343,7 +343,14 @@
 
             connectWebSocket();
 
-            const TOOL_ICONS = { get_weather: "🌤️", calculator: "🧮" };
+            const TOOL_ICONS = {
+                get_weather: "🌤️",
+                calculator: "🧮",
+                wikipedia: "📖",
+                exchange_rate: "💱",
+                world_time: "🕐",
+                dictionary: "📚",
+            };
 
             function showToolIcon(name) {
                 const icon = TOOL_ICONS[name] || "🛠️";
