@@ -125,6 +125,23 @@
                     width: 90%;
                 }
             }
+            #agentHint {
+                display: none;
+                flex-shrink: 0;
+                text-align: center;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.3px;
+                color: var(--white);
+                opacity: 0.55;
+                padding: 0 0 28px;
+            }
+            body.agent #viz {
+                margin-bottom: 12px;
+            }
+            body.agent #agentHint {
+                display: block;
+            }
         </style>
     </head>
     <body>
@@ -132,6 +149,7 @@
             <div id="conversation"></div>
             <div id="idlePrompt">press space to speak now</div>
             <canvas id="viz"></canvas>
+            <div id="agentHint">press space to interrupt</div>
         </div>
 
         <script>
@@ -234,6 +252,10 @@
                 document.body.classList.toggle("active", on);
             }
 
+            function setAgent(on) {
+                document.body.classList.toggle("agent", on);
+            }
+
             function stopAllAudio() {
                 player.stop();
                 if (currentAudio) {
@@ -248,6 +270,7 @@
             function returnIdle() {
                 state = "idle";
                 setActive(false);
+                setAgent(false);
             }
 
             function initViz() {
@@ -377,6 +400,7 @@
                             const sr = parseInt(meta.split(":")[0], 10);
                             state = "agent";
                             setActive(true);
+                            setAgent(true);
                             player.start(sr);
                         } else if (text === "[AUDIO_END]") {
                             player.end();
@@ -395,7 +419,7 @@
                                     liveTransDiv.remove();
                                     liveTransDiv = null;
                                 }
-                                if (!isRecording) {
+                                if (!isRecording && !isPlayingAudio) {
                                     returnIdle();
                                 }
                             }
@@ -509,6 +533,7 @@
                 }
                 state = "recording";
                 setActive(true);
+                setAgent(false);
                 try {
                     if (!ws || ws.readyState !== WebSocket.OPEN) {
                         idlePrompt.textContent = "still connecting...";
