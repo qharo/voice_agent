@@ -97,59 +97,48 @@
                 align-self: center;
                 color: #ffd6d6;
             }
-            #idlePrompt {
+            #bottom {
                 flex-shrink: 0;
-                padding: 0 0 42px;
-                text-align: center;
-                font-size: 20px;
-                font-weight: 500;
-                letter-spacing: 0.3px;
-                color: var(--black);
-            }
-            body.active #idlePrompt {
-                display: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                padding: 0 0 30px;
             }
             #viz {
-                display: none;
-                flex-shrink: 0;
                 width: min(60%, 640px);
                 height: 60px;
-                margin: 0 auto 34px;
                 pointer-events: none;
-            }
-            body.active #viz {
-                display: block;
             }
             @media (max-width: 768px) {
                 #viz {
                     width: 90%;
                 }
             }
-            #agentHint {
-                display: none;
-                flex-shrink: 0;
-                text-align: center;
-                font-size: 14px;
+            #idlePrompt {
+                font-size: 16px;
+                min-height: 24px;
                 font-weight: 500;
                 letter-spacing: 0.3px;
+                text-align: center;
+                color: var(--black);
+                transition: color 0.6s ease, opacity 0.6s ease;
+            }
+            body.active #idlePrompt {
                 color: var(--white);
+            }
+            body.agent #idlePrompt {
                 opacity: 0.55;
-                padding: 0 0 28px;
-            }
-            body.agent #viz {
-                margin-bottom: 12px;
-            }
-            body.agent #agentHint {
-                display: block;
             }
         </style>
     </head>
     <body>
         <div id="app">
             <div id="conversation"></div>
-            <div id="idlePrompt">press space to speak now</div>
-            <canvas id="viz"></canvas>
-            <div id="agentHint">press space to interrupt</div>
+            <div id="bottom">
+                <canvas id="viz"></canvas>
+                <div id="idlePrompt">press space to speak now</div>
+            </div>
         </div>
 
         <script>
@@ -271,6 +260,7 @@
                 state = "idle";
                 setActive(false);
                 setAgent(false);
+                idlePrompt.textContent = "press space to speak now";
             }
 
             function initViz() {
@@ -333,7 +323,8 @@
                     const active = document.body.classList.contains("active");
                     if (active && (canvas.width === 0 || canvas.clientWidth !== measuredW)) fit();
                     if (!active) {
-                        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+                        freq.fill(0);
+                        drawBars("#000000", 0.15);
                         return;
                     }
                     const src = (isRecording && micAnalyser) ? micAnalyser
@@ -401,6 +392,7 @@
                             state = "agent";
                             setActive(true);
                             setAgent(true);
+                            idlePrompt.textContent = "press space to interrupt";
                             player.start(sr);
                         } else if (text === "[AUDIO_END]") {
                             player.end();
@@ -534,6 +526,7 @@
                 state = "recording";
                 setActive(true);
                 setAgent(false);
+                idlePrompt.textContent = "";
                 try {
                     if (!ws || ws.readyState !== WebSocket.OPEN) {
                         idlePrompt.textContent = "still connecting...";
