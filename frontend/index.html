@@ -109,12 +109,29 @@
             body.active #idlePrompt {
                 display: none;
             }
+            #viz {
+                display: none;
+                flex-shrink: 0;
+                width: min(60%, 640px);
+                height: 60px;
+                margin: 0 auto 34px;
+                pointer-events: none;
+            }
+            body.active #viz {
+                display: block;
+            }
+            @media (max-width: 768px) {
+                #viz {
+                    width: 90%;
+                }
+            }
         </style>
     </head>
     <body>
         <div id="app">
             <div id="conversation"></div>
             <div id="idlePrompt">press space to speak now</div>
+            <canvas id="viz"></canvas>
         </div>
 
         <script>
@@ -124,6 +141,7 @@
             let ws = null;
             let audioContext = null;
             let processor = null;
+            let micAnalyser = null;
             let stream = null;
             let isRecording = false;
             let state = "idle"; // idle | recording | processing | agent
@@ -149,6 +167,12 @@
                             window.webkitAudioContext)();
                         this.ctx.resume();
                     }
+                    if (!this.analyser) {
+                        this.analyser = this.ctx.createAnalyser();
+                        this.analyser.fftSize = 256;
+                        this.analyser.smoothingTimeConstant = 0.8;
+                        this.analyser.connect(this.ctx.destination);
+                    }
                     this.sampleRate = sr;
                     this.active = true;
                     this.sources = [];
@@ -171,7 +195,7 @@
                     audioBuffer.copyToChannel(f32, 0);
                     const src = this.ctx.createBufferSource();
                     src.buffer = audioBuffer;
-                    src.connect(this.ctx.destination);
+                    src.connect(this.analyser);
                     const when = Math.max(
                         this.nextPlayTime,
                         this.ctx.currentTime,
@@ -225,6 +249,84 @@
                 state = "idle";
                 setActive(false);
             }
+
+            function initViz() {
+                const canvas = document.getElementById("viz");
+                const ctx = canvas.getContext("2d");
+                const BAR_COUNT = 40;
+                const freq = new Uint8Array(128);
+                let measuredW = -1;
+
+                function fit() {
+                    const dpr = window.devicePixelRatio || 1;
+                    const w = canvas.clientWidth;
+                    const h = canvas.clientHeight;
+                    if (w <= 0 || h <= 0) return;
+                    canvas.width = Math.round(w * dpr);
+                    canvas.height = Math.round(h * dpr);
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    measuredW = w;
+                }
+                window.addEventListener("resize", fit);
+                fit();
+
+                function drawBars(color, alpha) {
+                    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+                    const n = canvas.clientWidth;
+                    const h = canvas.clientHeight;
+                    const gap = 2;
+                    const bw = (n - gap * (BAR_COUNT - 1)) / BAR_COUNT;
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = alpha == null ? 1 : alpha;
+                    for (let i = 0; i < BAR_COUNT; i++) {
+                        let sum = 0;
+                        const s = Math.floor((i * 128) / BAR_COUNT);
+                        const e = Math.floor(((i + 1) * 128) / BAR_COUNT);
+                        for (let b = s; b < e; b++) sum += freq[b];
+                        const v = sum / Math.max(1, e - s) / 255;
+                        const bh = Math.max(2, v * h);
+                        const r = 6;
+                        const x = i * (bw + gap);
+                        const y = h - bh;
+                        if (r >= bw / 2) {
+                            ctx.fillRect(x, y, bw, bh);
+                        } else {
+                            ctx.beginPath();
+                            ctx.moveTo(x, y + r);
+                            ctx.arc(x + r, y + r, r, Math.PI, 1.5 * Math.PI);
+                            ctx.lineTo(x + bw - r, y);
+                            ctx.arc(x + bw - r, y + r, r, 1.5 * Math.PI, 2 * Math.PI);
+                            ctx.lineTo(x + bw, y + bh);
+                            ctx.lineTo(x, y + bh);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                    ctx.globalAlpha = 1;
+                }
+
+                function tick() {
+                    requestAnimationFrame(tick);
+                    const active = document.body.classList.contains("active");
+                    if (active && (canvas.width === 0 || canvas.clientWidth !== measuredW)) fit();
+                    if (!active) {
+                        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+                        return;
+                    }
+                    const src = (isRecording && micAnalyser) ? micAnalyser
+                        : (player.analyser && (player.active || player.sources.length > 0)) ? player.analyser
+                        : null;
+                    if (!src) {
+                        drawBars("#5a5a5e", 0.35);
+                        return;
+                    }
+                    src.getByteFrequencyData(freq);
+                    drawBars(isRecording && micAnalyser ? "#a5d6a7" : "#ffffff", 1);
+                }
+                tick();
+            }
+
+            initViz();
 
             function connectWebSocket() {
                 const protocol =
@@ -427,6 +529,9 @@
 
                     const source = audioContext.createMediaStreamSource(stream);
                     processor = audioContext.createScriptProcessor(4096, 1, 1);
+                    micAnalyser = audioContext.createAnalyser();
+                    micAnalyser.fftSize = 256;
+                    micAnalyser.smoothingTimeConstant = 0.8;
 
                     processor.onaudioprocess = (e) => {
                         if (ws.readyState === WebSocket.OPEN) {
@@ -441,10 +546,12 @@
                         }
                     };
 
-                    source.connect(processor);
+                    source.connect(micAnalyser);
+                    micAnalyser.connect(processor);
                     processor.connect(audioContext.destination);
 
                     isRecording = true;
+                    conversation.scrollTop = conversation.scrollHeight;
                 } catch (err) {
                     state = "idle";
                     setActive(false);
@@ -467,6 +574,7 @@
                     audioContext.close();
                     audioContext = null;
                 }
+                micAnalyser = null;
                 if (stream) {
                     stream.getTracks().forEach((t) => t.stop());
                     stream = null;
