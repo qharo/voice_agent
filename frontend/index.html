@@ -102,8 +102,8 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 12px;
-                padding: 0 0 30px;
+                gap: 8px;
+                padding: 0 0 24px;
             }
             #viz {
                 width: min(60%, 640px);
@@ -135,10 +135,10 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 14px 18px;
+                padding: 14px 18px 14px 26px;
             }
             .brand {
-                font-size: 18px;
+                font-size: 22px;
                 font-weight: 700;
                 letter-spacing: 0.2px;
                 color: var(--black);
@@ -245,14 +245,8 @@
             .sidebar-section h3 {
                 font-size: 15px;
                 font-weight: 700;
-                margin: 0 0 6px;
-                letter-spacing: 0.2px;
-            }
-            .sidebar-hint {
-                font-size: 13px;
-                line-height: 1.5;
-                opacity: 0.65;
                 margin: 0 0 12px;
+                letter-spacing: 0.2px;
             }
             #promptInput {
                 width: 100%;
@@ -372,9 +366,6 @@
             <div class="sidebar-body">
                 <section class="sidebar-section">
                     <h3>Prompt</h3>
-                    <p class="sidebar-hint">
-                        Custom instructions the agent follows for every turn. Leave empty to use the default.
-                    </p>
                     <textarea id="promptInput" rows="9" spellcheck="false" placeholder="e.g. You are a patient tutor who always explains in simple terms."></textarea>
                     <div class="sidebar-actions">
                         <button id="promptSave" class="btn-primary">Save</button>
@@ -384,9 +375,6 @@
                 </section>
                 <section class="sidebar-section">
                     <h3>Document</h3>
-                    <p class="sidebar-hint">
-                        Upload a PDF and the agent reads the first ten pages to answer questions about it.
-                    </p>
                     <button id="sidebarUpload" class="btn-primary">Upload PDF</button>
                     <input type="file" id="fileInput" accept="application/pdf" hidden />
                     <div id="docStatus" class="sidebar-status"></div>
@@ -804,12 +792,16 @@
             async function loadState() {
                 try {
                     const res = await fetch("/state");
-                    if (!res.ok) return;
+                    if (!res.ok) {
+                        const data = await res.json().catch(() => ({}));
+                        throw new Error(data.detail || res.statusText);
+                    }
                     const data = await res.json();
                     promptInput.value = data.custom_prompt || data.default_prompt || "";
                     renderDoc(data.doc);
+                    setSidebarStatus(promptStatus, "");
                 } catch (e) {
-                    setSidebarStatus(docStatus, "couldn't load settings", true);
+                    setSidebarStatus(docStatus, `couldn't load settings: ${e.message}`, true);
                 }
             }
 
