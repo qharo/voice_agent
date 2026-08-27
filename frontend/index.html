@@ -122,13 +122,10 @@
                 letter-spacing: 0.3px;
                 text-align: center;
                 color: var(--black);
-                transition: color 0.6s ease, opacity 0.6s ease;
+                transition: color 0.6s ease, opacity 0.12s ease;
             }
             body.active #idlePrompt {
                 color: var(--white);
-            }
-            body.agent #idlePrompt {
-                opacity: 0.55;
             }
             #topbar {
                 flex-shrink: 0;
@@ -400,6 +397,10 @@
             let audioContext = null;
             let processor = null;
             let micAnalyser = null;
+            let listenCtx = null;
+            let listenAnalyser = null;
+            let listenStream = null;
+            let promptLevel = 0;
             let stream = null;
             let isRecording = false;
             let state = "idle"; // idle | recording | processing | agent
@@ -574,6 +575,21 @@
                     requestAnimationFrame(tick);
                     const active = document.body.classList.contains("active");
                     if (active && (canvas.width === 0 || canvas.clientWidth !== measuredW)) fit();
+
+                    const barSrc = (isRecording && micAnalyser) ? micAnalyser
+                        : (player.analyser && (player.active || player.sources.length > 0)) ? player.analyser
+                        : null;
+                    const levelSrc = barSrc || listenAnalyser;
+                    let level = 0;
+                    if (levelSrc) {
+                        levelSrc.getByteFrequencyData(freq);
+                        let sum = 0;
+                        for (let i = 0; i < 128; i++) sum += freq[i];
+                        level = sum / 128 / 255;
+                    }
+                    promptLevel += (level - promptLevel) * 0.15;
+                    idlePrompt.style.opacity = (0.5 + 0.5 * promptLevel).toFixed(3);
+
                     if (!active) {
                         if (idleSince === null) idleSince = performance.now();
                         const elapsed = performance.now() - idleSince;
@@ -592,14 +608,11 @@
                         return;
                     }
                     idleSince = null;
-                    const src = (isRecording && micAnalyser) ? micAnalyser
-                        : (player.analyser && (player.active || player.sources.length > 0)) ? player.analyser
-                        : null;
-                    if (!src) {
+                    if (!barSrc) {
                         drawBars("#5a5a5e", 0.35);
                         return;
                     }
-                    src.getByteFrequencyData(freq);
+                    barSrc.getByteFrequencyData(freq);
                     drawBars(isRecording && micAnalyser ? "#a5d6a7" : "#ffffff", 1);
                 }
                 tick();
@@ -890,6 +903,25 @@
 
             loadState();
 
+            async function ensureListen() {
+                if (listenAnalyser) return;
+                try {
+                    listenCtx = new AudioContext();
+                    listenStream = await navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                    });
+                    const source = listenCtx.createMediaStreamSource(listenStream);
+                    listenAnalyser = listenCtx.createAnalyser();
+                    listenAnalyser.fftSize = 256;
+                    listenAnalyser.smoothingTimeConstant = 0.8;
+                    source.connect(listenAnalyser);
+                } catch (e) {
+                    listenCtx = null;
+                    listenAnalyser = null;
+                    listenStream = null;
+                }
+            }
+
             async function startRecording() {
                 if (isRecording) return;
                 if (isPlayingAudio) {
@@ -955,6 +987,7 @@
                     processor.connect(audioContext.destination);
 
                     isRecording = true;
+                    ensureListen();
                     conversation.scrollTop = conversation.scrollHeight;
                 } catch (err) {
                     state = "idle";
