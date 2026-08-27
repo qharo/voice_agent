@@ -10,3 +10,5 @@ soundfile
 httpx
 requests>=2.31.0
 prometheus-client==0.20.0
+pypdf
+fastembed

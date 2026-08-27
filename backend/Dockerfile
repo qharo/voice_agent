@@ -35,6 +35,9 @@ ENV LD_LIBRARY_PATH="/usr/local/piper:$LD_LIBRARY_PATH"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+ENV FASTEMBED_CACHE_PATH=/models/fastembed
+RUN python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5')"
+
 RUN wget -O /models/moonshine-streaming-tiny-Q8_0.gguf \
     https://huggingface.co/handy-computer/moonshine-streaming-tiny-gguf/resolve/main/moonshine-streaming-tiny-Q8_0.gguf
 

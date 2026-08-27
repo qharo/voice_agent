@@ -1,7 +1,8 @@
 import os
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from stt import STT
+import rag
 from llm import LLMClient, SYSTEM_PROMPT, strip_markdown
 from tts import TTSEngine
 from tts_pocket import PocketTTSStreamEngine, SAMPLE_RATE
@@ -31,6 +32,9 @@ app.add_middleware(
 stt = STT()
 llm = LLMClient()
 
+custom_prompt: str | None = None
+MAX_PROMPT_CHARS = 4000
+
 TTS_ENGINE = os.getenv("TTS_ENGINE", "piper")
 if TTS_ENGINE == "pocket":
     tts = PocketTTSStreamEngine(os.getenv("POCKET_TTS_DIR", "/models/pocket-tts"))
@@ -40,6 +44,44 @@ else:
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.post("/upload")
+async def upload_document(file: UploadFile = File(...)):
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(400, "Only PDF files are supported")
+    data = await file.read()
+    try:
+        info = rag.load_document(file.filename, data)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception:
+        raise HTTPException(400, "Could not parse that PDF")
+    return info
+
+@app.delete("/upload")
+async def clear_document():
+    rag.clear_document()
+    return {"status": "cleared"}
+
+@app.get("/state")
+def state():
+    return {
+        "custom_prompt": custom_prompt,
+        "default_prompt": SYSTEM_PROMPT,
+        "doc": rag.get_doc_info(),
+    }
+
+@app.post("/prompt")
+async def set_prompt(body: dict):
+    prompt = body.get("prompt", "")
+    if not isinstance(prompt, str):
+        raise HTTPException(400, "Invalid prompt")
+    prompt = prompt.strip()
+    if len(prompt) > MAX_PROMPT_CHARS:
+        raise HTTPException(400, f"Prompt exceeds the {MAX_PROMPT_CHARS} character limit")
+    global custom_prompt
+    custom_prompt = prompt or None
+    return {"custom_prompt": custom_prompt}
 
 async def _run_query(websocket: WebSocket, final_text: str, conversation_history: list):
     full_response = await process_voice_query(final_text, websocket, conversation_history)
@@ -197,10 +239,18 @@ async def process_voice_query(text: str, websocket: WebSocket, history: list[dic
 
     max_iterations = 5
 
+    system_content = custom_prompt or SYSTEM_PROMPT
+    if rag.has_document():
+        system_content += (
+            f"\n\nThe user has uploaded a document: '{rag.get_doc_name()}' "
+            f"(first {rag.MAX_PAGES} pages). Use the search_document tool to "
+            f"answer questions about it."
+        )
+
     for iteration in range(max_iterations):
         profiler.mark(f"llm_call_{iteration}")
         response = await llm.get_response(
-            [{"role": "system", "content": SYSTEM_PROMPT}] + query_msgs,
+            [{"role": "system", "content": system_content}] + query_msgs,
             tool_schemas,
         )
         msg = response.choices[0].message

@@ -130,11 +130,30 @@
             body.agent #idlePrompt {
                 opacity: 0.55;
             }
-            #aboutLink {
-                position: fixed;
-                top: 18px;
-                right: 18px;
-                z-index: 10;
+            #topbar {
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 18px;
+            }
+            .brand {
+                font-size: 18px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
+                color: var(--black);
+                text-decoration: none;
+                transition: color 0.6s ease;
+            }
+            body.active .brand {
+                color: var(--white);
+            }
+            .topbar-actions {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            .corner-btn {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -144,11 +163,18 @@
                 opacity: 0.5;
                 transition: color 0.6s ease, opacity 0.3s ease;
                 border-radius: 50%;
+                background: none;
+                border: none;
+                padding: 0;
+                cursor: pointer;
             }
-            #aboutLink:hover {
+            .corner-btn:hover {
                 opacity: 1;
             }
-            #aboutLink svg {
+            .corner-btn.active {
+                opacity: 1;
+            }
+            .corner-btn svg {
                 width: 22px;
                 height: 22px;
                 stroke: currentColor;
@@ -157,20 +183,174 @@
                 stroke-linecap: round;
                 stroke-linejoin: round;
             }
-            body.active #aboutLink {
+            body.active .corner-btn {
                 color: var(--white);
+            }
+            #sidebarBackdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.35);
+                z-index: 15;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            }
+            body.sidebar-open #sidebarBackdrop {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            #sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: min(340px, 92vw);
+                background: #ffffff;
+                color: #000000;
+                box-shadow: -8px 0 30px rgba(0, 0, 0, 0.25);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 20;
+                display: flex;
+                flex-direction: column;
+            }
+            body.sidebar-open #sidebar {
+                transform: translateX(0);
+            }
+            .sidebar-header {
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 18px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            }
+            .sidebar-title {
+                font-size: 18px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
+            }
+            .sidebar-body {
+                flex: 1;
+                overflow-y: auto;
+                padding: 22px 20px 40px;
+                scrollbar-width: none;
+            }
+            .sidebar-body::-webkit-scrollbar {
+                display: none;
+            }
+            .sidebar-section {
+                margin-bottom: 30px;
+            }
+            .sidebar-section h3 {
+                font-size: 15px;
+                font-weight: 700;
+                margin: 0 0 6px;
+                letter-spacing: 0.2px;
+            }
+            .sidebar-hint {
+                font-size: 13px;
+                line-height: 1.5;
+                opacity: 0.65;
+                margin: 0 0 12px;
+            }
+            #promptInput {
+                width: 100%;
+                font-family: inherit;
+                font-size: 14px;
+                line-height: 1.5;
+                color: #000;
+                background: #fff;
+                border: 1px solid rgba(0, 0, 0, 0.25);
+                border-radius: 10px;
+                padding: 10px 12px;
+                resize: vertical;
+                box-sizing: border-box;
+            }
+            #promptInput:focus {
+                outline: none;
+                border-color: rgba(0, 0, 0, 0.6);
+            }
+            .sidebar-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 10px;
+            }
+            .btn-primary,
+            .btn-ghost {
+                font-family: inherit;
+                font-size: 14px;
+                font-weight: 500;
+                border-radius: 999px;
+                padding: 8px 18px;
+                cursor: pointer;
+                transition: opacity 0.2s ease;
+            }
+            .btn-primary {
+                background: #000;
+                color: #fff;
+                border: none;
+            }
+            .btn-ghost {
+                background: transparent;
+                color: #000;
+                border: 1px solid rgba(0, 0, 0, 0.35);
+            }
+            .btn-primary:hover,
+            .btn-ghost:hover {
+                opacity: 0.75;
+            }
+            .sidebar-status {
+                margin-top: 10px;
+                font-size: 13px;
+                line-height: 1.5;
+                opacity: 0.8;
+                min-height: 18px;
+            }
+            .sidebar-status.error {
+                color: #c0392b;
+                opacity: 1;
+            }
+            .doc-meta {
+                margin-top: 10px;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+            .doc-remove {
+                margin-top: 8px;
+                font-family: inherit;
+                font-size: 13px;
+                font-weight: 500;
+                color: #c0392b;
+                background: none;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                text-decoration: underline;
             }
         </style>
     </head>
     <body>
         <div id="app">
-            <a href="about.html" id="aboutLink" target="_blank" rel="noopener" aria-label="About this voice agent" title="About this voice agent">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <line x1="12" y1="11" x2="12" y2="16"></line>
-                    <line x1="12" y1="8" x2="12" y2="8.5"></line>
-                </svg>
-            </a>
+            <header id="topbar">
+                <a class="brand" href="index.html">Voice Agent</a>
+                <nav class="topbar-actions">
+                    <a href="about.html" id="aboutLink" class="corner-btn" aria-label="About this voice agent" title="About this voice agent">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <line x1="12" y1="11" x2="12" y2="16"></line>
+                            <line x1="12" y1="8" x2="12" y2="8.5"></line>
+                        </svg>
+                    </a>
+                    <button id="sidebarToggle" class="corner-btn" aria-label="Settings" title="Settings">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="4" y1="7" x2="20" y2="7"></line>
+                            <line x1="4" y1="12" x2="20" y2="12"></line>
+                            <line x1="4" y1="17" x2="20" y2="17"></line>
+                        </svg>
+                    </button>
+                </nav>
+            </header>
             <div id="conversation"></div>
             <div id="bottom">
                 <canvas id="viz"></canvas>
@@ -178,9 +358,55 @@
             </div>
         </div>
 
+        <div id="sidebarBackdrop" hidden></div>
+        <aside id="sidebar" aria-label="Settings">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Settings</span>
+                <button id="sidebarClose" class="corner-btn" aria-label="Close settings" title="Close settings">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="sidebar-body">
+                <section class="sidebar-section">
+                    <h3>Prompt</h3>
+                    <p class="sidebar-hint">
+                        Custom instructions the agent follows for every turn. Leave empty to use the default.
+                    </p>
+                    <textarea id="promptInput" rows="9" spellcheck="false" placeholder="e.g. You are a patient tutor who always explains in simple terms."></textarea>
+                    <div class="sidebar-actions">
+                        <button id="promptSave" class="btn-primary">Save</button>
+                        <button id="promptReset" class="btn-ghost">Reset to default</button>
+                    </div>
+                    <div id="promptStatus" class="sidebar-status"></div>
+                </section>
+                <section class="sidebar-section">
+                    <h3>Document</h3>
+                    <p class="sidebar-hint">
+                        Upload a PDF and the agent reads the first ten pages to answer questions about it.
+                    </p>
+                    <button id="sidebarUpload" class="btn-primary">Upload PDF</button>
+                    <input type="file" id="fileInput" accept="application/pdf" hidden />
+                    <div id="docStatus" class="sidebar-status"></div>
+                </section>
+            </div>
+        </aside>
+
         <script>
             const conversation = document.getElementById("conversation");
             const idlePrompt = document.getElementById("idlePrompt");
+            const fileInput = document.getElementById("fileInput");
+            const sidebarToggle = document.getElementById("sidebarToggle");
+            const sidebarClose = document.getElementById("sidebarClose");
+            const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+            const promptInput = document.getElementById("promptInput");
+            const promptSave = document.getElementById("promptSave");
+            const promptReset = document.getElementById("promptReset");
+            const promptStatus = document.getElementById("promptStatus");
+            const sidebarUpload = document.getElementById("sidebarUpload");
+            const docStatus = document.getElementById("docStatus");
 
             let ws = null;
             let audioContext = null;
@@ -519,6 +745,7 @@
                 exchange_rate: "💱",
                 world_time: "🕐",
                 dictionary: "📚",
+                search_document: "📄",
             };
 
             function showToolIcon(name) {
@@ -554,6 +781,122 @@
                 conversation.appendChild(div);
                 conversation.scrollTop = conversation.scrollHeight;
             }
+
+            function setSidebarStatus(el, text, isError) {
+                el.textContent = text;
+                el.classList.toggle("error", !!isError);
+            }
+
+            function openSidebar() {
+                document.body.classList.add("sidebar-open");
+            }
+            function closeSidebar() {
+                document.body.classList.remove("sidebar-open");
+            }
+
+            sidebarToggle.addEventListener("click", openSidebar);
+            sidebarClose.addEventListener("click", closeSidebar);
+            sidebarBackdrop.addEventListener("click", closeSidebar);
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeSidebar();
+            });
+
+            async function loadState() {
+                try {
+                    const res = await fetch("/state");
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    promptInput.value = data.custom_prompt || data.default_prompt || "";
+                    renderDoc(data.doc);
+                } catch (e) {
+                    setSidebarStatus(docStatus, "couldn't load settings", true);
+                }
+            }
+
+            function renderDoc(doc) {
+                if (!doc) {
+                    docStatus.innerHTML = "";
+                    setSidebarStatus(docStatus, "No document loaded");
+                    return;
+                }
+                const meta = document.createElement("div");
+                meta.className = "doc-meta";
+                meta.textContent =
+                    `${doc.filename} · ${doc.pages} page${doc.pages === 1 ? "" : "s"} · ` +
+                    `${doc.chunks} passages`;
+                const remove = document.createElement("button");
+                remove.className = "doc-remove";
+                remove.textContent = "Remove document";
+                remove.addEventListener("click", async () => {
+                    try {
+                        await fetch("/upload", { method: "DELETE" });
+                        renderDoc(null);
+                    } catch (e) {
+                        setSidebarStatus(docStatus, "remove failed", true);
+                    }
+                });
+                docStatus.innerHTML = "";
+                docStatus.appendChild(meta);
+                docStatus.appendChild(remove);
+            }
+
+            promptSave.addEventListener("click", async () => {
+                const prompt = promptInput.value.trim();
+                setSidebarStatus(promptStatus, "saving...");
+                try {
+                    const res = await fetch("/prompt", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.detail || res.statusText);
+                    }
+                    setSidebarStatus(promptStatus, "saved");
+                } catch (e) {
+                    setSidebarStatus(promptStatus, `save failed: ${e.message}`, true);
+                }
+            });
+
+            promptReset.addEventListener("click", async () => {
+                setSidebarStatus(promptStatus, "resetting...");
+                try {
+                    const res = await fetch("/prompt", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt: "" }),
+                    });
+                    if (!res.ok) throw new Error(res.statusText);
+                    await loadState();
+                    setSidebarStatus(promptStatus, "reset to default");
+                } catch (e) {
+                    setSidebarStatus(promptStatus, `reset failed: ${e.message}`, true);
+                }
+            });
+
+            sidebarUpload.addEventListener("click", () => fileInput.click());
+
+            fileInput.addEventListener("change", async () => {
+                const file = fileInput.files[0];
+                fileInput.value = "";
+                if (!file) return;
+                setSidebarStatus(docStatus, `uploading ${file.name}...`);
+                const form = new FormData();
+                form.append("file", file);
+                try {
+                    const res = await fetch("/upload", { method: "POST", body: form });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.detail || res.statusText);
+                    }
+                    renderDoc(data);
+                } catch (e) {
+                    setSidebarStatus(docStatus, `upload failed: ${e.message}`, true);
+                }
+            });
+
+            loadState();
 
             async function startRecording() {
                 if (isRecording) return;
@@ -659,12 +1002,14 @@
 
             document.addEventListener("keydown", (e) => {
                 if (e.code === "Space") {
+                    if (e.target.matches("input, textarea")) return;
                     e.preventDefault();
                     if (!e.repeat) startRecording();
                 }
             });
             document.addEventListener("keyup", (e) => {
                 if (e.code === "Space") {
+                    if (e.target.matches("input, textarea")) return;
                     e.preventDefault();
                     stopRecording();
                 }

@@ -33,22 +33,62 @@
                 color: var(--black);
                 line-height: 1.6;
             }
+            #topbar {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 18px;
+                background: var(--green);
+            }
+            .brand {
+                font-size: 18px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
+                color: var(--black);
+                text-decoration: none;
+            }
+            .topbar-actions {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            .corner-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 34px;
+                height: 34px;
+                color: var(--black);
+                opacity: 0.5;
+                transition: opacity 0.3s ease;
+                border-radius: 50%;
+                background: none;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+            }
+            .corner-btn:hover {
+                opacity: 1;
+            }
+            .corner-btn.active {
+                opacity: 1;
+            }
+            .corner-btn svg {
+                width: 22px;
+                height: 22px;
+                stroke: currentColor;
+                stroke-width: 1.8;
+                fill: none;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
             .wrap {
                 max-width: 640px;
                 margin: 0 auto;
-                padding: 64px 24px 96px;
-            }
-            a.back {
-                display: inline-block;
-                margin-bottom: 40px;
-                color: var(--black);
-                text-decoration: none;
-                font-size: 15px;
-                letter-spacing: 0.2px;
-                opacity: 0.65;
-            }
-            a.back:hover {
-                opacity: 1;
+                padding: 40px 24px 96px;
             }
             h1 {
                 font-size: 34px;
@@ -138,9 +178,27 @@
         </style>
     </head>
     <body>
+        <header id="topbar">
+            <a class="brand" href="index.html">Voice Agent</a>
+            <nav class="topbar-actions">
+                <a href="about.html" id="aboutLink" class="corner-btn active" aria-label="About this voice agent" title="About this voice agent">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <line x1="12" y1="11" x2="12" y2="16"></line>
+                        <line x1="12" y1="8" x2="12" y2="8.5"></line>
+                    </svg>
+                </a>
+                <a href="index.html" id="uploadBtn" class="corner-btn" aria-label="Upload a PDF" title="Upload a PDF">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 3h9l4 4v14H6z"></path>
+                        <path d="M15 3v4h4"></path>
+                        <path d="M9 14l3-3 3 3"></path>
+                        <path d="M12 11v6"></path>
+                    </svg>
+                </a>
+            </nav>
+        </header>
         <div class="wrap">
-            <a class="back" href="index.html">&larr; Back to the voice agent</a>
-
             <h1>About the Voice Agent</h1>
             <p class="lede">
                 A real-time voice assistant that lives entirely in your browser. You talk, it
