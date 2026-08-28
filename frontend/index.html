@@ -13,6 +13,7 @@
                 --green: #a5d6a7;
                 --black: #000000;
                 --white: #ffffff;
+                --assistant: #2e7d32;
                 --user-text: var(--black);
             }
             * {
@@ -86,36 +87,20 @@
             }
             .agent-msg {
                 align-self: flex-start;
-                color: var(--white);
+                color: var(--assistant);
                 text-align: left;
             }
             .streaming-msg {
                 align-self: flex-start;
-                color: var(--white);
+                color: var(--assistant);
             }
             .error-msg {
                 align-self: center;
                 color: #ffd6d6;
             }
-            #bottom {
-                flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-                padding: 0 0 24px;
-            }
-            #viz {
-                width: min(60%, 640px);
-                height: 60px;
-                pointer-events: none;
-            }
-            @media (max-width: 768px) {
-                #viz {
-                    width: 90%;
-                }
-            }
             #idlePrompt {
+                flex-shrink: 0;
+                padding: 0 0 24px;
                 font-size: 16px;
                 min-height: 24px;
                 font-weight: 500;
@@ -343,10 +328,7 @@
                 </nav>
             </header>
             <div id="conversation"></div>
-            <div id="bottom">
-                <canvas id="viz"></canvas>
-                <div id="idlePrompt">press space to speak now</div>
-            </div>
+            <div id="idlePrompt">press space to speak now</div>
         </div>
 
         <div id="sidebarBackdrop" hidden></div>
@@ -515,110 +497,29 @@
                 idlePrompt.textContent = "press space to speak now";
             }
 
-            function initViz() {
-                const canvas = document.getElementById("viz");
-                const ctx = canvas.getContext("2d");
-                const BAR_COUNT = 40;
+            (function startMeter() {
                 const freq = new Uint8Array(128);
-                let measuredW = -1;
-                let idleSince = null;
-
-                function fit() {
-                    const dpr = window.devicePixelRatio || 1;
-                    const w = canvas.clientWidth;
-                    const h = canvas.clientHeight;
-                    if (w <= 0 || h <= 0) return;
-                    canvas.width = Math.round(w * dpr);
-                    canvas.height = Math.round(h * dpr);
-                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-                    measuredW = w;
-                }
-                window.addEventListener("resize", fit);
-                fit();
-
-                function drawBars(color, alpha) {
-                    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-                    const n = canvas.clientWidth;
-                    const h = canvas.clientHeight;
-                    const gap = 2;
-                    const bw = (n - gap * (BAR_COUNT - 1)) / BAR_COUNT;
-                    ctx.fillStyle = color;
-                    ctx.globalAlpha = alpha == null ? 1 : alpha;
-                    for (let i = 0; i < BAR_COUNT; i++) {
-                        let sum = 0;
-                        const s = Math.floor((i * 128) / BAR_COUNT);
-                        const e = Math.floor(((i + 1) * 128) / BAR_COUNT);
-                        for (let b = s; b < e; b++) sum += freq[b];
-                        const v = sum / Math.max(1, e - s) / 255;
-                        const bh = Math.max(2, v * h);
-                        const r = 6;
-                        const x = i * (bw + gap);
-                        const y = h - bh;
-                        if (r >= bw / 2) {
-                            ctx.fillRect(x, y, bw, bh);
-                        } else {
-                            ctx.beginPath();
-                            ctx.moveTo(x, y + r);
-                            ctx.arc(x + r, y + r, r, Math.PI, 1.5 * Math.PI);
-                            ctx.lineTo(x + bw - r, y);
-                            ctx.arc(x + bw - r, y + r, r, 1.5 * Math.PI, 2 * Math.PI);
-                            ctx.lineTo(x + bw, y + bh);
-                            ctx.lineTo(x, y + bh);
-                            ctx.closePath();
-                            ctx.fill();
-                        }
-                    }
-                    ctx.globalAlpha = 1;
-                }
-
                 function tick() {
                     requestAnimationFrame(tick);
-                    const active = document.body.classList.contains("active");
-                    if (active && (canvas.width === 0 || canvas.clientWidth !== measuredW)) fit();
-
-                    const barSrc = (isRecording && micAnalyser) ? micAnalyser
+                    const src = (isRecording && micAnalyser) ? micAnalyser
                         : (player.analyser && (player.active || player.sources.length > 0)) ? player.analyser
-                        : null;
-                    const levelSrc = barSrc || listenAnalyser;
+                        : listenAnalyser;
                     let level = 0;
-                    if (levelSrc) {
-                        levelSrc.getByteFrequencyData(freq);
+                    if (src) {
+                        src.getByteFrequencyData(freq);
                         let sum = 0;
                         for (let i = 0; i < 128; i++) sum += freq[i];
                         level = sum / 128 / 255;
                     }
                     promptLevel += (level - promptLevel) * 0.15;
-                    idlePrompt.style.opacity = (0.5 + 0.5 * promptLevel).toFixed(3);
-
-                    if (!active) {
-                        if (idleSince === null) idleSince = performance.now();
-                        const elapsed = performance.now() - idleSince;
-                        const HOLD = 500;
-                        const FADE = 400;
-                        let alpha;
-                        if (elapsed < HOLD) alpha = 0.15;
-                        else if (elapsed < HOLD + FADE) alpha = 0.15 * (1 - (elapsed - HOLD) / FADE);
-                        else alpha = 0;
-                        if (alpha > 0) {
-                            freq.fill(0);
-                            drawBars("#000000", alpha);
-                        } else {
-                            ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-                        }
-                        return;
+                    const opacity = (0.5 + 0.5 * promptLevel).toFixed(3);
+                    idlePrompt.style.opacity = opacity;
+                    if (isRecording && liveTransDiv) {
+                        liveTransDiv.style.opacity = opacity;
                     }
-                    idleSince = null;
-                    if (!barSrc) {
-                        drawBars("#5a5a5e", 0.35);
-                        return;
-                    }
-                    barSrc.getByteFrequencyData(freq);
-                    drawBars(isRecording && micAnalyser ? "#a5d6a7" : "#ffffff", 1);
                 }
                 tick();
-            }
-
-            initViz();
+            })();
 
             function connectWebSocket() {
                 const protocol =
