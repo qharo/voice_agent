@@ -851,7 +851,7 @@
                 state = "recording";
                 setActive(true);
                 setAgent(false);
-                idlePrompt.textContent = "";
+                idlePrompt.textContent = "listening";
                 try {
                     if (!ws || ws.readyState !== WebSocket.OPEN) {
                         idlePrompt.textContent = "still connecting...";
@@ -926,6 +926,7 @@
                 isRecording = false;
                 state = "processing";
                 setActive(true);
+                idlePrompt.textContent = "";
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send("stop");
