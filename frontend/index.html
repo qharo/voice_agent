@@ -504,7 +504,9 @@
             }
 
             (function startMeter() {
-                const freq = new Uint8Array(128);
+                const RMF_FLOOR = 0.008;
+                const RMF_CEIL = 0.12;
+                let td = new Float32Array(256);
                 function tick() {
                     requestAnimationFrame(tick);
                     const src = (isRecording && micAnalyser) ? micAnalyser
@@ -512,10 +514,15 @@
                         : listenAnalyser;
                     let level = 0;
                     if (src) {
-                        src.getByteFrequencyData(freq);
-                        let sum = 0;
-                        for (let i = 0; i < 128; i++) sum += freq[i];
-                        level = sum / 128 / 255;
+                        if (td.length !== src.fftSize) td = new Float32Array(src.fftSize);
+                        src.getFloatTimeDomainData(td);
+                        let sumSq = 0;
+                        for (let i = 0; i < td.length; i++) {
+                            const x = td[i];
+                            sumSq += x * x;
+                        }
+                        const rms = Math.sqrt(sumSq / td.length);
+                        level = Math.min(1, Math.max(0, (rms - RMF_FLOOR) / (RMF_CEIL - RMF_FLOOR)));
                     }
                     promptLevel += (level - promptLevel) * 0.15;
                     const opacity = (1 - 0.9 * promptLevel).toFixed(3);
