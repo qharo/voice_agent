@@ -518,7 +518,7 @@
                         level = sum / 128 / 255;
                     }
                     promptLevel += (level - promptLevel) * 0.15;
-                    const opacity = (1 - 0.7 * promptLevel).toFixed(3);
+                    const opacity = (1 - 0.9 * promptLevel).toFixed(3);
                     idlePrompt.style.opacity = opacity;
                     if (isRecording && liveTransDiv) {
                         liveTransDiv.style.opacity = opacity;
