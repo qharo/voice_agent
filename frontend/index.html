@@ -702,6 +702,29 @@
                 el.classList.toggle("error", !!isError);
             }
 
+            async function parseResponse(res) {
+                const ct = res.headers.get("content-type") || "";
+                if (ct.includes("application/json")) {
+                    return await res.json();
+                }
+                const text = (await res.text())
+                    .replace(/<[^>]*>/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim();
+                if (res.status === 413) {
+                    return {
+                        detail:
+                            "file rejected as too large by the server/proxy (413) — " +
+                            "check the ingress proxy-body-size limit",
+                    };
+                }
+                return {
+                    detail:
+                        `the server returned an HTML page instead of JSON (HTTP ${res.status}) — ` +
+                        "the request may not have reached the backend",
+                };
+            }
+
             function openSidebar() {
                 document.body.classList.add("sidebar-open");
             }
@@ -719,11 +742,10 @@
             async function loadState() {
                 try {
                     const res = await fetch("/state");
+                    const data = await parseResponse(res);
                     if (!res.ok) {
-                        const data = await res.json().catch(() => ({}));
                         throw new Error(data.detail || res.statusText);
                     }
-                    const data = await res.json();
                     promptInput.value = data.custom_prompt || data.default_prompt || "";
                     renderDoc(data.doc);
                     setSidebarStatus(promptStatus, "");
@@ -768,7 +790,7 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ prompt }),
                     });
-                    const data = await res.json();
+                    const data = await parseResponse(res);
                     if (!res.ok) {
                         throw new Error(data.detail || res.statusText);
                     }
@@ -800,12 +822,22 @@
                 const file = fileInput.files[0];
                 fileInput.value = "";
                 if (!file) return;
+                if (file.size > 15 * 1024 * 1024) {
+                    const mb = (file.size / 1024 / 1024).toFixed(1);
+                    setSidebarStatus(
+                        docStatus,
+                        `${file.name} is ${mb} MB — the server limit is 20 MB, ` +
+                            "but very large files may still be rejected. Try a smaller file.",
+                        true,
+                    );
+                    return;
+                }
                 setSidebarStatus(docStatus, `uploading ${file.name}...`);
                 const form = new FormData();
                 form.append("file", file);
                 try {
                     const res = await fetch("/upload", { method: "POST", body: form });
-                    const data = await res.json();
+                    const data = await parseResponse(res);
                     if (!res.ok) {
                         throw new Error(data.detail || res.statusText);
                     }
