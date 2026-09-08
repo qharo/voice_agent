@@ -118,6 +118,20 @@
             body.active #idlePrompt {
                 color: var(--white);
             }
+            #queueStatus {
+                flex-shrink: 0;
+                padding: 0 0 8px;
+                font-size: 13px;
+                min-height: 0;
+                text-align: center;
+                color: var(--black);
+                opacity: 0.75;
+                letter-spacing: 0.3px;
+                transition: color 0.6s ease;
+            }
+            body.active #queueStatus {
+                color: var(--white);
+            }
             #topbar {
                 flex-shrink: 0;
                 display: flex;
@@ -334,6 +348,7 @@
                 </nav>
             </header>
             <div id="conversation"></div>
+            <div id="queueStatus" hidden></div>
             <div id="idlePrompt">press space to speak now</div>
         </div>
 
@@ -370,6 +385,7 @@
         <script>
             const conversation = document.getElementById("conversation");
             const idlePrompt = document.getElementById("idlePrompt");
+            const queueStatus = document.getElementById("queueStatus");
             const fileInput = document.getElementById("fileInput");
             const sidebarToggle = document.getElementById("sidebarToggle");
             const sidebarClose = document.getElementById("sidebarClose");
@@ -589,6 +605,10 @@
                         } else if (text === "[AUDIO_END]") {
                             player.end();
                         } else if (text === "[END]") {
+                            if (queueStatus) {
+                                queueStatus.textContent = "";
+                                queueStatus.hidden = true;
+                            }
                             if (streamingDiv) {
                                 streamingDiv.classList.remove(
                                     "streaming-msg",
@@ -638,6 +658,21 @@
                             );
                         } else if (text.startsWith("[ERROR:")) {
                             addMessage(text, "error");
+                        } else if (text.startsWith("[QUEUE:")) {
+                            const pos = parseInt(
+                                text.substring("[QUEUE:".length, text.length - 1),
+                                10,
+                            );
+                            if (pos > 0) {
+                                queueStatus.textContent =
+                                    pos === 1
+                                        ? "waiting in queue..."
+                                        : `waiting in queue... (position ${pos})`;
+                                queueStatus.hidden = false;
+                            } else {
+                                queueStatus.textContent = "";
+                                queueStatus.hidden = true;
+                            }
                         } else {
                             if (liveTransDiv) {
                                 liveTransDiv.remove();
