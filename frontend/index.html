@@ -324,6 +324,28 @@
                 cursor: pointer;
                 text-decoration: underline;
             }
+            .preset-hint {
+                font-size: 13px;
+                line-height: 1.5;
+                opacity: 0.75;
+                margin: 0 0 10px;
+            }
+            .preset-select {
+                width: 100%;
+                font-family: inherit;
+                font-size: 14px;
+                color: #000;
+                background: #fff;
+                border: 1px solid rgba(0, 0, 0, 0.25);
+                border-radius: 10px;
+                padding: 9px 12px;
+                box-sizing: border-box;
+                cursor: pointer;
+            }
+            .preset-select:focus {
+                outline: none;
+                border-color: rgba(0, 0, 0, 0.6);
+            }
         </style>
     </head>
     <body>
@@ -365,6 +387,12 @@
             </div>
             <div class="sidebar-body">
                 <section class="sidebar-section">
+                    <h3>Presets</h3>
+                    <p class="preset-hint">One-click demo that loads a prompt and an FAQ document.</p>
+                    <select id="presetSelect" class="preset-select"></select>
+                    <div id="presetStatus" class="sidebar-status"></div>
+                </section>
+                <section class="sidebar-section">
                     <h3>Prompt</h3>
                     <textarea id="promptInput" rows="9" spellcheck="false" placeholder="e.g. You are a patient tutor who always explains in simple terms."></textarea>
                     <div class="sidebar-actions">
@@ -396,6 +424,8 @@
             const promptStatus = document.getElementById("promptStatus");
             const sidebarUpload = document.getElementById("sidebarUpload");
             const docStatus = document.getElementById("docStatus");
+            const presetSelect = document.getElementById("presetSelect");
+            const presetStatus = document.getElementById("presetStatus");
 
             let ws = null;
             let audioContext = null;
@@ -783,11 +813,63 @@
                     }
                     promptInput.value = data.custom_prompt || data.default_prompt || "";
                     renderDoc(data.doc);
+                    presetSelect.value = data.active_preset || "";
                     setSidebarStatus(promptStatus, "");
                 } catch (e) {
                     setSidebarStatus(docStatus, `couldn't load settings: ${e.message}`, true);
                 }
             }
+
+            async function loadPresets() {
+                try {
+                    const res = await fetch("/presets");
+                    const data = await parseResponse(res);
+                    if (!res.ok) throw new Error(data.detail || res.statusText);
+                    presetSelect.innerHTML = "";
+                    const none = document.createElement("option");
+                    none.value = "";
+                    none.textContent = "None — my own settings";
+                    presetSelect.appendChild(none);
+                    for (const p of data.presets || []) {
+                        const opt = document.createElement("option");
+                        opt.value = p.slug;
+                        opt.textContent = p.name;
+                        presetSelect.appendChild(opt);
+                    }
+                    presetSelect.value = data.active || "";
+                } catch (e) {
+                    setSidebarStatus(presetStatus, `couldn't load presets: ${e.message}`, true);
+                }
+            }
+
+            presetSelect.addEventListener("change", async () => {
+                const slug = presetSelect.value;
+                try {
+                    if (slug) {
+                        setSidebarStatus(presetStatus, "activating preset...");
+                        const res = await fetch("/presets/activate", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ slug }),
+                        });
+                        const data = await parseResponse(res);
+                        if (!res.ok) throw new Error(data.detail || res.statusText);
+                        promptInput.value = data.custom_prompt || data.default_prompt || "";
+                        renderDoc(data.doc);
+                        setSidebarStatus(presetStatus, "preset activated");
+                    } else {
+                        setSidebarStatus(presetStatus, "clearing preset...");
+                        const res = await fetch("/presets/clear", { method: "POST" });
+                        const data = await parseResponse(res);
+                        if (!res.ok) throw new Error(data.detail || res.statusText);
+                        promptInput.value = data.default_prompt || "";
+                        renderDoc(null);
+                        setSidebarStatus(presetStatus, "preset cleared");
+                    }
+                } catch (e) {
+                    setSidebarStatus(presetStatus, `preset error: ${e.message}`, true);
+                }
+            });
 
             function renderDoc(doc) {
                 if (!doc) {
@@ -807,6 +889,7 @@
                     try {
                         await fetch("/upload", { method: "DELETE" });
                         renderDoc(null);
+                        await loadPresets();
                     } catch (e) {
                         setSidebarStatus(docStatus, "remove failed", true);
                     }
@@ -830,6 +913,7 @@
                         throw new Error(data.detail || res.statusText);
                     }
                     setSidebarStatus(promptStatus, "saved");
+                    await loadPresets();
                 } catch (e) {
                     setSidebarStatus(promptStatus, `save failed: ${e.message}`, true);
                 }
@@ -877,12 +961,14 @@
                         throw new Error(data.detail || res.statusText);
                     }
                     renderDoc(data);
+                    await loadPresets();
                 } catch (e) {
                     setSidebarStatus(docStatus, `upload failed: ${e.message}`, true);
                 }
             });
 
-            loadState();
+loadState();
+            loadPresets();
 
             async function ensureListen() {
                 if (listenAnalyser) return;

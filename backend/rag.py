@@ -35,6 +35,8 @@ def _chunk(text: str) -> list[str]:
         chunk = text[start:end].strip()
         if chunk:
             chunks.append(chunk)
+        if end >= n:
+            break
         start = max(end - CHUNK_OVERLAP, start + 1)
     return chunks
 

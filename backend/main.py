@@ -3,6 +3,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, H
 from fastapi.middleware.cors import CORSMiddleware
 from stt import STT
 import rag
+import presets
 from llm import LLMClient, SYSTEM_PROMPT, strip_markdown
 from tts import TTSEngine
 from tts_pocket import PocketTTSStreamEngine, SAMPLE_RATE
@@ -33,6 +34,7 @@ stt = STT()
 llm = LLMClient()
 
 custom_prompt: str | None = None
+active_preset: str | None = None
 MAX_PROMPT_CHARS = 4000
 
 TTS_ENGINE = os.getenv("TTS_ENGINE", "piper")
@@ -56,11 +58,15 @@ async def upload_document(file: UploadFile = File(...)):
         raise HTTPException(400, str(e))
     except Exception:
         raise HTTPException(400, "Could not parse that PDF")
+    global active_preset
+    active_preset = None
     return info
 
 @app.delete("/upload")
 async def clear_document():
+    global active_preset
     rag.clear_document()
+    active_preset = None
     return {"status": "cleared"}
 
 @app.get("/state")
@@ -69,6 +75,50 @@ def state():
         "custom_prompt": custom_prompt,
         "default_prompt": SYSTEM_PROMPT,
         "doc": rag.get_doc_info(),
+        "active_preset": active_preset,
+    }
+
+@app.get("/presets")
+def presets_list():
+    return {
+        "presets": [
+            {"slug": slug, "name": p["name"], "description": p["description"]}
+            for slug, p in presets.all_presets().items()
+        ],
+        "active": active_preset,
+    }
+
+@app.post("/presets/activate")
+async def activate_preset(body: dict):
+    global custom_prompt, active_preset
+    slug = body.get("slug", "")
+    preset = presets.get_preset(slug)
+    if not preset:
+        raise HTTPException(400, f"Unknown preset: {slug}")
+    try:
+        info = rag.load_document(preset["document"], presets.read_document(slug))
+    except Exception:
+        raise HTTPException(500, "Could not load the preset document")
+    custom_prompt = preset["prompt"]
+    active_preset = slug
+    return {
+        "active_preset": active_preset,
+        "custom_prompt": custom_prompt,
+        "default_prompt": SYSTEM_PROMPT,
+        "doc": info,
+    }
+
+@app.post("/presets/clear")
+async def clear_preset():
+    global custom_prompt, active_preset
+    custom_prompt = None
+    rag.clear_document()
+    active_preset = None
+    return {
+        "active_preset": None,
+        "custom_prompt": None,
+        "default_prompt": SYSTEM_PROMPT,
+        "doc": None,
     }
 
 @app.post("/prompt")
@@ -79,8 +129,9 @@ async def set_prompt(body: dict):
     prompt = prompt.strip()
     if len(prompt) > MAX_PROMPT_CHARS:
         raise HTTPException(400, f"Prompt exceeds the {MAX_PROMPT_CHARS} character limit")
-    global custom_prompt
+    global custom_prompt, active_preset
     custom_prompt = prompt or None
+    active_preset = None
     return {"custom_prompt": custom_prompt}
 
 async def _run_query(websocket: WebSocket, final_text: str, conversation_history: list):
