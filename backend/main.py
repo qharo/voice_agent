@@ -84,7 +84,17 @@ async def set_prompt(body: dict):
     return {"custom_prompt": custom_prompt}
 
 async def _run_query(websocket: WebSocket, final_text: str, conversation_history: list):
-    full_response = await process_voice_query(final_text, websocket, conversation_history)
+    try:
+        full_response = await process_voice_query(final_text, websocket, conversation_history)
+    except Exception as e:
+        print(f"Query error: {e}")
+        errors_total.labels(stage="llm").inc()
+        try:
+            await websocket.send_text(f"[ERROR: {str(e)[:120]}]")
+        except Exception:
+            pass
+        full_response = None
+
     if full_response:
         conversation_history.append({"role": "assistant", "content": full_response})
     if len(conversation_history) > 20:

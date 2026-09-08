@@ -63,7 +63,7 @@ class LLMClient:
         self,
         messages: list[dict],
         tools: list[dict] | None = None,
-        max_tokens: int = 1024,
+        max_tokens: int = 600,
     ):
         kwargs = {
             "model": "qwen/qwen3.6-27b",
