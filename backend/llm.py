@@ -63,10 +63,10 @@ class LLMClient:
         self,
         messages: list[dict],
         tools: list[dict] | None = None,
-        max_tokens: int = 600,
+        max_tokens: int = 1024,
     ):
         kwargs = {
-            "model": "qwen/qwen3.6-27b",
+            "model": "openai/gpt-oss-20b",
             "messages": messages,
             "max_tokens": max_tokens,
         }
