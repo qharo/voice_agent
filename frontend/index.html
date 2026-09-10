@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+        <meta charset="utf-8" />
         <title>Voice Agent</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -262,10 +263,26 @@
                 padding: 10px 12px;
                 resize: vertical;
                 box-sizing: border-box;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
             }
             #promptInput:focus {
                 outline: none;
                 border-color: rgba(0, 0, 0, 0.6);
+            }
+            #promptInput::-webkit-scrollbar {
+                width: 8px;
+            }
+            #promptInput::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            #promptInput::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.18);
+                border-radius: 999px;
+                border: 2px solid #fff;
+            }
+            #promptInput::-webkit-scrollbar-thumb:hover {
+                background: rgba(0, 0, 0, 0.32);
             }
             .sidebar-actions {
                 display: flex;
@@ -307,10 +324,32 @@
                 color: #c0392b;
                 opacity: 1;
             }
+            .sidebar-status.success {
+                color: var(--assistant);
+                opacity: 1;
+            }
+            .sidebar-status.success::before {
+                content: "✓ ";
+                font-weight: 700;
+            }
+            .sidebar-status.show {
+                animation: fadeInStatus 0.25s ease;
+            }
+            @keyframes fadeInStatus {
+                from {
+                    opacity: 0;
+                    transform: translateY(4px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
             .doc-meta {
                 margin-top: 10px;
                 font-size: 13px;
                 line-height: 1.5;
+                font-weight: 500;
             }
             .doc-remove {
                 margin-top: 8px;
@@ -762,9 +801,13 @@
                 conversation.scrollTop = conversation.scrollHeight;
             }
 
-            function setSidebarStatus(el, text, isError) {
+            function setSidebarStatus(el, text, state) {
                 el.textContent = text;
-                el.classList.toggle("error", !!isError);
+                el.classList.toggle("error", state === true || state === "error");
+                el.classList.toggle("success", state === "success");
+                el.classList.remove("show");
+                void el.offsetWidth; // restart the fade-in on every message
+                el.classList.add("show");
             }
 
             async function parseResponse(res) {
@@ -828,7 +871,7 @@
                     presetSelect.innerHTML = "";
                     const none = document.createElement("option");
                     none.value = "";
-                    none.textContent = "None — my own settings";
+                    none.textContent = "Custom";
                     presetSelect.appendChild(none);
                     for (const p of data.presets || []) {
                         const opt = document.createElement("option");
@@ -856,7 +899,7 @@
                         if (!res.ok) throw new Error(data.detail || res.statusText);
                         promptInput.value = data.custom_prompt || data.default_prompt || "";
                         renderDoc(data.doc);
-                        setSidebarStatus(presetStatus, "preset activated");
+                        setSidebarStatus(presetStatus, "preset activated", "success");
                     } else {
                         setSidebarStatus(presetStatus, "clearing preset...");
                         const res = await fetch("/presets/clear", { method: "POST" });
@@ -864,7 +907,7 @@
                         if (!res.ok) throw new Error(data.detail || res.statusText);
                         promptInput.value = data.default_prompt || "";
                         renderDoc(null);
-                        setSidebarStatus(presetStatus, "preset cleared");
+                        setSidebarStatus(presetStatus, "preset cleared", "success");
                     }
                 } catch (e) {
                     setSidebarStatus(presetStatus, `preset error: ${e.message}`, true);
@@ -879,9 +922,7 @@
                 }
                 const meta = document.createElement("div");
                 meta.className = "doc-meta";
-                meta.textContent =
-                    `${doc.filename} · ${doc.pages} page${doc.pages === 1 ? "" : "s"} · ` +
-                    `${doc.chunks} passages`;
+                meta.textContent = doc.filename;
                 const remove = document.createElement("button");
                 remove.className = "doc-remove";
                 remove.textContent = "Remove document";
@@ -912,7 +953,7 @@
                     if (!res.ok) {
                         throw new Error(data.detail || res.statusText);
                     }
-                    setSidebarStatus(promptStatus, "saved");
+                    setSidebarStatus(promptStatus, "saved", "success");
                     await loadPresets();
                 } catch (e) {
                     setSidebarStatus(promptStatus, `save failed: ${e.message}`, true);
@@ -929,7 +970,7 @@
                     });
                     if (!res.ok) throw new Error(res.statusText);
                     await loadState();
-                    setSidebarStatus(promptStatus, "reset to default");
+                    setSidebarStatus(promptStatus, "reset to default", "success");
                 } catch (e) {
                     setSidebarStatus(promptStatus, `reset failed: ${e.message}`, true);
                 }
