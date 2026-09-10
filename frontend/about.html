@@ -102,18 +102,12 @@
             }
             .eyebrow {
                 display: block;
-                font-size: 12px;
+                font-size: 15px;
                 font-weight: 700;
                 letter-spacing: 0.14em;
                 text-transform: uppercase;
-                opacity: 0.5;
-                margin: 56px 0 0;
-            }
-            h2 {
-                font-size: 24px;
-                font-weight: 700;
-                letter-spacing: -0.2px;
-                margin: 6px 0 14px;
+                opacity: 0.6;
+                margin: 56px 0 14px;
             }
             h3 {
                 font-size: 16px;
@@ -160,6 +154,116 @@
                 font-size: 13px;
                 opacity: 0.68;
                 text-align: center;
+            }
+            figure.gantt {
+                margin: 10px 0 4px;
+                padding: 20px 18px;
+                background: rgba(255, 255, 255, 0.55);
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                border-radius: 14px;
+                overflow-x: auto;
+            }
+            .gantt {
+                min-width: 520px;
+                display: grid;
+                grid-template-columns: max-content 1fr;
+                column-gap: 12px;
+                row-gap: 8px;
+                font-size: 12px;
+            }
+            .gantt-axis {
+                position: relative;
+                height: 16px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+            }
+            .gantt-axis .tick {
+                position: absolute;
+                top: 0;
+                transform: translateX(-50%);
+                opacity: 0.55;
+                white-space: nowrap;
+            }
+            .gantt-axis .tick::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                top: 15px;
+                width: 1px;
+                height: 5px;
+                background: rgba(0, 0, 0, 0.25);
+            }
+            .gantt-lane-label {
+                align-self: center;
+                text-align: right;
+                opacity: 0.7;
+                white-space: nowrap;
+            }
+            .gantt-track {
+                position: relative;
+                height: 30px;
+                background-image: repeating-linear-gradient(
+                    to right,
+                    rgba(0, 0, 0, 0.07) 0,
+                    rgba(0, 0, 0, 0.07) 1px,
+                    transparent 1px,
+                    transparent 25%
+                );
+                border-radius: 4px;
+            }
+            .gantt-bar {
+                position: absolute;
+                top: 4px;
+                bottom: 4px;
+                left: calc(var(--start) * 100%);
+                width: calc((var(--end) - var(--start)) * 100%);
+                display: flex;
+                align-items: center;
+                padding: 0 8px;
+                border-radius: 5px;
+                background: #eef6ee;
+                border: 1px solid rgba(0, 0, 0, 0.35);
+                font-size: 11px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                transform-origin: left center;
+            }
+            .gantt-bar.model {
+                background: #ffffff;
+                border: 2px solid #2e7d32;
+                font-weight: 500;
+            }
+            .gantt-firstaudio {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: calc(var(--at) * 100%);
+                width: 0;
+                border-left: 1px dashed #8a7c1a;
+                pointer-events: none;
+            }
+            @media (prefers-reduced-motion: no-preference) {
+                .gantt-bar {
+                    transform: scaleX(0);
+                    opacity: 0;
+                    animation: gantt-grow 0.5s ease-out forwards;
+                    animation-delay: calc(var(--i) * 0.12s);
+                }
+                .gantt-axis .tick {
+                    opacity: 0;
+                    animation: gantt-fade 0.4s ease-out forwards;
+                }
+            }
+            @keyframes gantt-grow {
+                to {
+                    transform: scaleX(1);
+                    opacity: 1;
+                }
+            }
+            @keyframes gantt-fade {
+                to {
+                    opacity: 0.55;
+                }
             }
             .table-scroll {
                 overflow-x: auto;
@@ -231,102 +335,61 @@
             </p>
 
             <span class="eyebrow">Pipeline</span>
-            <h2>How a turn flows</h2>
             <p>
                 One turn, from the moment you press Space to the first audio coming back.
                 Speech is streamed to the server as raw audio over a single WebSocket;
-                transcription, generation, and synthesis are chained so the reply starts
-                playing before the whole thing is done.
+                transcription, generation, and synthesis are chained so stages overlap:
+                the transcript streams while you speak, and playback starts while the
+                voice is still being synthesised. Time runs left to right (a rough turn,
+                not measured averages &mdash; see the <strong>Agent</strong> section for
+                the tool-calling loop).
             </p>
-            <figure class="diagram">
-                <!-- source: diagrams/pipeline.dot -- re-render via https://kroki.io/graphviz/svg -->
-                <svg class="diagram-svg" width="340" height="535" viewBox="0.00 0.00 340.00 535.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 531.16)">
-<title>pipeline</title>
-<g id="node1" class="node">
-<title>speak</title>
-<path fill="#eef6ee" stroke="#000000" d="M250.43,-527.16C250.43,-527.16 81.38,-527.16 81.38,-527.16 75.38,-527.16 69.38,-521.16 69.38,-515.16 69.38,-515.16 69.38,-503.16 69.38,-503.16 69.38,-497.16 75.38,-491.16 81.38,-491.16 81.38,-491.16 250.43,-491.16 250.43,-491.16 256.43,-491.16 262.43,-497.16 262.43,-503.16 262.43,-503.16 262.43,-515.16 262.43,-515.16 262.43,-521.16 256.43,-527.16 250.43,-527.16"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-504.34" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">Browser — hold Space and speak</text>
-</g>
-<g id="node2" class="node">
-<title>stt</title>
-<path fill="white" stroke="#2e7d32" stroke-width="2" d="M319.8,-445.41C319.8,-445.41 12,-445.41 12,-445.41 6,-445.41 0,-439.41 0,-433.41 0,-433.41 0,-416.19 0,-416.19 0,-410.19 6,-404.19 12,-404.19 12,-404.19 319.8,-404.19 319.8,-404.19 325.8,-404.19 331.8,-410.19 331.8,-416.19 331.8,-416.19 331.8,-433.41 331.8,-433.41 331.8,-439.41 325.8,-445.41 319.8,-445.41"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-425.6" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">STT · Moonshine streaming tiny (Q8, in&#45;process)</text>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-414.35" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">partial transcripts stream live · finalize on release ≈ 100–250 ms</text>
-</g>
-<g id="edge1" class="edge">
-<title>speak&#45;&gt;stt</title>
-<path fill="none" stroke="#000000" d="M165.9,-490.69C165.9,-480.51 165.9,-467.4 165.9,-455.62"/>
-<polygon fill="#000000" stroke="#000000" points="168.7,-455.66 165.9,-447.66 163.1,-455.66 168.7,-455.66"/>
-<text xml:space="preserve" text-anchor="middle" x="242.03" y="-464.61" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;16 kHz PCM16 over one WebSocket</text>
-</g>
-<g id="node3" class="node">
-<title>llm</title>
-<path fill="white" stroke="#2e7d32" stroke-width="2" d="M312.68,-358.44C312.68,-358.44 19.12,-358.44 19.12,-358.44 13.12,-358.44 7.12,-352.44 7.12,-346.44 7.12,-346.44 7.12,-317.97 7.12,-317.97 7.12,-311.97 13.12,-305.97 19.12,-305.97 19.12,-305.97 312.68,-305.97 312.68,-305.97 318.68,-305.97 324.68,-311.97 324.68,-317.97 324.68,-317.97 324.68,-346.44 324.68,-346.44 324.68,-352.44 318.68,-358.44 312.68,-358.44"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-338.63" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">LLM · Groq &#160;openai/gpt&#45;oss&#45;20b</text>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-327.38" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">first token ≈ 250–450 ms · short reply ≈ 0.5–1.2 s</text>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-316.13" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">(+ a tool round&#45;trip if a tool is called — see “The agent loop”)</text>
-</g>
-<g id="edge2" class="edge">
-<title>stt&#45;&gt;llm</title>
-<path fill="none" stroke="#000000" d="M165.9,-403.24C165.9,-392.94 165.9,-380.18 165.9,-368.39"/>
-<polygon fill="#000000" stroke="#000000" points="168.7,-368.72 165.9,-360.72 163.1,-368.72 168.7,-368.72"/>
-<text xml:space="preserve" text-anchor="middle" x="196.65" y="-377.64" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;final transcript</text>
-</g>
-<g id="node4" class="node">
-<title>strip</title>
-<path fill="white" stroke="#000000" d="M274.43,-268.97C274.43,-268.97 57.38,-268.97 57.38,-268.97 51.38,-268.97 45.37,-262.97 45.37,-256.97 45.37,-256.97 45.37,-244.97 45.37,-244.97 45.37,-238.97 51.37,-232.97 57.37,-232.97 57.37,-232.97 274.43,-232.97 274.43,-232.97 280.43,-232.97 286.43,-238.97 286.43,-244.97 286.43,-244.97 286.43,-256.97 286.43,-256.97 286.43,-262.97 280.43,-268.97 274.43,-268.97"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-246.15" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">strip_markdown → [STREAM:] text to the UI</text>
-</g>
-<g id="edge3" class="edge">
-<title>llm&#45;&gt;strip</title>
-<path fill="none" stroke="#000000" d="M165.9,-305.26C165.9,-296.83 165.9,-287.45 165.9,-278.94"/>
-<polygon fill="#000000" stroke="#000000" points="168.7,-278.98 165.9,-270.98 163.1,-278.98 168.7,-278.98"/>
-</g>
-<g id="node5" class="node">
-<title>tts</title>
-<path fill="white" stroke="#2e7d32" stroke-width="2" d="M305.93,-195.97C305.93,-195.97 25.88,-195.97 25.88,-195.97 19.88,-195.97 13.88,-189.97 13.88,-183.97 13.88,-183.97 13.88,-166.75 13.88,-166.75 13.88,-160.75 19.88,-154.75 25.88,-154.75 25.88,-154.75 305.93,-154.75 305.93,-154.75 311.93,-154.75 317.93,-160.75 317.93,-166.75 317.93,-166.75 317.93,-183.97 317.93,-183.97 317.93,-189.97 311.93,-195.97 305.93,-195.97"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-176.16" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">TTS · Piper &#160;en_US&#45;amy&#45;medium (streaming subprocess)</text>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-164.91" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">first audio ≈ 150–350 ms, then faster than real time</text>
-</g>
-<g id="edge4" class="edge">
-<title>strip&#45;&gt;tts</title>
-<path fill="none" stroke="#000000" d="M165.9,-232.53C165.9,-224.66 165.9,-215.14 165.9,-206.19"/>
-<polygon fill="#000000" stroke="#000000" points="168.7,-206.33 165.9,-198.33 163.1,-206.33 168.7,-206.33"/>
-</g>
-<g id="node6" class="node">
-<title>play</title>
-<path fill="#eef6ee" stroke="#000000" d="M314.93,-109C314.93,-109 16.88,-109 16.88,-109 10.88,-109 4.88,-103 4.88,-97 4.88,-97 4.88,-85 4.88,-85 4.88,-79 10.88,-73 16.88,-73 16.88,-73 314.93,-73 314.93,-73 320.93,-73 326.93,-79 326.93,-85 326.93,-85 326.93,-97 326.93,-97 326.93,-103 320.93,-109 314.93,-109"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-86.17" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">Browser · Web Audio — gapless playback · Space = barge&#45;in</text>
-</g>
-<g id="edge5" class="edge">
-<title>tts&#45;&gt;play</title>
-<path fill="none" stroke="#000000" d="M165.9,-154C165.9,-143.39 165.9,-130.28 165.9,-118.85"/>
-<polygon fill="#000000" stroke="#000000" points="168.7,-118.85 165.9,-110.85 163.1,-118.85 168.7,-118.85"/>
-<text xml:space="preserve" text-anchor="middle" x="204.53" y="-128.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;Int16 PCM frames</text>
-</g>
-<g id="node7" class="node">
-<title>done</title>
-<polygon fill="#fffbe6" stroke="#8a7c1a" points="294.3,-36 31.5,-36 31.5,0 300.3,0 300.3,-30 294.3,-36"/>
-<polyline fill="none" stroke="#8a7c1a" points="294.3,-36 294.3,-30"/>
-<polyline fill="none" stroke="#8a7c1a" points="300.3,-30 294.3,-30"/>
-<text xml:space="preserve" text-anchor="middle" x="165.9" y="-13.18" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">end&#45;to&#45;end to first audio ≈ 1–2 s &#160;&#160;(rough estimate)</text>
-</g>
-<g id="edge6" class="edge">
-<title>play&#45;&gt;done</title>
-<path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M165.9,-72.81C165.9,-61.65 165.9,-47.16 165.9,-36.03"/>
-</g>
-</g>
-</svg>
-            <figcaption>
-                Timings are rough estimates for this stack, not measured averages &mdash;
-                the app records latency histograms in Prometheus but nothing is persisted
-                here.
-            </figcaption>
+            <figure class="gantt">
+                <div class="gantt" role="img" aria-label="Timeline of one turn: capture and streaming STT overlap; the LLM runs after the final transcript; TTS follows the full reply; audio playback overlaps TTS. First audio lands around 1.9 seconds.">
+                    <div></div>
+                    <div class="gantt-axis">
+                        <span class="tick" style="left: 0%">0</span>
+                        <span class="tick" style="left: 22.7%">0.5s</span>
+                        <span class="tick" style="left: 45.5%">1s</span>
+                        <span class="tick" style="left: 68.2%">1.5s</span>
+                        <span class="tick" style="left: 90.9%">2s</span>
+                    </div>
+
+                    <div class="gantt-lane-label">Capture</div>
+                    <div class="gantt-track">
+                        <div class="gantt-bar" style="--start: 0; --end: 0.227; --i: 0" title="Browser — hold Space and speak · 16 kHz PCM16 over one WebSocket">Browser · hold Space and speak</div>
+                    </div>
+
+                    <div class="gantt-lane-label">STT</div>
+                    <div class="gantt-track">
+                        <div class="gantt-bar model" style="--start: 0; --end: 0.318; --i: 1" title="Moonshine streaming tiny (Q8, in-process) · partials stream live · finalize on release ≈ 100–250 ms">STT · Moonshine streaming &middot; partials live, finalize ≈100–250&nbsp;ms</div>
+                    </div>
+
+                    <div class="gantt-lane-label">LLM</div>
+                    <div class="gantt-track">
+                        <div class="gantt-bar model" style="--start: 0.318; --end: 0.682; --i: 2" title="Groq openai/gpt-oss-20b · first token ≈ 250–450 ms · short reply ≈ 0.5–1.2 s (+ a tool round-trip if a tool is called)">LLM · Groq gpt-oss-20b &middot; first token ≈250–450&nbsp;ms</div>
+                    </div>
+
+                    <div class="gantt-lane-label">TTS</div>
+                    <div class="gantt-track">
+                        <div class="gantt-bar model" style="--start: 0.682; --end: 0.864; --i: 3" title="Piper en_US-amy-medium (streaming subprocess) · first audio ≈ 150–350 ms, then faster than real time">TTS · Piper amy-medium &middot; first audio ≈150–350&nbsp;ms</div>
+                    </div>
+
+                    <div class="gantt-lane-label">Playback</div>
+                    <div class="gantt-track">
+                        <div class="gantt-firstaudio" style="--at: 0.864" title="end-to-end to first audio ≈ 1–2 s"></div>
+                        <div class="gantt-bar" style="--start: 0.795; --end: 1; --i: 4" title="Browser · Web Audio — gapless playback · Space = barge-in">Browser · Web Audio &middot; gapless &middot; Space = barge-in</div>
+                    </div>
+                </div>
+                <figcaption>
+                    Timings are rough estimates for this stack, not measured averages
+                    &mdash; the app records latency histograms in Prometheus but nothing
+                    is persisted here. The dashed line marks first audio, end-to-end
+                    ≈&nbsp;1–2&nbsp;s.
+                </figcaption>
             </figure>
 
             <span class="eyebrow">Agent</span>
-            <h2>The agent loop</h2>
             <p>
                 The language model doesn&rsquo;t just answer &mdash; it can call tools and
                 search an uploaded document, then keep going with the results. Each turn
@@ -446,7 +509,6 @@
             </figure>
 
             <span class="eyebrow">Delivery</span>
-            <h2>How it ships</h2>
             <ul>
                 <li>
                     A push to <code>main</code> triggers GitHub Actions
@@ -488,7 +550,6 @@
             </ul>
 
             <span class="eyebrow">Reference</span>
-            <h2>Numbers</h2>
             <div class="table-scroll">
                 <table class="stats">
                     <thead>
@@ -514,7 +575,6 @@
             </div>
 
             <span class="eyebrow">Notes</span>
-            <h2>Where the lines were drawn</h2>
 
             <h3>Design tradeoffs</h3>
             <ul>
