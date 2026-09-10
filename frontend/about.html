@@ -84,7 +84,7 @@
                 stroke-linejoin: round;
             }
             .wrap {
-                max-width: 640px;
+                max-width: 760px;
                 margin: 0 auto;
                 padding: 40px 24px 96px;
             }
@@ -99,6 +99,112 @@
                 line-height: 1.7;
                 max-width: 520px;
                 margin: 0;
+            }
+            .eyebrow {
+                display: block;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                opacity: 0.5;
+                margin: 56px 0 0;
+            }
+            h2 {
+                font-size: 24px;
+                font-weight: 700;
+                letter-spacing: -0.2px;
+                margin: 6px 0 14px;
+            }
+            h3 {
+                font-size: 16px;
+                font-weight: 700;
+                margin: 22px 0 4px;
+            }
+            p {
+                font-size: 16px;
+            }
+            ul {
+                padding-left: 22px;
+                margin: 10px 0;
+            }
+            li {
+                font-size: 16px;
+                margin: 7px 0;
+                line-height: 1.7;
+            }
+            code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-size: 0.88em;
+                background: rgba(255, 255, 255, 0.5);
+                border: 1px solid rgba(0, 0, 0, 0.12);
+                border-radius: 4px;
+                padding: 1px 5px;
+            }
+            figure.diagram {
+                margin: 10px 0 4px;
+                padding: 20px 18px;
+                background: rgba(255, 255, 255, 0.55);
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                border-radius: 14px;
+                overflow-x: auto;
+                text-align: center;
+            }
+            figure.diagram .diagram-svg {
+                display: block;
+                margin: 0 auto;
+                max-width: 100%;
+                height: auto;
+            }
+            figcaption {
+                margin-top: 12px;
+                font-size: 13px;
+                opacity: 0.68;
+                text-align: center;
+            }
+            .table-scroll {
+                overflow-x: auto;
+                margin: 12px 0;
+            }
+            table.stats {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+            }
+            table.stats th,
+            table.stats td {
+                border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+                padding: 9px 12px;
+                text-align: left;
+                vertical-align: top;
+            }
+            table.stats thead th {
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                background: rgba(255, 255, 255, 0.5);
+            }
+            table.stats tbody th {
+                font-weight: 600;
+                white-space: nowrap;
+                width: 34%;
+            }
+            table.stats tbody tr:last-child td,
+            table.stats tbody tr:last-child th {
+                border-bottom: none;
+            }
+            .endlinks {
+                margin: 26px 0 0;
+                font-size: 15px;
+            }
+            .endlinks a {
+                color: #1b5e20;
+                font-weight: 600;
+                text-decoration: underline;
+            }
+            @media (max-width: 560px) {
+                table.stats tbody th {
+                    white-space: normal;
+                }
             }
         </style>
     </head>
@@ -122,6 +228,329 @@
                 server that transcribes it live, reasons with a language model, and speaks the
                 reply back in a natural voice. It can also answer questions about PDFs you
                 upload, and reach live tools for weather, currency conversion, and more.
+            </p>
+
+            <span class="eyebrow">Pipeline</span>
+            <h2>How a turn flows</h2>
+            <p>
+                One turn, from the moment you press Space to the first audio coming back.
+                Speech is streamed to the server as raw audio over a single WebSocket;
+                transcription, generation, and synthesis are chained so the reply starts
+                playing before the whole thing is done.
+            </p>
+            <figure class="diagram">
+                <!-- source: diagrams/pipeline.dot -- re-render via https://kroki.io/graphviz/svg -->
+                <svg class="diagram-svg" width="340" height="535" viewBox="0.00 0.00 340.00 535.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 531.16)">
+<title>pipeline</title>
+<g id="node1" class="node">
+<title>speak</title>
+<path fill="#eef6ee" stroke="#000000" d="M250.43,-527.16C250.43,-527.16 81.38,-527.16 81.38,-527.16 75.38,-527.16 69.38,-521.16 69.38,-515.16 69.38,-515.16 69.38,-503.16 69.38,-503.16 69.38,-497.16 75.38,-491.16 81.38,-491.16 81.38,-491.16 250.43,-491.16 250.43,-491.16 256.43,-491.16 262.43,-497.16 262.43,-503.16 262.43,-503.16 262.43,-515.16 262.43,-515.16 262.43,-521.16 256.43,-527.16 250.43,-527.16"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-504.34" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">Browser — hold Space and speak</text>
+</g>
+<g id="node2" class="node">
+<title>stt</title>
+<path fill="white" stroke="#2e7d32" stroke-width="2" d="M319.8,-445.41C319.8,-445.41 12,-445.41 12,-445.41 6,-445.41 0,-439.41 0,-433.41 0,-433.41 0,-416.19 0,-416.19 0,-410.19 6,-404.19 12,-404.19 12,-404.19 319.8,-404.19 319.8,-404.19 325.8,-404.19 331.8,-410.19 331.8,-416.19 331.8,-416.19 331.8,-433.41 331.8,-433.41 331.8,-439.41 325.8,-445.41 319.8,-445.41"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-425.6" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">STT · Moonshine streaming tiny (Q8, in&#45;process)</text>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-414.35" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">partial transcripts stream live · finalize on release ≈ 100–250 ms</text>
+</g>
+<g id="edge1" class="edge">
+<title>speak&#45;&gt;stt</title>
+<path fill="none" stroke="#000000" d="M165.9,-490.69C165.9,-480.51 165.9,-467.4 165.9,-455.62"/>
+<polygon fill="#000000" stroke="#000000" points="168.7,-455.66 165.9,-447.66 163.1,-455.66 168.7,-455.66"/>
+<text xml:space="preserve" text-anchor="middle" x="242.03" y="-464.61" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;16 kHz PCM16 over one WebSocket</text>
+</g>
+<g id="node3" class="node">
+<title>llm</title>
+<path fill="white" stroke="#2e7d32" stroke-width="2" d="M312.68,-358.44C312.68,-358.44 19.12,-358.44 19.12,-358.44 13.12,-358.44 7.12,-352.44 7.12,-346.44 7.12,-346.44 7.12,-317.97 7.12,-317.97 7.12,-311.97 13.12,-305.97 19.12,-305.97 19.12,-305.97 312.68,-305.97 312.68,-305.97 318.68,-305.97 324.68,-311.97 324.68,-317.97 324.68,-317.97 324.68,-346.44 324.68,-346.44 324.68,-352.44 318.68,-358.44 312.68,-358.44"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-338.63" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">LLM · Groq &#160;openai/gpt&#45;oss&#45;20b</text>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-327.38" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">first token ≈ 250–450 ms · short reply ≈ 0.5–1.2 s</text>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-316.13" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">(+ a tool round&#45;trip if a tool is called — see “The agent loop”)</text>
+</g>
+<g id="edge2" class="edge">
+<title>stt&#45;&gt;llm</title>
+<path fill="none" stroke="#000000" d="M165.9,-403.24C165.9,-392.94 165.9,-380.18 165.9,-368.39"/>
+<polygon fill="#000000" stroke="#000000" points="168.7,-368.72 165.9,-360.72 163.1,-368.72 168.7,-368.72"/>
+<text xml:space="preserve" text-anchor="middle" x="196.65" y="-377.64" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;final transcript</text>
+</g>
+<g id="node4" class="node">
+<title>strip</title>
+<path fill="white" stroke="#000000" d="M274.43,-268.97C274.43,-268.97 57.38,-268.97 57.38,-268.97 51.38,-268.97 45.37,-262.97 45.37,-256.97 45.37,-256.97 45.37,-244.97 45.37,-244.97 45.37,-238.97 51.37,-232.97 57.37,-232.97 57.37,-232.97 274.43,-232.97 274.43,-232.97 280.43,-232.97 286.43,-238.97 286.43,-244.97 286.43,-244.97 286.43,-256.97 286.43,-256.97 286.43,-262.97 280.43,-268.97 274.43,-268.97"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-246.15" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">strip_markdown → [STREAM:] text to the UI</text>
+</g>
+<g id="edge3" class="edge">
+<title>llm&#45;&gt;strip</title>
+<path fill="none" stroke="#000000" d="M165.9,-305.26C165.9,-296.83 165.9,-287.45 165.9,-278.94"/>
+<polygon fill="#000000" stroke="#000000" points="168.7,-278.98 165.9,-270.98 163.1,-278.98 168.7,-278.98"/>
+</g>
+<g id="node5" class="node">
+<title>tts</title>
+<path fill="white" stroke="#2e7d32" stroke-width="2" d="M305.93,-195.97C305.93,-195.97 25.88,-195.97 25.88,-195.97 19.88,-195.97 13.88,-189.97 13.88,-183.97 13.88,-183.97 13.88,-166.75 13.88,-166.75 13.88,-160.75 19.88,-154.75 25.88,-154.75 25.88,-154.75 305.93,-154.75 305.93,-154.75 311.93,-154.75 317.93,-160.75 317.93,-166.75 317.93,-166.75 317.93,-183.97 317.93,-183.97 317.93,-189.97 311.93,-195.97 305.93,-195.97"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-176.16" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">TTS · Piper &#160;en_US&#45;amy&#45;medium (streaming subprocess)</text>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-164.91" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">first audio ≈ 150–350 ms, then faster than real time</text>
+</g>
+<g id="edge4" class="edge">
+<title>strip&#45;&gt;tts</title>
+<path fill="none" stroke="#000000" d="M165.9,-232.53C165.9,-224.66 165.9,-215.14 165.9,-206.19"/>
+<polygon fill="#000000" stroke="#000000" points="168.7,-206.33 165.9,-198.33 163.1,-206.33 168.7,-206.33"/>
+</g>
+<g id="node6" class="node">
+<title>play</title>
+<path fill="#eef6ee" stroke="#000000" d="M314.93,-109C314.93,-109 16.88,-109 16.88,-109 10.88,-109 4.88,-103 4.88,-97 4.88,-97 4.88,-85 4.88,-85 4.88,-79 10.88,-73 16.88,-73 16.88,-73 314.93,-73 314.93,-73 320.93,-73 326.93,-79 326.93,-85 326.93,-85 326.93,-97 326.93,-97 326.93,-103 320.93,-109 314.93,-109"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-86.17" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">Browser · Web Audio — gapless playback · Space = barge&#45;in</text>
+</g>
+<g id="edge5" class="edge">
+<title>tts&#45;&gt;play</title>
+<path fill="none" stroke="#000000" d="M165.9,-154C165.9,-143.39 165.9,-130.28 165.9,-118.85"/>
+<polygon fill="#000000" stroke="#000000" points="168.7,-118.85 165.9,-110.85 163.1,-118.85 168.7,-118.85"/>
+<text xml:space="preserve" text-anchor="middle" x="204.53" y="-128.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;Int16 PCM frames</text>
+</g>
+<g id="node7" class="node">
+<title>done</title>
+<polygon fill="#fffbe6" stroke="#8a7c1a" points="294.3,-36 31.5,-36 31.5,0 300.3,0 300.3,-30 294.3,-36"/>
+<polyline fill="none" stroke="#8a7c1a" points="294.3,-36 294.3,-30"/>
+<polyline fill="none" stroke="#8a7c1a" points="300.3,-30 294.3,-30"/>
+<text xml:space="preserve" text-anchor="middle" x="165.9" y="-13.18" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">end&#45;to&#45;end to first audio ≈ 1–2 s &#160;&#160;(rough estimate)</text>
+</g>
+<g id="edge6" class="edge">
+<title>play&#45;&gt;done</title>
+<path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M165.9,-72.81C165.9,-61.65 165.9,-47.16 165.9,-36.03"/>
+</g>
+</g>
+</svg>
+            <figcaption>
+                Timings are rough estimates for this stack, not measured averages &mdash;
+                the app records latency histograms in Prometheus but nothing is persisted
+                here.
+            </figcaption>
+            </figure>
+
+            <span class="eyebrow">Agent</span>
+            <h2>The agent loop</h2>
+            <p>
+                The language model doesn&rsquo;t just answer &mdash; it can call tools and
+                search an uploaded document, then keep going with the results. Each turn
+                carries the recent conversation and whichever system prompt is active
+                (your own, a preset, or the default).
+            </p>
+            <figure class="diagram">
+                <!-- source: diagrams/agent.dot -- re-render via https://kroki.io/graphviz/svg -->
+                <svg class="diagram-svg" width="607" height="444" viewBox="0.00 0.00 607.00 444.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 440.13)">
+<title>agent</title>
+<g id="clust1" class="cluster">
+<title>cluster_loop</title>
+<path fill="#f6faf6" stroke="#2e7d32" d="M28.15,-65C28.15,-65 295.15,-65 295.15,-65 301.15,-65 307.15,-71 307.15,-77 307.15,-77 307.15,-321.68 307.15,-321.68 307.15,-327.68 301.15,-333.68 295.15,-333.68 295.15,-333.68 28.15,-333.68 28.15,-333.68 22.15,-333.68 16.15,-327.68 16.15,-321.68 16.15,-321.68 16.15,-77 16.15,-77 16.15,-71 22.15,-65 28.15,-65"/>
+<text xml:space="preserve" text-anchor="middle" x="161.65" y="-320.18" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="10.00" fill="#2e7d32">agent loop — up to 5 iterations</text>
+</g>
+<g id="node1" class="node">
+<title>inputs</title>
+<path fill="#eef6ee" stroke="#000000" d="M258.3,-436.13C258.3,-436.13 12,-436.13 12,-436.13 6,-436.13 0,-430.13 0,-424.13 0,-424.13 0,-384.41 0,-384.41 0,-378.41 6,-372.41 12,-372.41 12,-372.41 258.3,-372.41 258.3,-372.41 264.3,-372.41 270.3,-378.41 270.3,-384.41 270.3,-384.41 270.3,-424.13 270.3,-424.13 270.3,-430.13 264.3,-436.13 258.3,-436.13"/>
+<text xml:space="preserve" text-anchor="middle" x="135.15" y="-416.32" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">Turn input</text>
+<text xml:space="preserve" text-anchor="middle" x="135.15" y="-405.07" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">transcript &#160;+ &#160;conversation history (≤ 20 messages)</text>
+<text xml:space="preserve" text-anchor="middle" x="135.15" y="-393.82" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">+ &#160;system prompt (custom / preset / default)</text>
+<text xml:space="preserve" text-anchor="middle" x="135.15" y="-382.57" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">+ &#160;“a PDF is uploaded” note when one is loaded</text>
+</g>
+<g id="node2" class="node">
+<title>llm</title>
+<path fill="white" stroke="#2e7d32" stroke-width="2" d="M200.18,-307.18C200.18,-307.18 70.12,-307.18 70.12,-307.18 64.12,-307.18 58.12,-301.18 58.12,-295.18 58.12,-295.18 58.12,-283.18 58.12,-283.18 58.12,-277.18 64.12,-271.18 70.12,-271.18 70.12,-271.18 200.18,-271.18 200.18,-271.18 206.18,-271.18 212.18,-277.18 212.18,-283.18 212.18,-283.18 212.18,-295.18 212.18,-295.18 212.18,-301.18 206.18,-307.18 200.18,-307.18"/>
+<text xml:space="preserve" text-anchor="middle" x="135.15" y="-284.35" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">LLM &#160;&#160;(tool_choice = auto)</text>
+</g>
+<g id="edge1" class="edge">
+<title>inputs&#45;&gt;llm</title>
+<path fill="none" stroke="#000000" d="M135.15,-372.07C135.15,-354.8 135.15,-333.55 135.15,-317.02"/>
+<polygon fill="#000000" stroke="#000000" points="137.95,-317.42 135.15,-309.42 132.35,-317.42 137.95,-317.42"/>
+</g>
+<g id="node3" class="node">
+<title>dec</title>
+<path fill="#fffbe6" stroke="#8a7c1a" d="M213,-210.25C213,-210.25 160,-189.16 160,-189.16 154.42,-186.94 154.42,-182.5 160,-180.28 160,-180.28 213,-159.19 213,-159.19 218.58,-156.97 229.72,-156.97 235.3,-159.19 235.3,-159.19 288.3,-180.28 288.3,-180.28 293.88,-182.5 293.88,-186.94 288.3,-189.16 288.3,-189.16 235.3,-210.25 235.3,-210.25 229.72,-212.47 218.58,-212.47 213,-210.25"/>
+<text xml:space="preserve" text-anchor="middle" x="224.15" y="-179.9" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">tool calls?</text>
+</g>
+<g id="edge2" class="edge">
+<title>llm&#45;&gt;dec</title>
+<path fill="none" stroke="#000000" d="M150.65,-270.33C164.02,-254.94 183.57,-232.44 199.14,-214.51"/>
+<polygon fill="#000000" stroke="#000000" points="200.99,-216.65 204.12,-208.78 196.76,-212.98 200.99,-216.65"/>
+</g>
+<g id="node4" class="node">
+<title>exec</title>
+<path fill="white" stroke="#000000" d="M155.43,-109C155.43,-109 92.88,-109 92.88,-109 86.88,-109 80.88,-103 80.88,-97 80.88,-97 80.88,-85 80.88,-85 80.88,-79 86.88,-73 92.88,-73 92.88,-73 155.43,-73 155.43,-73 161.43,-73 167.43,-79 167.43,-85 167.43,-85 167.43,-97 167.43,-97 167.43,-103 161.43,-109 155.43,-109"/>
+<text xml:space="preserve" text-anchor="middle" x="124.15" y="-86.17" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">execute tool</text>
+</g>
+<g id="edge3" class="edge">
+<title>dec&#45;&gt;exec</title>
+<path fill="none" stroke="#000000" d="M201.96,-163.36C186.45,-149.14 165.71,-130.12 149.54,-115.29"/>
+<polygon fill="#000000" stroke="#000000" points="151.83,-113.59 144.04,-110.24 148.04,-117.71 151.83,-113.59"/>
+<text xml:space="preserve" text-anchor="middle" x="180.53" y="-128.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;yes</text>
+</g>
+<g id="node5" class="node">
+<title>final</title>
+<path fill="white" stroke="#000000" d="M371.42,-109C371.42,-109 326.88,-109 326.88,-109 320.88,-109 314.88,-103 314.88,-97 314.88,-97 314.88,-85 314.88,-85 314.88,-79 320.88,-73 326.88,-73 326.88,-73 371.42,-73 371.42,-73 377.42,-73 383.42,-79 383.42,-85 383.42,-85 383.42,-97 383.42,-97 383.42,-103 377.42,-109 371.42,-109"/>
+<text xml:space="preserve" text-anchor="middle" x="349.15" y="-86.17" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">final text</text>
+</g>
+<g id="edge5" class="edge">
+<title>dec&#45;&gt;final</title>
+<path fill="none" stroke="#000000" d="M250.05,-164.72C269.79,-150.23 297.06,-130.22 318,-114.86"/>
+<polygon fill="#000000" stroke="#000000" points="319.38,-117.31 324.18,-110.32 316.07,-112.8 319.38,-117.31"/>
+<text xml:space="preserve" text-anchor="middle" x="305.35" y="-128.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;no</text>
+</g>
+<g id="node7" class="node">
+<title>tools</title>
+<path fill="white" stroke="#000000" d="M584.8,-430.51C584.8,-430.51 353.5,-430.51 353.5,-430.51 347.5,-430.51 341.5,-424.51 341.5,-418.51 341.5,-418.51 341.5,-390.04 341.5,-390.04 341.5,-384.04 347.5,-378.04 353.5,-378.04 353.5,-378.04 584.8,-378.04 584.8,-378.04 590.8,-378.04 596.8,-384.04 596.8,-390.04 596.8,-390.04 596.8,-418.51 596.8,-418.51 596.8,-424.51 590.8,-430.51 584.8,-430.51"/>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-410.7" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">7 tools · all free / keyless</text>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-399.45" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">weather · calculator · wikipedia · dictionary</text>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-388.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">exchange_rate · world_time · search_document</text>
+</g>
+<g id="edge7" class="edge">
+<title>dec&#45;&gt;tools</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M228.54,-213.46C235.14,-246.33 250.62,-300.78 284.4,-333.68 302.33,-351.14 325.07,-364.3 348.41,-374.2"/>
+<polygon fill="#000000" stroke="#000000" points="347.16,-376.71 355.63,-377.13 349.27,-371.52 347.16,-376.71"/>
+<text xml:space="preserve" text-anchor="middle" x="307.27" y="-285.5" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;picks from</text>
+</g>
+<g id="edge4" class="edge">
+<title>exec&#45;&gt;llm</title>
+<path fill="none" stroke="#000000" d="M93.8,-109.35C78.07,-120.17 60.37,-135.67 51.65,-154.75 40.58,-178.98 40.68,-190.42 51.65,-214.69 60.96,-235.29 79.22,-252.42 96.29,-264.94"/>
+<polygon fill="#000000" stroke="#000000" points="94.62,-267.19 102.78,-269.49 97.84,-262.61 94.62,-267.19"/>
+<text xml:space="preserve" text-anchor="middle" x="95.9" y="-181.04" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;tool result appended</text>
+</g>
+<g id="node6" class="node">
+<title>out</title>
+<path fill="#eef6ee" stroke="#000000" d="M411.92,-36C411.92,-36 286.38,-36 286.38,-36 280.38,-36 274.38,-30 274.38,-24 274.38,-24 274.38,-12 274.38,-12 274.38,-6 280.38,0 286.38,0 286.38,0 411.92,0 411.92,0 417.92,0 423.92,-6 423.92,-12 423.92,-12 423.92,-24 423.92,-24 423.92,-30 417.92,-36 411.92,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="349.15" y="-13.18" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">strip_markdown &#160;→ &#160;TTS</text>
+</g>
+<g id="edge6" class="edge">
+<title>final&#45;&gt;out</title>
+<path fill="none" stroke="#000000" d="M349.15,-72.81C349.15,-64.62 349.15,-54.62 349.15,-45.48"/>
+<polygon fill="#000000" stroke="#000000" points="351.95,-45.54 349.15,-37.54 346.35,-45.54 351.95,-45.54"/>
+</g>
+<g id="node8" class="node">
+<title>rag</title>
+<path fill="white" stroke="#2e7d32" d="M587.05,-326.66C587.05,-326.66 351.25,-326.66 351.25,-326.66 345.25,-326.66 339.25,-320.66 339.25,-314.66 339.25,-314.66 339.25,-263.69 339.25,-263.69 339.25,-257.69 345.25,-251.69 351.25,-251.69 351.25,-251.69 587.05,-251.69 587.05,-251.69 593.05,-251.69 599.05,-257.69 599.05,-263.69 599.05,-263.69 599.05,-314.66 599.05,-314.66 599.05,-320.66 593.05,-326.66 587.05,-326.66"/>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-306.85" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">RAG over the uploaded PDF</text>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-295.6" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">PDF ≤ 10 pages / ≤ 20 MB</text>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-284.35" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">→ chunk 1000 chars, 150 overlap</text>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-273.1" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">→ embed &#160;BAAI/bge&#45;small&#45;en&#45;v1.5 &#160;(fastembed)</text>
+<text xml:space="preserve" text-anchor="middle" x="469.15" y="-261.85" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">→ top&#45;4 passages by cosine</text>
+</g>
+<g id="edge8" class="edge">
+<title>tools&#45;&gt;rag</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M469.15,-377.61C469.15,-365.31 469.15,-350.2 469.15,-336.03"/>
+<polygon fill="#000000" stroke="#000000" points="471.95,-336.4 469.15,-328.4 466.35,-336.4 471.95,-336.4"/>
+<text xml:space="preserve" text-anchor="middle" x="508.15" y="-345.86" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;search_document</text>
+</g>
+</g>
+</svg>
+            <figcaption>
+                The loop runs at most five times per turn; if the model is still calling
+                tools after that, the turn ends with a fallback reply.
+            </figcaption>
+            </figure>
+
+            <span class="eyebrow">Delivery</span>
+            <h2>How it ships</h2>
+            <ul>
+                <li>
+                    A push to <code>main</code> triggers GitHub Actions
+                    (<code>.github/workflows/deploy.yml</code>).
+                    <code>dorny/paths-filter</code> looks at what changed and builds only
+                    the affected part &mdash; backend, frontend, or the Helm chart.
+                </li>
+                <li>
+                    Backend and frontend build as <code>linux/amd64</code> Docker images
+                    and are pushed to GHCR
+                    (<code>ghcr.io/qharo/voice-agent-*</code>), using the Actions layer
+                    cache to keep rebuilds fast.
+                </li>
+                <li>
+                    The deploy job loads a kubeconfig from a secret, runs
+                    <code>helm upgrade</code> when the chart changed, otherwise
+                    <code>kubectl rollout restart</code> for just the changed
+                    Deployment, then waits on rollout status.
+                </li>
+                <li>
+                    The cluster is K3s. The Helm chart <code>helm/voice-agent</code>
+                    carries the namespace, both Deployments and Services, and an
+                    ingress-nginx Ingress with cert-manager (Let&rsquo;s Encrypt) TLS at
+                    <code>qharo-voice-agent.duckdns.org</code>, WebSocket-friendly
+                    timeouts, and a 20&nbsp;MB upload cap.
+                </li>
+                <li>
+                    The <code>GROQ_API_KEY</code> ships in the repo as a Bitnami
+                    <strong>SealedSecret</strong> &mdash; encrypted, safe to commit,
+                    decryptable only in-cluster.
+                </li>
+                <li>
+                    The backend exposes Prometheus metrics at <code>/metrics</code>; a
+                    <strong>ServiceMonitor</strong> scrapes them every 15&nbsp;seconds and
+                    a <strong>Grafana dashboard</strong> ships as a ConfigMap &mdash;
+                    active sessions, queue depth, STT / LLM / TTS latencies, tool calls,
+                    and error counts.
+                </li>
+            </ul>
+
+            <span class="eyebrow">Reference</span>
+            <h2>Numbers</h2>
+            <div class="table-scroll">
+                <table class="stats">
+                    <thead>
+                        <tr><th>Area</th><th>Detail</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><th>Audio in</th><td>16&nbsp;kHz mono PCM16, streamed frame-by-frame over one WebSocket</td></tr>
+                        <tr><th>STT</th><td><code>moonshine-streaming-tiny</code> Q8_0 GGUF via <code>transcribe_cpp</code>, in-process</td></tr>
+                        <tr><th>LLM</th><td>Groq <code>openai/gpt-oss-20b</code>, <code>max_tokens</code> 1024, up to 5 tool iterations per turn</td></tr>
+                        <tr><th>Tools</th><td>7, all free / keyless: weather, calculator, Wikipedia, dictionary, exchange rate, world time, document search</td></tr>
+                        <tr><th>TTS (default)</th><td>Piper <code>en_US-amy-medium</code>, 22.05&nbsp;kHz, length-scale 0.9, streaming subprocess</td></tr>
+                        <tr><th>TTS (alt)</th><td>Pocket-TTS 100M ONNX-INT8, 24&nbsp;kHz, 80&nbsp;ms frames (<code>TTS_ENGINE=pocket</code>)</td></tr>
+                        <tr><th>RAG</th><td>PDF only, &le;10 pages / &le;20&nbsp;MB; 1000-char chunks, 150 overlap; <code>bge-small-en-v1.5</code> embeddings; top-4 by cosine</td></tr>
+                        <tr><th>Conversation memory</th><td>Last 20 messages, per WebSocket, in-process</td></tr>
+                        <tr><th>Concurrency</th><td>4 turns processed at once (<code>asyncio.Semaphore</code>); queued clients get a live position</td></tr>
+                        <tr><th>Custom prompt limit</th><td>4000 characters</td></tr>
+                        <tr><th>Deploy</th><td>K3s + Helm chart <code>voice-agent</code>; GHCR images; path-filtered GitHub Actions</td></tr>
+                        <tr><th>TLS / DNS</th><td>ingress-nginx + cert-manager (Let&rsquo;s Encrypt), DuckDNS</td></tr>
+                        <tr><th>Backend resources</th><td>1&ndash;2&nbsp;GiB RAM, 0.5&ndash;2 vCPU, 1 replica; models loaded at startup</td></tr>
+                        <tr><th>Metrics</th><td>Prometheus <code>/metrics</code>, 15&nbsp;s scrape, Grafana dashboard shipped as a ConfigMap</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <span class="eyebrow">Notes</span>
+            <h2>Where the lines were drawn</h2>
+
+            <h3>Design tradeoffs</h3>
+            <ul>
+                <li>Push-to-talk instead of voice-activity endpointing &mdash; you decide when a turn ends, which keeps the interaction predictable and the server simple.</li>
+                <li>The LLM is hosted (Groq) for speed and quality, but STT and TTS run locally in the backend process &mdash; no per-request cost, no extra network hop, and they work offline.</li>
+                <li>Concurrency is capped at four turns so a small box stays responsive; extra callers wait in a fair queue rather than degrading everyone.</li>
+                <li>RAG holds one document at a time, and the prompt / preset / document state is process-global rather than per-session &mdash; deliberately minimal for a single-user demo.</li>
+            </ul>
+
+            <h3>Known limitations</h3>
+            <ul>
+                <li>The LLM response isn&rsquo;t streamed into TTS yet &mdash; the full reply is generated first, then synthesised. STT already emits partial transcripts, but the live turn still waits for the final text.</li>
+                <li>The RAG index lives in memory, so an uploaded document is lost on a backend restart or redeploy.</li>
+                <li>Single backend replica &mdash; the in-process models and in-memory state don&rsquo;t share across pods.</li>
+                <li>Voices are English-only.</li>
+            </ul>
+
+            <h3>Future work</h3>
+            <ul>
+                <li>Feed partial STT hypotheses straight into the turn so generation can start before you finish speaking.</li>
+                <li>Stream LLM tokens into TTS sentence-by-sentence to cut time-to-first-audio.</li>
+                <li>Per-session prompt and document state; multi-document RAG.</li>
+                <li>Horizontal autoscaling with shared state pulled out of the process.</li>
+            </ul>
+
+            <h3>Credits &amp; links</h3>
+            <p>
+                The models and tools are all free and keyless: Moonshine (STT), Piper
+                (TTS), <code>gpt-oss-20b</code> served by Groq, and open APIs for weather
+                (Open-Meteo), currency (Frankfurter), Wikipedia, dictionary, and world
+                time.
+            </p>
+            <p class="endlinks">
+                <a href="https://github.com/qharo/voice_agent" target="_blank" rel="noopener">Source on GitHub</a>
+                &nbsp;&middot;&nbsp;
+                <a href="https://qharo-voice-agent.duckdns.org" target="_blank" rel="noopener">Live demo</a>
             </p>
         </div>
     </body>
