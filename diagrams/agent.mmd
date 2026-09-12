@@ -1,31 +1,39 @@
-%%{init: {'flowchart': {'curve': 'stepBefore'}}}%%
+%%{init: {'flowchart': {'defaultRenderer': 'elk', 'curve': 'stepBefore', 'elk': {'edgeRouting': 'ORTHOGONAL', 'nodePlacement': 'NETWORK_SIMPLEX'}}, 'theme': 'base', 'themeVariables': {'fontFamily': 'Roboto', 'primaryTextColor': '#000000', 'lineColor': '#000000', 'edgeLabelBackground': '#ffffff'}}}%%
 flowchart TD
-    A["A · Turn input"] --> B["B · LLM"]
-    B --> C{"C · Tool calls?"}
-    C -->|yes| D["D · Execute tool"]
+    classDef input fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000;
+    classDef model fill:#ffffff,stroke:#2e7d32,stroke-width:2px,color:#000000;
+    classDef dec fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000;
+    classDef panel fill:#ffffff,stroke:#2e7d32,stroke-width:2px,color:#000000;
+
+    A["A · Turn input"]:::input
+
+    subgraph LOOP ["Agent loop · up to 5 iterations"]
+        B["B · LLM"]:::model
+        C{"C · Tool calls?"}:::dec
+        D["D · Execute tool"]:::model
+    end
+
+    E["E · Final text"]:::input
+    F["F · Speak reply"]:::input
+
+    subgraph TOOLS ["G · Tool picker"]
+        G["weather · calculator · wikipedia · dictionary · exchange_rate · world_time · search_document"]:::panel
+    end
+
+    subgraph RAG ["H · Document search"]
+        H["PDF ≤ 10 pages · 1000-char chunks · bge-small · top-4"]:::panel
+    end
+
+    style LOOP fill:#ffffff,stroke:#2e7d32,stroke-width:2px,color:#000000
+    style TOOLS fill:#ffffff,stroke:#2e7d32,stroke-width:2px,color:#000000
+    style RAG fill:#ffffff,stroke:#2e7d32,stroke-width:2px,color:#000000
+
+    A --> B
+    B --> C
+    C -->|yes| D
+    C -->|no| E
+    E --> F
     D -->|result appended| B
-    C -->|no| E["E · Final text"]
-    E --> F["F · Speak reply"]
 
-    subgraph LOOP["Agent loop · up to 5 iterations"]
-        B
-        C
-        D
-    end
-    subgraph TOOLS["G · Tool picker"]
-        G["weather · calculator · wikipedia · dictionary · exchange_rate · world_time · search_document"]
-    end
-    subgraph RAG["H · Document search"]
-        H["PDF ≤ 10 pages · 1000-char chunks · bge-small · top-4"]
-    end
-    C -.->|picks from| TOOLS
-    TOOLS -.->|search_document| RAG
-
-    classDef input fill:#eef6ee,stroke:#000;
-    classDef model fill:#ffffff,stroke:#2e7d32,stroke-width:2px;
-    classDef dec fill:#fffbe6,stroke:#8a7c1a;
-    classDef panel fill:#ffffff,stroke:#2e7d32;
-    class A,E input;
-    class B,D model;
-    class C dec;
-    class TOOLS,RAG panel;
+    C -.->|picks from| G
+    G -.->|search_document| H
