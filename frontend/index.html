@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <title>Voice Agent</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,6 +26,9 @@
                 height: 100%;
                 margin: 0;
             }
+            html {
+                -webkit-text-size-adjust: 100%;
+            }
             body {
                 font-family:
                     "Roboto",
@@ -36,6 +40,8 @@
                 color: var(--black);
                 transition: background-color 0.6s ease;
                 overflow: hidden;
+                overscroll-behavior: none;
+                touch-action: manipulation;
             }
             body.active {
                 background: var(--black);
@@ -45,32 +51,47 @@
             #app {
                 position: relative;
                 height: 100vh;
+                height: 100svh;
+                height: 100dvh;
                 display: flex;
                 flex-direction: column;
+                padding-top: env(safe-area-inset-top, 0px);
             }
             #conversation {
                 flex: 1;
-                width: min(60%, 760px);
+                width: min(760px, calc(100% - 32px));
                 margin: 0 auto;
-                padding: 28px 0;
+                padding: 20px 0 12px;
                 overflow-y: auto;
                 display: flex;
                 flex-direction: column;
                 gap: 12px;
                 scrollbar-width: none;
+                touch-action: pan-x pan-y;
+                overscroll-behavior: contain;
+                -webkit-touch-callout: none;
+                user-select: none;
             }
             #conversation::-webkit-scrollbar {
                 display: none;
             }
-            @media (max-width: 768px) {
+            @media (min-width: 1100px) {
                 #conversation {
-                    width: 90%;
+                    width: min(60%, 760px);
+                    padding: 28px 0;
+                }
+            }
+            @media (max-width: 520px) {
+                #conversation {
+                    width: calc(100% - 24px);
+                    padding: 14px 0 8px;
+                    gap: 10px;
                 }
             }
             .message {
                 white-space: pre-wrap;
                 word-wrap: break-word;
-                font-size: 20px;
+                font-size: clamp(17px, 2.6vw, 20px);
                 line-height: 1.55;
                 width: 100%;
                 max-width: none;
@@ -107,22 +128,24 @@
             }
             #idlePrompt {
                 flex-shrink: 0;
-                padding: 0 0 24px;
-                font-size: 16px;
+                padding: 0 16px calc(20px + env(safe-area-inset-bottom, 0px));
+                font-size: clamp(14px, 3.8vw, 16px);
                 min-height: 24px;
                 font-weight: 500;
                 letter-spacing: 0.3px;
                 text-align: center;
                 color: var(--black);
                 transition: color 0.6s ease, opacity 0.12s ease;
+                -webkit-touch-callout: none;
+                user-select: none;
             }
             body.active #idlePrompt {
                 color: var(--white);
             }
             #queueStatus {
                 flex-shrink: 0;
-                padding: 0 0 8px;
-                font-size: 13px;
+                padding: 0 16px 8px;
+                font-size: clamp(12px, 3.4vw, 13px);
                 min-height: 0;
                 text-align: center;
                 color: var(--black);
@@ -138,15 +161,17 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 14px 18px 14px 26px;
+                gap: 12px;
+                padding: 12px 14px 12px 18px;
             }
             .brand {
-                font-size: 22px;
+                font-size: clamp(18px, 4.5vw, 22px);
                 font-weight: 700;
                 letter-spacing: 0.2px;
                 color: var(--black);
                 text-decoration: none;
                 transition: color 0.6s ease;
+                white-space: nowrap;
             }
             body.active .brand {
                 color: var(--white);
@@ -154,9 +179,9 @@
             .nav-link {
                 display: flex;
                 align-items: center;
-                min-height: 34px;
+                min-height: 44px;
                 padding: 0 12px;
-                font-size: 16px;
+                font-size: clamp(14px, 3.8vw, 16px);
                 font-weight: 500;
                 letter-spacing: 0.2px;
                 color: var(--black);
@@ -179,6 +204,12 @@
             body.active .nav-link {
                 color: var(--white);
             }
+            .github-icon {
+                display: none;
+                width: 22px;
+                height: 22px;
+                fill: currentColor;
+            }
             .topbar-actions {
                 display: flex;
                 align-items: center;
@@ -188,8 +219,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 34px;
-                height: 34px;
+                width: 44px;
+                height: 44px;
                 color: var(--black);
                 opacity: 0.5;
                 transition: color 0.6s ease, opacity 0.3s ease;
@@ -235,7 +266,9 @@
                 top: 0;
                 right: 0;
                 height: 100vh;
-                width: min(340px, 92vw);
+                height: 100svh;
+                height: 100dvh;
+                width: min(360px, 94vw);
                 background: #ffffff;
                 color: #000000;
                 box-shadow: -8px 0 30px rgba(0, 0, 0, 0.25);
@@ -264,8 +297,9 @@
             .sidebar-body {
                 flex: 1;
                 overflow-y: auto;
-                padding: 22px 20px 40px;
+                padding: 22px 20px calc(32px + env(safe-area-inset-bottom, 0px));
                 scrollbar-width: none;
+                overscroll-behavior: contain;
             }
             .sidebar-body::-webkit-scrollbar {
                 display: none;
@@ -282,13 +316,13 @@
             #promptInput {
                 width: 100%;
                 font-family: inherit;
-                font-size: 14px;
+                font-size: 16px;
                 line-height: 1.5;
                 color: #000;
                 background: #fff;
                 border: 1px solid rgba(0, 0, 0, 0.25);
                 border-radius: 10px;
-                padding: 10px 12px;
+                padding: 12px;
                 resize: vertical;
                 box-sizing: border-box;
                 scrollbar-width: thin;
@@ -314,16 +348,18 @@
             }
             .sidebar-actions {
                 display: flex;
+                flex-wrap: wrap;
                 gap: 8px;
                 margin-top: 10px;
             }
             .btn-primary,
             .btn-ghost {
                 font-family: inherit;
-                font-size: 14px;
+                font-size: 15px;
                 font-weight: 500;
                 border-radius: 999px;
-                padding: 8px 18px;
+                padding: 10px 18px;
+                min-height: 44px;
                 cursor: pointer;
                 transition: opacity 0.2s ease;
             }
@@ -412,18 +448,61 @@
             .preset-select {
                 width: 100%;
                 font-family: inherit;
-                font-size: 14px;
+                font-size: 16px;
                 color: #000;
                 background: #fff;
                 border: 1px solid rgba(0, 0, 0, 0.25);
                 border-radius: 10px;
-                padding: 9px 12px;
+                padding: 12px;
                 box-sizing: border-box;
                 cursor: pointer;
+                min-height: 44px;
             }
             .preset-select:focus {
                 outline: none;
                 border-color: rgba(0, 0, 0, 0.6);
+            }
+            @media (max-width: 420px) {
+                #topbar {
+                    gap: 4px;
+                    padding: 8px 8px 8px 14px;
+                }
+                .topbar-actions {
+                    gap: 2px;
+                }
+                .nav-link {
+                    min-height: 44px;
+                    padding: 0 8px;
+                }
+            }
+            @media (max-width: 360px) {
+                .github-label {
+                    display: none;
+                }
+                .github-icon {
+                    display: block;
+                }
+            }
+            @media (max-height: 520px) and (orientation: landscape) {
+                #topbar {
+                    padding-top: 6px;
+                    padding-bottom: 6px;
+                }
+                #conversation {
+                    padding: 10px 0 6px;
+                }
+                #idlePrompt {
+                    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                body,
+                .agent-msg,
+                .streaming-msg,
+                .nav-link,
+                .corner-btn {
+                    transition: none;
+                }
             }
         </style>
     </head>
@@ -439,7 +518,12 @@
                         target="_blank"
                         rel="noopener"
                         aria-label="Voice Agent source code on GitHub"
-                        >GitHub</a
+                        ><svg class="github-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path
+                                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+                            ></path>
+                        </svg>
+                        <span class="github-label">GitHub</span></a
                     >
                     <button id="sidebarToggle" class="corner-btn" aria-label="Settings" title="Settings">
                         <svg viewBox="0 0 24 24">
@@ -526,6 +610,20 @@
             let isPlayingAudio = false;
             let discardTurn = false;
             let shouldReconnect = true;
+            let cancelPendingStart = false;
+            let inputMode =
+                window.matchMedia("(pointer: coarse)").matches ||
+                "ontouchstart" in window ||
+                navigator.maxTouchPoints > 0
+                    ? "touch"
+                    : "keyboard";
+            const TOUCH_HOLD_MS = 500;
+            const TOUCH_MOVE_PX = 10;
+            let touchHoldTimer = null;
+            let touchHoldPointerId = null;
+            let touchHoldStartX = 0;
+            let touchHoldStartY = 0;
+            let touchHoldFired = false;
 
             const player = {
                 ctx: null,
@@ -623,11 +721,30 @@
                 isPlayingAudio = false;
             }
 
+            function setIdlePrompt(mode) {
+                if (mode === "idle") {
+                    idlePrompt.textContent =
+                        inputMode === "touch"
+                            ? "touch and hold to speak now"
+                            : "press space to speak now";
+                } else if (mode === "recording") {
+                    idlePrompt.textContent =
+                        inputMode === "touch"
+                            ? "listening — release to send"
+                            : "listening";
+                } else if (mode === "interrupt") {
+                    idlePrompt.textContent =
+                        inputMode === "touch"
+                            ? "touch and hold to interrupt"
+                            : "press space to interrupt";
+                }
+            }
+
             function returnIdle() {
                 state = "idle";
                 setActive(false);
                 setAgent(false);
-                idlePrompt.textContent = "press space to speak now";
+                setIdlePrompt("idle");
             }
 
             (function startMeter() {
@@ -671,7 +788,7 @@
 
                 ws.onopen = () => {
                     if (!isRecording && !isPlayingAudio) {
-                        idlePrompt.textContent = "press space to speak now";
+                        setIdlePrompt("idle");
                     }
                 };
 
@@ -711,7 +828,7 @@
                             state = "agent";
                             setActive(true);
                             setAgent(true);
-                            idlePrompt.textContent = "press space to interrupt";
+                            setIdlePrompt("interrupt");
                             player.start(sr);
                         } else if (text === "[AUDIO_END]") {
                             player.end();
@@ -1061,6 +1178,7 @@
 
 loadState();
             loadPresets();
+            setIdlePrompt("idle");
 
             async function ensureListen() {
                 if (listenAnalyser) return;
@@ -1083,6 +1201,7 @@ loadState();
 
             async function startRecording() {
                 if (isRecording) return;
+                cancelPendingStart = false;
                 if (isPlayingAudio) {
                     // interrupt ongoing assistant playback
                     stopAllAudio();
@@ -1103,7 +1222,7 @@ loadState();
                 state = "recording";
                 setActive(true);
                 setAgent(false);
-                idlePrompt.textContent = "listening";
+                setIdlePrompt("recording");
                 try {
                     if (!ws || ws.readyState !== WebSocket.OPEN) {
                         idlePrompt.textContent = "still connecting...";
@@ -1148,7 +1267,13 @@ loadState();
                     isRecording = true;
                     ensureListen();
                     conversation.scrollTop = conversation.scrollHeight;
+                    if (cancelPendingStart) {
+                        cancelPendingStart = false;
+                        stopRecording();
+                        return;
+                    }
                 } catch (err) {
+                    cancelPendingStart = false;
                     state = "idle";
                     setActive(false);
                     idlePrompt.textContent =
@@ -1160,7 +1285,10 @@ loadState();
             }
 
             function stopRecording() {
-                if (!isRecording) return;
+                if (!isRecording) {
+                    cancelPendingStart = state === "recording";
+                    return;
+                }
 
                 if (processor) {
                     processor.disconnect();
@@ -1185,10 +1313,67 @@ loadState();
                 }
             }
 
+            function isTalkSurface(target) {
+                if (!(target instanceof Element)) return false;
+                if (document.body.classList.contains("sidebar-open")) return false;
+                return !target.closest(
+                    "a, button, input, textarea, select, label, audio, video, [data-no-talk]",
+                );
+            }
+
+            function clearTouchHold() {
+                if (touchHoldTimer) {
+                    clearTimeout(touchHoldTimer);
+                    touchHoldTimer = null;
+                }
+                touchHoldPointerId = null;
+                touchHoldFired = false;
+            }
+
+            document.addEventListener("pointerdown", (e) => {
+                if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+                if (e.button !== undefined && e.button !== 0) return;
+                if (touchHoldPointerId !== null) return;
+                if (!isTalkSurface(e.target)) return;
+                inputMode = "touch";
+                if (state === "idle") setIdlePrompt("idle");
+                touchHoldPointerId = e.pointerId;
+                touchHoldStartX = e.clientX;
+                touchHoldStartY = e.clientY;
+                touchHoldFired = false;
+                touchHoldTimer = setTimeout(() => {
+                    touchHoldFired = true;
+                    startRecording();
+                }, TOUCH_HOLD_MS);
+            });
+            document.addEventListener("pointermove", (e) => {
+                if (e.pointerId !== touchHoldPointerId) return;
+                if (touchHoldFired) return;
+                const moved = Math.hypot(
+                    e.clientX - touchHoldStartX,
+                    e.clientY - touchHoldStartY,
+                );
+                if (moved > TOUCH_MOVE_PX) clearTouchHold();
+            });
+            function endTouchHold(e) {
+                if (e.pointerId !== touchHoldPointerId) return;
+                const fired = touchHoldFired;
+                clearTouchHold();
+                if (fired) stopRecording();
+            }
+            document.addEventListener("pointerup", endTouchHold);
+            document.addEventListener("pointercancel", endTouchHold);
+            document.addEventListener("contextmenu", (e) => {
+                if (touchHoldPointerId !== null && isTalkSurface(e.target)) {
+                    e.preventDefault();
+                }
+            });
+
             document.addEventListener("keydown", (e) => {
                 if (e.code === "Space") {
                     if (e.target.matches("input, textarea")) return;
                     e.preventDefault();
+                    inputMode = "keyboard";
                     if (!e.repeat) startRecording();
                 }
             });
