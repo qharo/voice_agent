@@ -1557,19 +1557,12 @@
                     <code>gpt-oss-20b</code>.
                 </li>
                 <li>
-                    <strong>C · Decision:</strong> Evaluates if the model
-                    emitted tool calls. If <em>no</em>, the flow proceeds
-                    directly to <strong>E</strong>.
-                </li>
-                <li>
-                    <strong>D · Execute tool:</strong> Runs the chosen tool and
-                    appends the result, looping back to <strong>B</strong>.
-                    Capped at 5 iterations per turn (otherwise triggers a
-                    fallback reply).
-                </li>
-                <li>
-                    <strong>E · Final text:</strong> The resolved answer text
-                    generated once no further tool calls are needed.
+                    <strong>C, D, E · Tool execution loop:</strong> Evaluates if
+                    the model emitted tool calls (C). If yes, it runs the chosen
+                    tool and appends the result (D), looping back to the LLM.
+                    This is capped at 5 iterations per turn (otherwise
+                    triggering a fallback reply). When no more tool calls are
+                    needed, the flow proceeds to the final answer text (E).
                 </li>
                 <li>
                     <strong>F · Speak reply:</strong> Cleans the final text via
@@ -1577,16 +1570,13 @@
                     Piper TTS.
                 </li>
                 <li>
-                    <strong>G · Tool picker:</strong> The agent&rsquo;s registry
-                    of 7 free, keyless tools (weather, calculator, Wikipedia,
-                    dictionary, exchange rate, world time, and document search).
-                </li>
-                <li>
-                    <strong>H · Document search (RAG):</strong> The
-                    <code>search_document</code> tool pipeline: PDF (&le; 10
-                    pages / 20&nbsp;MB) &rarr; 1000-char chunks (150 overlap)
-                    &rarr; <code>bge-small-en-v1.5</code> embeddings &rarr;
-                    top-4 retrieval by cosine similarity.
+                    <strong>G, H · Tools &amp; Document search (RAG):</strong>
+                    The agent&rsquo;s registry of 7 free, keyless tools (G).
+                    When <code>search_document</code> is chosen, it processes
+                    PDFs (&le; 10 pages / 20&nbsp;MB) into 1000-char chunks with
+                    150-char overlap, generates
+                    <code>bge-small-en-v1.5</code> embeddings, and retrieves the
+                    top-4 results by cosine similarity (H).
                 </li>
             </ul>
 
