@@ -127,7 +127,8 @@
                 line-height: 1.7;
             }
             code {
-                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
                 font-size: 0.88em;
                 background: rgba(255, 255, 255, 0.5);
                 border: 1px solid rgba(0, 0, 0, 0.12);
@@ -154,6 +155,19 @@
                 font-size: 13px;
                 opacity: 0.68;
                 text-align: center;
+            }
+            .diagram-legend {
+                margin: 16px 0 4px;
+                padding-left: 28px;
+                max-width: 640px;
+            }
+            .diagram-legend li {
+                font-size: 15px;
+                margin: 9px 0;
+                line-height: 1.65;
+            }
+            .diagram-legend li::marker {
+                font-weight: 700;
             }
             figure.gantt {
                 margin: 10px 0 4px;
@@ -316,7 +330,13 @@
         <header id="topbar">
             <a class="brand" href="index.html">Voice Agent</a>
             <nav class="topbar-actions">
-                <a href="index.html" id="homeLink" class="corner-btn" aria-label="Back to the voice agent" title="Back to the voice agent">
+                <a
+                    href="index.html"
+                    id="homeLink"
+                    class="corner-btn"
+                    aria-label="Back to the voice agent"
+                    title="Back to the voice agent"
+                >
                     <svg viewBox="0 0 24 24">
                         <path d="M3 11l9-8 9 8"></path>
                         <path d="M5 10v10h14V10"></path>
@@ -327,15 +347,15 @@
         <div class="wrap">
             <h1>About</h1>
             <p class="about-text">
-                This is a real-time voice assistant that runs entirely in your browser &mdash;
-                you talk, it listens, and it answers out loud. Your speech is streamed to a
-                server that transcribes it live, reasons with a language model, and speaks the
-                reply back in a natural voice. It can also answer questions about PDFs you
-                upload, and reach live tools for weather, currency conversion, and more.
+                This is an implementation of a real-time voice assistant. Your
+                speech is transcribed live, reasoned with a language model and
+                responded to with a natural voice. It can also answer questions
+                about PDFs you upload, and reach live tools for weather,
+                currency conversion, and more.
             </p>
 
             <span class="eyebrow">Pipeline</span>
-            <p>
+            <!--<p>
                 One turn, from the moment you press Space to the first audio coming back.
                 Speech is streamed to the server as raw audio over a single WebSocket;
                 transcription, generation, and synthesis are chained so stages overlap:
@@ -343,9 +363,13 @@
                 voice is still being synthesised. Time runs left to right (a rough turn,
                 not measured averages &mdash; see the <strong>Agent</strong> section for
                 the tool-calling loop).
-            </p>
+            </p>-->
             <figure class="gantt">
-                <div class="gantt" role="img" aria-label="Timeline of one turn: capture and streaming STT overlap; the LLM runs after the final transcript; TTS follows the full reply; audio playback overlaps TTS. First audio lands around 1.9 seconds.">
+                <div
+                    class="gantt"
+                    role="img"
+                    aria-label="Timeline of one turn: capture and streaming STT overlap; the LLM runs after the final transcript; TTS follows the full reply; audio playback overlaps TTS. First audio lands around 1.9 seconds."
+                >
                     <div></div>
                     <div class="gantt-axis">
                         <span class="tick" style="left: 0%">0</span>
@@ -357,170 +381,111 @@
 
                     <div class="gantt-lane-label">Capture</div>
                     <div class="gantt-track">
-                        <div class="gantt-bar" style="--start: 0; --end: 0.227; --i: 0" title="Browser — hold Space and speak · 16 kHz PCM16 over one WebSocket">Browser · hold Space and speak</div>
+                        <div
+                            class="gantt-bar"
+                            style="--start: 0; --end: 0.227; --i: 0"
+                            title="16 kHz PCM16 over one WebSocket"
+                        >
+                            hold Space and speak
+                        </div>
                     </div>
 
                     <div class="gantt-lane-label">STT</div>
                     <div class="gantt-track">
-                        <div class="gantt-bar model" style="--start: 0; --end: 0.318; --i: 1" title="Moonshine streaming tiny (Q8, in-process) · partials stream live · finalize on release ≈ 100–250 ms">STT · Moonshine streaming &middot; partials live, finalize ≈100–250&nbsp;ms</div>
+                        <div
+                            class="gantt-bar model"
+                            style="--start: 0; --end: 0.318; --i: 1"
+                            title="Q8 quantized, streaming ≈ 100–250 ms"
+                        >
+                            Moonshine STT
+                        </div>
                     </div>
 
                     <div class="gantt-lane-label">LLM</div>
                     <div class="gantt-track">
-                        <div class="gantt-bar model" style="--start: 0.318; --end: 0.682; --i: 2" title="Groq openai/gpt-oss-20b · first token ≈ 250–450 ms · short reply ≈ 0.5–1.2 s (+ a tool round-trip if a tool is called)">LLM · Groq gpt-oss-20b &middot; first token ≈250–450&nbsp;ms</div>
+                        <div
+                            class="gantt-bar model"
+                            style="--start: 0.318; --end: 0.682; --i: 2"
+                            title="Groq openai/gpt-oss-20b · first token ≈ 250–450 ms · short reply ≈ 0.5–1.2 s (+ a tool round-trip if a tool is called)"
+                        >
+                            LLM · Groq gpt-oss-20b &middot; first token
+                            ≈250–450&nbsp;ms
+                        </div>
                     </div>
 
                     <div class="gantt-lane-label">TTS</div>
                     <div class="gantt-track">
-                        <div class="gantt-bar model" style="--start: 0.682; --end: 0.864; --i: 3" title="Piper en_US-amy-medium (streaming subprocess) · first audio ≈ 150–350 ms, then faster than real time">TTS · Piper amy-medium &middot; first audio ≈150–350&nbsp;ms</div>
+                        <div
+                            class="gantt-bar model"
+                            style="--start: 0.682; --end: 0.864; --i: 3"
+                            title="Piper en_US-amy-medium (streaming subprocess) · first audio ≈ 150–350 ms, then faster than real time"
+                        >
+                            TTS · Piper amy-medium &middot; first audio
+                            ≈150–350&nbsp;ms
+                        </div>
                     </div>
 
                     <div class="gantt-lane-label">Playback</div>
                     <div class="gantt-track">
-                        <div class="gantt-firstaudio" style="--at: 0.864" title="end-to-end to first audio ≈ 1–2 s"></div>
-                        <div class="gantt-bar" style="--start: 0.795; --end: 1; --i: 4" title="Browser · Web Audio — gapless playback · Space = barge-in">Browser · Web Audio &middot; gapless &middot; Space = barge-in</div>
+                        <div
+                            class="gantt-firstaudio"
+                            style="--at: 0.864"
+                            title="end-to-end to first audio ≈ 1–2 s"
+                        ></div>
+                        <div
+                            class="gantt-bar"
+                            style="--start: 0.795; --end: 1; --i: 4"
+                            title="Browser · Web Audio — gapless playback · Space = barge-in"
+                        >
+                            Browser · Web Audio &middot; gapless &middot; Space
+                            = barge-in
+                        </div>
                     </div>
                 </div>
-                <figcaption>
-                    Timings are rough estimates for this stack, not measured averages
-                    &mdash; the app records latency histograms in Prometheus but nothing
-                    is persisted here. The dashed line marks first audio, end-to-end
-                    ≈&nbsp;1–2&nbsp;s.
-                </figcaption>
+                <!--<figcaption>
+                    Timings are rough estimates for this stack, not measured
+                    averages &mdash; the app records latency histograms in
+                    Prometheus but nothing is persisted here. The dashed line
+                    marks first audio, end-to-end ≈&nbsp;1–2&nbsp;s.
+                </figcaption>-->
             </figure>
 
             <span class="eyebrow">Agent</span>
-            <p>
-                The language model doesn&rsquo;t just answer &mdash; it can call tools and
-                search an uploaded document, then keep going with the results. Each turn
-                carries the recent conversation and whichever system prompt is active
-                (your own, a preset, or the default).
-            </p>
+            <!--<p>
+                The language model doesn&rsquo;t just answer &mdash; it can call
+                tools and search an uploaded document, then keep going with the
+                results. Each turn carries the recent conversation and whichever
+                system prompt is active (your own, a preset, or the default).
+            </p>-->
             <figure class="diagram">
-                <!-- source: diagrams/agent.dot -- re-render via https://kroki.io/graphviz/svg -->
-                <svg class="diagram-svg" width="607" height="444" viewBox="0.00 0.00 607.00 444.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 440.13)">
-<title>agent</title>
-<g id="clust1" class="cluster">
-<title>cluster_loop</title>
-<path fill="#f6faf6" stroke="#2e7d32" d="M28.15,-65C28.15,-65 295.15,-65 295.15,-65 301.15,-65 307.15,-71 307.15,-77 307.15,-77 307.15,-321.68 307.15,-321.68 307.15,-327.68 301.15,-333.68 295.15,-333.68 295.15,-333.68 28.15,-333.68 28.15,-333.68 22.15,-333.68 16.15,-327.68 16.15,-321.68 16.15,-321.68 16.15,-77 16.15,-77 16.15,-71 22.15,-65 28.15,-65"/>
-<text xml:space="preserve" text-anchor="middle" x="161.65" y="-320.18" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="10.00" fill="#2e7d32">agent loop — up to 5 iterations</text>
-</g>
-<g id="node1" class="node">
-<title>inputs</title>
-<path fill="#eef6ee" stroke="#000000" d="M258.3,-436.13C258.3,-436.13 12,-436.13 12,-436.13 6,-436.13 0,-430.13 0,-424.13 0,-424.13 0,-384.41 0,-384.41 0,-378.41 6,-372.41 12,-372.41 12,-372.41 258.3,-372.41 258.3,-372.41 264.3,-372.41 270.3,-378.41 270.3,-384.41 270.3,-384.41 270.3,-424.13 270.3,-424.13 270.3,-430.13 264.3,-436.13 258.3,-436.13"/>
-<text xml:space="preserve" text-anchor="middle" x="135.15" y="-416.32" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">Turn input</text>
-<text xml:space="preserve" text-anchor="middle" x="135.15" y="-405.07" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">transcript &#160;+ &#160;conversation history (≤ 20 messages)</text>
-<text xml:space="preserve" text-anchor="middle" x="135.15" y="-393.82" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">+ &#160;system prompt (custom / preset / default)</text>
-<text xml:space="preserve" text-anchor="middle" x="135.15" y="-382.57" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">+ &#160;“a PDF is uploaded” note when one is loaded</text>
-</g>
-<g id="node2" class="node">
-<title>llm</title>
-<path fill="white" stroke="#2e7d32" stroke-width="2" d="M200.18,-307.18C200.18,-307.18 70.12,-307.18 70.12,-307.18 64.12,-307.18 58.12,-301.18 58.12,-295.18 58.12,-295.18 58.12,-283.18 58.12,-283.18 58.12,-277.18 64.12,-271.18 70.12,-271.18 70.12,-271.18 200.18,-271.18 200.18,-271.18 206.18,-271.18 212.18,-277.18 212.18,-283.18 212.18,-283.18 212.18,-295.18 212.18,-295.18 212.18,-301.18 206.18,-307.18 200.18,-307.18"/>
-<text xml:space="preserve" text-anchor="middle" x="135.15" y="-284.35" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">LLM &#160;&#160;(tool_choice = auto)</text>
-</g>
-<g id="edge1" class="edge">
-<title>inputs&#45;&gt;llm</title>
-<path fill="none" stroke="#000000" d="M135.15,-372.07C135.15,-354.8 135.15,-333.55 135.15,-317.02"/>
-<polygon fill="#000000" stroke="#000000" points="137.95,-317.42 135.15,-309.42 132.35,-317.42 137.95,-317.42"/>
-</g>
-<g id="node3" class="node">
-<title>dec</title>
-<path fill="#fffbe6" stroke="#8a7c1a" d="M213,-210.25C213,-210.25 160,-189.16 160,-189.16 154.42,-186.94 154.42,-182.5 160,-180.28 160,-180.28 213,-159.19 213,-159.19 218.58,-156.97 229.72,-156.97 235.3,-159.19 235.3,-159.19 288.3,-180.28 288.3,-180.28 293.88,-182.5 293.88,-186.94 288.3,-189.16 288.3,-189.16 235.3,-210.25 235.3,-210.25 229.72,-212.47 218.58,-212.47 213,-210.25"/>
-<text xml:space="preserve" text-anchor="middle" x="224.15" y="-179.9" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">tool calls?</text>
-</g>
-<g id="edge2" class="edge">
-<title>llm&#45;&gt;dec</title>
-<path fill="none" stroke="#000000" d="M150.65,-270.33C164.02,-254.94 183.57,-232.44 199.14,-214.51"/>
-<polygon fill="#000000" stroke="#000000" points="200.99,-216.65 204.12,-208.78 196.76,-212.98 200.99,-216.65"/>
-</g>
-<g id="node4" class="node">
-<title>exec</title>
-<path fill="white" stroke="#000000" d="M155.43,-109C155.43,-109 92.88,-109 92.88,-109 86.88,-109 80.88,-103 80.88,-97 80.88,-97 80.88,-85 80.88,-85 80.88,-79 86.88,-73 92.88,-73 92.88,-73 155.43,-73 155.43,-73 161.43,-73 167.43,-79 167.43,-85 167.43,-85 167.43,-97 167.43,-97 167.43,-103 161.43,-109 155.43,-109"/>
-<text xml:space="preserve" text-anchor="middle" x="124.15" y="-86.17" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">execute tool</text>
-</g>
-<g id="edge3" class="edge">
-<title>dec&#45;&gt;exec</title>
-<path fill="none" stroke="#000000" d="M201.96,-163.36C186.45,-149.14 165.71,-130.12 149.54,-115.29"/>
-<polygon fill="#000000" stroke="#000000" points="151.83,-113.59 144.04,-110.24 148.04,-117.71 151.83,-113.59"/>
-<text xml:space="preserve" text-anchor="middle" x="180.53" y="-128.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;yes</text>
-</g>
-<g id="node5" class="node">
-<title>final</title>
-<path fill="white" stroke="#000000" d="M371.42,-109C371.42,-109 326.88,-109 326.88,-109 320.88,-109 314.88,-103 314.88,-97 314.88,-97 314.88,-85 314.88,-85 314.88,-79 320.88,-73 326.88,-73 326.88,-73 371.42,-73 371.42,-73 377.42,-73 383.42,-79 383.42,-85 383.42,-85 383.42,-97 383.42,-97 383.42,-103 377.42,-109 371.42,-109"/>
-<text xml:space="preserve" text-anchor="middle" x="349.15" y="-86.17" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">final text</text>
-</g>
-<g id="edge5" class="edge">
-<title>dec&#45;&gt;final</title>
-<path fill="none" stroke="#000000" d="M250.05,-164.72C269.79,-150.23 297.06,-130.22 318,-114.86"/>
-<polygon fill="#000000" stroke="#000000" points="319.38,-117.31 324.18,-110.32 316.07,-112.8 319.38,-117.31"/>
-<text xml:space="preserve" text-anchor="middle" x="305.35" y="-128.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;no</text>
-</g>
-<g id="node7" class="node">
-<title>tools</title>
-<path fill="white" stroke="#000000" d="M584.8,-430.51C584.8,-430.51 353.5,-430.51 353.5,-430.51 347.5,-430.51 341.5,-424.51 341.5,-418.51 341.5,-418.51 341.5,-390.04 341.5,-390.04 341.5,-384.04 347.5,-378.04 353.5,-378.04 353.5,-378.04 584.8,-378.04 584.8,-378.04 590.8,-378.04 596.8,-384.04 596.8,-390.04 596.8,-390.04 596.8,-418.51 596.8,-418.51 596.8,-424.51 590.8,-430.51 584.8,-430.51"/>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-410.7" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">7 tools · all free / keyless</text>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-399.45" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">weather · calculator · wikipedia · dictionary</text>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-388.2" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">exchange_rate · world_time · search_document</text>
-</g>
-<g id="edge7" class="edge">
-<title>dec&#45;&gt;tools</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M228.54,-213.46C235.14,-246.33 250.62,-300.78 284.4,-333.68 302.33,-351.14 325.07,-364.3 348.41,-374.2"/>
-<polygon fill="#000000" stroke="#000000" points="347.16,-376.71 355.63,-377.13 349.27,-371.52 347.16,-376.71"/>
-<text xml:space="preserve" text-anchor="middle" x="307.27" y="-285.5" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;picks from</text>
-</g>
-<g id="edge4" class="edge">
-<title>exec&#45;&gt;llm</title>
-<path fill="none" stroke="#000000" d="M93.8,-109.35C78.07,-120.17 60.37,-135.67 51.65,-154.75 40.58,-178.98 40.68,-190.42 51.65,-214.69 60.96,-235.29 79.22,-252.42 96.29,-264.94"/>
-<polygon fill="#000000" stroke="#000000" points="94.62,-267.19 102.78,-269.49 97.84,-262.61 94.62,-267.19"/>
-<text xml:space="preserve" text-anchor="middle" x="95.9" y="-181.04" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;tool result appended</text>
-</g>
-<g id="node6" class="node">
-<title>out</title>
-<path fill="#eef6ee" stroke="#000000" d="M411.92,-36C411.92,-36 286.38,-36 286.38,-36 280.38,-36 274.38,-30 274.38,-24 274.38,-24 274.38,-12 274.38,-12 274.38,-6 280.38,0 286.38,0 286.38,0 411.92,0 411.92,0 417.92,0 423.92,-6 423.92,-12 423.92,-12 423.92,-24 423.92,-24 423.92,-30 417.92,-36 411.92,-36"/>
-<text xml:space="preserve" text-anchor="middle" x="349.15" y="-13.18" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">strip_markdown &#160;→ &#160;TTS</text>
-</g>
-<g id="edge6" class="edge">
-<title>final&#45;&gt;out</title>
-<path fill="none" stroke="#000000" d="M349.15,-72.81C349.15,-64.62 349.15,-54.62 349.15,-45.48"/>
-<polygon fill="#000000" stroke="#000000" points="351.95,-45.54 349.15,-37.54 346.35,-45.54 351.95,-45.54"/>
-</g>
-<g id="node8" class="node">
-<title>rag</title>
-<path fill="white" stroke="#2e7d32" d="M587.05,-326.66C587.05,-326.66 351.25,-326.66 351.25,-326.66 345.25,-326.66 339.25,-320.66 339.25,-314.66 339.25,-314.66 339.25,-263.69 339.25,-263.69 339.25,-257.69 345.25,-251.69 351.25,-251.69 351.25,-251.69 587.05,-251.69 587.05,-251.69 593.05,-251.69 599.05,-257.69 599.05,-263.69 599.05,-263.69 599.05,-314.66 599.05,-314.66 599.05,-320.66 593.05,-326.66 587.05,-326.66"/>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-306.85" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">RAG over the uploaded PDF</text>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-295.6" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">PDF ≤ 10 pages / ≤ 20 MB</text>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-284.35" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">→ chunk 1000 chars, 150 overlap</text>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-273.1" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">→ embed &#160;BAAI/bge&#45;small&#45;en&#45;v1.5 &#160;(fastembed)</text>
-<text xml:space="preserve" text-anchor="middle" x="469.15" y="-261.85" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="11.00">→ top&#45;4 passages by cosine</text>
-</g>
-<g id="edge8" class="edge">
-<title>tools&#45;&gt;rag</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M469.15,-377.61C469.15,-365.31 469.15,-350.2 469.15,-336.03"/>
-<polygon fill="#000000" stroke="#000000" points="471.95,-336.4 469.15,-328.4 466.35,-336.4 471.95,-336.4"/>
-<text xml:space="preserve" text-anchor="middle" x="508.15" y="-345.86" font-family="Roboto,Helvetica,Arial,sans-serif" font-size="9.00" fill="#333333"> &#160;search_document</text>
-</g>
-</g>
-</svg>
-            <figcaption>
-                The loop runs at most five times per turn; if the model is still calling
-                tools after that, the turn ends with a fallback reply.
-            </figcaption>
+            <!-- source: diagrams/agent.mmd -- re-render via POST https://kroki.io/mermaid/svg -->
+<svg id="container" width="979.4453125" xmlns="http://www.w3.org/2000/svg" class="flowchart diagram-svg" height="940.046875" viewBox="0 0 979.4453125 940.046875" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#container{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#container .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#container .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#container .error-icon{fill:#552222;}#container .error-text{fill:#552222;stroke:#552222;}#container .edge-thickness-normal{stroke-width:1px;}#container .edge-thickness-thick{stroke-width:3.5px;}#container .edge-pattern-solid{stroke-dasharray:0;}#container .edge-thickness-invisible{stroke-width:0;fill:none;}#container .edge-pattern-dashed{stroke-dasharray:3;}#container .edge-pattern-dotted{stroke-dasharray:2;}#container .marker{fill:#333333;stroke:#333333;}#container .marker.cross{stroke:#333333;}#container svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#container p{margin:0;}#container .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#container .cluster-label text{fill:#333;}#container .cluster-label span{color:#333;}#container .cluster-label span p{background-color:transparent;}#container .label text,#container span{fill:#333;color:#333;}#container .node rect,#container .node circle,#container .node ellipse,#container .node polygon,#container .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#container .rough-node .label text,#container .node .label text,#container .image-shape .label,#container .icon-shape .label{text-anchor:middle;}#container .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#container .rough-node .label,#container .node .label,#container .image-shape .label,#container .icon-shape .label{text-align:center;}#container .node.clickable{cursor:pointer;}#container .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#container .arrowheadPath{fill:#333333;}#container .edgePath .path{stroke:#333333;stroke-width:1px;}#container .flowchart-link{stroke:#333333;fill:none;}#container .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#container .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#container .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#container .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#container .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#container .cluster text{fill:#333;}#container .cluster span{color:#333;}#container div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#container .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#container rect.text{fill:none;stroke-width:0;}#container .icon-shape,#container .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#container .icon-shape p,#container .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#container .icon-shape .label rect,#container .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#container .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#container .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#container .node .neo-node{stroke:#9370DB;}#container [data-look="neo"].node rect,#container [data-look="neo"].cluster rect,#container [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#container [data-look="neo"].swimlane.cluster rect{filter:none;}#container [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#container [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#container [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#container [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#container [data-look="neo"].node circle .state-start{fill:#000000;}#container [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#container [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#container :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#container .input&gt;*{fill:rgb(238, 246, 238)!important;stroke:rgb(0, 0, 0)!important;}#container .input span{fill:rgb(238, 246, 238)!important;stroke:rgb(0, 0, 0)!important;}#container .model&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;}#container .model span{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;}#container .dec&gt;*{fill:rgb(255, 251, 230)!important;stroke:rgb(138, 124, 26)!important;}#container .dec span{fill:rgb(255, 251, 230)!important;stroke:rgb(138, 124, 26)!important;}#container .panel&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;}#container .panel span{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;}</style><g><marker id="container_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="container_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="container_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"><g class="cluster" id="container-LOOP" data-look="classic"><rect style="" x="8" y="112" width="387.640625" height="598.046875"></rect><g class="cluster-label" transform="translate(94.5859375, 112)"><foreignObject width="214.46875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Agent loop · up to 5 iterations</p></span></div></foreignObject></g></g></g><g class="edgePaths"><path d="M185.758,62L185.758,87L185.758,87L185.758,112L185.758,112L185.758,133L185.758,133" id="container-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MTg1Ljc1NzgxMjUsInkiOjYyfSx7IngiOjE4NS43NTc4MTI1LCJ5Ijo4N30seyJ4IjoxODUuNzU3ODEyNSwieSI6MTEyfSx7IngiOjE4NS43NTc4MTI1LCJ5IjoxMzd9XQ==" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M233.726,191L233.726,216L278.141,216L278.141,237L278.141,237" id="container-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6MjMzLjcyNTgxMTI5ODA3NjksInkiOjE5MX0seyJ4IjoyNzguMTQwNjI1LCJ5IjoyMTZ9LHsieCI6Mjc4LjE0MDYyNSwieSI6MjQxfV0=" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M245.762,358.668L245.762,428.047L193.086,428.047L193.086,544.381L142.264,544.381" id="container-L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6MjQ1Ljc2MjEyMDEyMTYwMDczLCJ5IjozNTguNjY4MzcwMTIxNjAwNzN9LHsieCI6MTkzLjA4NTkzNzUsInkiOjQyOC4wNDY4NzV9LHsieCI6MTQwLjY2MjQ2ODExMjI0NDksInkiOjU0OC4wNDY4NzV9XQ==" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M125.095,548.047L125.095,428.047L108.328,428.047L108.328,316.023L108.328,316.023L108.328,216L108.328,216L108.328,193.23L142.233,193.23" id="container-L_D_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_B_0" data-points="W3sieCI6MTI1LjA5NDcwNjYzMjY1MzA2LCJ5Ijo1NDguMDQ2ODc1fSx7IngiOjEwOC4zMjgxMjUsInkiOjQyOC4wNDY4NzV9LHsieCI6MTA4LjMyODEyNSwieSI6MzE2LjAyMzQzNzV9LHsieCI6MTA4LjMyODEyNSwieSI6MjE2fSx7IngiOjE0NS41NTM5MzYyOTgwNzY5LCJ5IjoxOTF9XQ==" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M273.447,386.353L273.447,428.047L270.664,428.047L270.664,545.916L457.948,545.916" id="container-L_C_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_E_0" data-points="W3sieCI6MjczLjQ0Njc1NTM4MTMwODgzLCJ5IjozODYuMzUzMDA1MzgxMzA4ODN9LHsieCI6MjcwLjY2NDA2MjUsInkiOjQyOC4wNDY4NzV9LHsieCI6NDYxLjMzMzcwNTM1NzE0MjgzLCJ5Ijo1NDguMDQ2ODc1fV0=" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M504.234,602.047L504.234,710.047L504.234,710.047L504.234,747.047L504.234,747.047L504.234,827.047L504.234,827.047" id="container-L_E_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6NTA0LjIzNDM3NSwieSI6NjAyLjA0Njg3NX0seyJ4Ijo1MDQuMjM0Mzc1LCJ5Ijo3MTAuMDQ2ODc1fSx7IngiOjUwNC4yMzQzNzUsInkiOjc0Ny4wNDY4NzV9LHsieCI6NTA0LjIzNDM3NSwieSI6ODMxLjA0Njg3NX1d" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M318.119,391.047L318.119,428.047L337.836,428.047L337.836,521.018L632.631,521.018" id="container-L_C_TOOLS_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_TOOLS_0" data-points="W3sieCI6MzE4LjExOTI5MDU5Mjk2MzI0LCJ5IjozOTEuMDQ2ODc1fSx7IngiOjMzNy44MzU5Mzc1LCJ5Ijo0MjguMDQ2ODc1fSx7IngiOjYzNi40NDUzMTI1LCJ5Ijo1MjIuMjIxMjkwODc2MTAyfV0=" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path><path d="M803.945,685.047L803.945,710.047L803.945,710.047L803.945,747.047L803.945,747.047L803.945,780.047L803.945,780.047" id="container-L_TOOLS_RAG_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_TOOLS_RAG_0" data-points="W3sieCI6ODAzLjk0NTMxMjUsInkiOjY4NS4wNDY4NzV9LHsieCI6ODAzLjk0NTMxMjUsInkiOjcxMC4wNDY4NzV9LHsieCI6ODAzLjk0NTMxMjUsInkiOjc0Ny4wNDY4NzV9LHsieCI6ODAzLjk0NTMxMjUsInkiOjc4NC4wNDY4NzV9XQ==" data-look="classic" marker-end="url(#container_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(193.0859375, 428.046875)"><g class="label" data-id="L_C_D_0" transform="translate(-12.0078125, -12)"><foreignObject width="24.015625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>yes</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(108.328125, 316.0234375)"><g class="label" data-id="L_D_B_0" transform="translate(-59.7890625, -12)"><foreignObject width="119.578125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>result appended</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(270.6640625, 428.046875)"><g class="label" data-id="L_C_E_0" transform="translate(-9.3671875, -12)"><foreignObject width="18.734375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>no</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_F_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(337.8359375, 428.046875)"><g class="label" data-id="L_C_TOOLS_0" transform="translate(-37.8046875, -12)"><foreignObject width="75.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>picks from</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(803.9453125, 747.046875)"><g class="label" data-id="L_TOOLS_RAG_0" transform="translate(-64.3828125, -12)"><foreignObject width="128.765625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>search_document</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="root" transform="translate(628.4453125, 776.046875)"><g class="clusters"><g class="cluster panel" id="container-RAG" data-look="classic"><rect style="fill:#ffffff !important;stroke:#2e7d32 !important" x="8" y="8" width="335" height="148"></rect><g class="cluster-label" transform="translate(101.03125, 8)"><foreignObject width="148.9375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>H · Document search</p></span></div></foreignObject></g></g></g><g class="edgePaths"></g><g class="edgeLabels"></g><g class="nodes"><g class="node default" id="container-flowchart-H-16" data-look="classic" transform="translate(175.5, 82)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>PDF ≤ 10 pages · 1000-char chunks · bge-small · top-4</p></span></div></foreignObject></g></g></g></g><g class="root" transform="translate(628.4453125, 457.046875)"><g class="clusters"><g class="cluster panel" id="container-TOOLS" data-look="classic"><rect style="fill:#ffffff !important;stroke:#2e7d32 !important" x="8" y="8" width="335" height="220"></rect><g class="cluster-label" transform="translate(124.4765625, 8)"><foreignObject width="102.046875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>G · Tool picker</p></span></div></foreignObject></g></g></g><g class="edgePaths"></g><g class="edgeLabels"></g><g class="nodes"><g class="node default" id="container-flowchart-G-15" data-look="classic" transform="translate(175.5, 118)"><rect class="basic label-container" style="" x="-130" y="-75" width="260" height="150"></rect><g class="label" style="" transform="translate(-100, -60)"><rect></rect><foreignObject width="200" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>weather · calculator · wikipedia · dictionary · exchange_rate · world_time · search_document</p></span></div></foreignObject></g></g></g></g><g class="node default input" id="container-flowchart-A-0" data-look="classic" transform="translate(185.7578125, 35)"><rect class="basic label-container" style="fill:#eef6ee !important;stroke:#000 !important" x="-78.359375" y="-27" width="156.71875" height="54"></rect><g class="label" style="" transform="translate(-48.359375, -12)"><rect></rect><foreignObject width="96.71875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>A · Turn input</p></span></div></foreignObject></g></g><g class="node default model" id="container-flowchart-B-1" data-look="classic" transform="translate(185.7578125, 164)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="-55.140625" y="-27" width="110.28125" height="54"></rect><g class="label" style="" transform="translate(-25.140625, -12)"><rect></rect><foreignObject width="50.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>B · LLM</p></span></div></foreignObject></g></g><g class="node default dec" id="container-flowchart-C-3" data-look="classic" transform="translate(278.140625, 316.0234375)"><polygon points="75.0234375,0 150.046875,-75.0234375 75.0234375,-150.046875 0,-75.0234375" class="label-container" transform="translate(-74.5234375, 75.0234375)" style="fill:#fffbe6 !important;stroke:#8a7c1a !important"></polygon><g class="label" style="" transform="translate(-48.0234375, -12)"><rect></rect><foreignObject width="96.046875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>C · Tool calls?</p></span></div></foreignObject></g></g><g class="node default model" id="container-flowchart-D-5" data-look="classic" transform="translate(128.8671875, 575.046875)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="-85.8671875" y="-27" width="171.734375" height="54"></rect><g class="label" style="" transform="translate(-55.8671875, -12)"><rect></rect><foreignObject width="111.734375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>D · Execute tool</p></span></div></foreignObject></g></g><g class="node default input" id="container-flowchart-E-9" data-look="classic" transform="translate(504.234375, 575.046875)"><rect class="basic label-container" style="fill:#eef6ee !important;stroke:#000 !important" x="-73.59375" y="-27" width="147.1875" height="54"></rect><g class="label" style="" transform="translate(-43.59375, -12)"><rect></rect><foreignObject width="87.1875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>E · Final text</p></span></div></foreignObject></g></g><g class="node default" id="container-flowchart-F-11" data-look="classic" transform="translate(504.234375, 858.046875)"><rect class="basic label-container" style="" x="-82.2109375" y="-27" width="164.421875" height="54"></rect><g class="label" style="" transform="translate(-52.2109375, -12)"><rect></rect><foreignObject width="104.421875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>F · Speak reply</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="container-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="container-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs></svg>
             </figure>
+            <ol type="A" class="diagram-legend">
+                <li><strong>Turn input</strong> &mdash; the transcript, plus the last 20 messages, the active system prompt (custom, preset, or default), and an &ldquo;a PDF is uploaded&rdquo; note when a document is loaded.</li>
+                <li><strong>LLM call</strong> with <code>tool_choice = auto</code> (Groq <code>gpt-oss-20b</code>).</li>
+                <li><strong>Decision:</strong> did the model emit tool calls?</li>
+                <li><strong>Execute the chosen tool</strong> and append its result, then loop back to B &mdash; at most five iterations per turn, otherwise a fallback reply.</li>
+                <li><strong>Final answer text</strong> &mdash; no more tool calls.</li>
+                <li><strong>Speak the reply:</strong> <code>strip_markdown</code>, then Piper TTS.</li>
+                <li><strong>Tool picker:</strong> 7 free, keyless tools &mdash; weather, calculator, Wikipedia, dictionary, exchange rate, world time, document search.</li>
+                <li><strong>Document search (RAG):</strong> PDF &le; 10 pages / 20&nbsp;MB &rarr; 1000-char chunks with 150 overlap &rarr; <code>bge-small-en-v1.5</code> embeddings &rarr; top-4 by cosine.</li>
+            </ol>
 
             <span class="eyebrow">Delivery</span>
             <ul>
                 <li>
                     A push to <code>main</code> triggers GitHub Actions
                     (<code>.github/workflows/deploy.yml</code>).
-                    <code>dorny/paths-filter</code> looks at what changed and builds only
-                    the affected part &mdash; backend, frontend, or the Helm chart.
+                    <code>dorny/paths-filter</code> looks at what changed and
+                    builds only the affected part &mdash; backend, frontend, or
+                    the Helm chart.
                 </li>
                 <li>
-                    Backend and frontend build as <code>linux/amd64</code> Docker images
-                    and are pushed to GHCR
-                    (<code>ghcr.io/qharo/voice-agent-*</code>), using the Actions layer
-                    cache to keep rebuilds fast.
+                    Backend and frontend build as
+                    <code>linux/amd64</code> Docker images and are pushed to
+                    GHCR (<code>ghcr.io/qharo/voice-agent-*</code>), using the
+                    Actions layer cache to keep rebuilds fast.
                 </li>
                 <li>
                     The deploy job loads a kubeconfig from a secret, runs
@@ -529,23 +494,27 @@
                     Deployment, then waits on rollout status.
                 </li>
                 <li>
-                    The cluster is K3s. The Helm chart <code>helm/voice-agent</code>
+                    The cluster is K3s. The Helm chart
+                    <code>helm/voice-agent</code>
                     carries the namespace, both Deployments and Services, and an
-                    ingress-nginx Ingress with cert-manager (Let&rsquo;s Encrypt) TLS at
-                    <code>qharo-voice-agent.duckdns.org</code>, WebSocket-friendly
-                    timeouts, and a 20&nbsp;MB upload cap.
+                    ingress-nginx Ingress with cert-manager (Let&rsquo;s
+                    Encrypt) TLS at
+                    <code>qharo-voice-agent.duckdns.org</code>,
+                    WebSocket-friendly timeouts, and a 20&nbsp;MB upload cap.
                 </li>
                 <li>
                     The <code>GROQ_API_KEY</code> ships in the repo as a Bitnami
-                    <strong>SealedSecret</strong> &mdash; encrypted, safe to commit,
-                    decryptable only in-cluster.
+                    <strong>SealedSecret</strong> &mdash; encrypted, safe to
+                    commit, decryptable only in-cluster.
                 </li>
                 <li>
-                    The backend exposes Prometheus metrics at <code>/metrics</code>; a
-                    <strong>ServiceMonitor</strong> scrapes them every 15&nbsp;seconds and
-                    a <strong>Grafana dashboard</strong> ships as a ConfigMap &mdash;
-                    active sessions, queue depth, STT / LLM / TTS latencies, tool calls,
-                    and error counts.
+                    The backend exposes Prometheus metrics at
+                    <code>/metrics</code>; a
+                    <strong>ServiceMonitor</strong> scrapes them every
+                    15&nbsp;seconds and a
+                    <strong>Grafana dashboard</strong> ships as a ConfigMap
+                    &mdash; active sessions, queue depth, STT / LLM / TTS
+                    latencies, tool calls, and error counts.
                 </li>
             </ul>
 
@@ -553,23 +522,111 @@
             <div class="table-scroll">
                 <table class="stats">
                     <thead>
-                        <tr><th>Area</th><th>Detail</th></tr>
+                        <tr>
+                            <th>Area</th>
+                            <th>Detail</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <tr><th>Audio in</th><td>16&nbsp;kHz mono PCM16, streamed frame-by-frame over one WebSocket</td></tr>
-                        <tr><th>STT</th><td><code>moonshine-streaming-tiny</code> Q8_0 GGUF via <code>transcribe_cpp</code>, in-process</td></tr>
-                        <tr><th>LLM</th><td>Groq <code>openai/gpt-oss-20b</code>, <code>max_tokens</code> 1024, up to 5 tool iterations per turn</td></tr>
-                        <tr><th>Tools</th><td>7, all free / keyless: weather, calculator, Wikipedia, dictionary, exchange rate, world time, document search</td></tr>
-                        <tr><th>TTS (default)</th><td>Piper <code>en_US-amy-medium</code>, 22.05&nbsp;kHz, length-scale 0.9, streaming subprocess</td></tr>
-                        <tr><th>TTS (alt)</th><td>Pocket-TTS 100M ONNX-INT8, 24&nbsp;kHz, 80&nbsp;ms frames (<code>TTS_ENGINE=pocket</code>)</td></tr>
-                        <tr><th>RAG</th><td>PDF only, &le;10 pages / &le;20&nbsp;MB; 1000-char chunks, 150 overlap; <code>bge-small-en-v1.5</code> embeddings; top-4 by cosine</td></tr>
-                        <tr><th>Conversation memory</th><td>Last 20 messages, per WebSocket, in-process</td></tr>
-                        <tr><th>Concurrency</th><td>4 turns processed at once (<code>asyncio.Semaphore</code>); queued clients get a live position</td></tr>
-                        <tr><th>Custom prompt limit</th><td>4000 characters</td></tr>
-                        <tr><th>Deploy</th><td>K3s + Helm chart <code>voice-agent</code>; GHCR images; path-filtered GitHub Actions</td></tr>
-                        <tr><th>TLS / DNS</th><td>ingress-nginx + cert-manager (Let&rsquo;s Encrypt), DuckDNS</td></tr>
-                        <tr><th>Backend resources</th><td>1&ndash;2&nbsp;GiB RAM, 0.5&ndash;2 vCPU, 1 replica; models loaded at startup</td></tr>
-                        <tr><th>Metrics</th><td>Prometheus <code>/metrics</code>, 15&nbsp;s scrape, Grafana dashboard shipped as a ConfigMap</td></tr>
+                        <tr>
+                            <th>Audio in</th>
+                            <td>
+                                16&nbsp;kHz mono PCM16, streamed frame-by-frame
+                                over one WebSocket
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>STT</th>
+                            <td>
+                                <code>moonshine-streaming-tiny</code> Q8_0 GGUF
+                                via <code>transcribe_cpp</code>, in-process
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>LLM</th>
+                            <td>
+                                Groq <code>openai/gpt-oss-20b</code>,
+                                <code>max_tokens</code> 1024, up to 5 tool
+                                iterations per turn
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Tools</th>
+                            <td>
+                                7, all free / keyless: weather, calculator,
+                                Wikipedia, dictionary, exchange rate, world
+                                time, document search
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>TTS (default)</th>
+                            <td>
+                                Piper <code>en_US-amy-medium</code>,
+                                22.05&nbsp;kHz, length-scale 0.9, streaming
+                                subprocess
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>TTS (alt)</th>
+                            <td>
+                                Pocket-TTS 100M ONNX-INT8, 24&nbsp;kHz,
+                                80&nbsp;ms frames
+                                (<code>TTS_ENGINE=pocket</code>)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>RAG</th>
+                            <td>
+                                PDF only, &le;10 pages / &le;20&nbsp;MB;
+                                1000-char chunks, 150 overlap;
+                                <code>bge-small-en-v1.5</code> embeddings; top-4
+                                by cosine
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Conversation memory</th>
+                            <td>Last 20 messages, per WebSocket, in-process</td>
+                        </tr>
+                        <tr>
+                            <th>Concurrency</th>
+                            <td>
+                                4 turns processed at once
+                                (<code>asyncio.Semaphore</code>); queued clients
+                                get a live position
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Custom prompt limit</th>
+                            <td>4000 characters</td>
+                        </tr>
+                        <tr>
+                            <th>Deploy</th>
+                            <td>
+                                K3s + Helm chart <code>voice-agent</code>; GHCR
+                                images; path-filtered GitHub Actions
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>TLS / DNS</th>
+                            <td>
+                                ingress-nginx + cert-manager (Let&rsquo;s
+                                Encrypt), DuckDNS
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Backend resources</th>
+                            <td>
+                                1&ndash;2&nbsp;GiB RAM, 0.5&ndash;2 vCPU, 1
+                                replica; models loaded at startup
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Metrics</th>
+                            <td>
+                                Prometheus <code>/metrics</code>, 15&nbsp;s
+                                scrape, Grafana dashboard shipped as a ConfigMap
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -578,39 +635,88 @@
 
             <h3>Design tradeoffs</h3>
             <ul>
-                <li>Push-to-talk instead of voice-activity endpointing &mdash; you decide when a turn ends, which keeps the interaction predictable and the server simple.</li>
-                <li>The LLM is hosted (Groq) for speed and quality, but STT and TTS run locally in the backend process &mdash; no per-request cost, no extra network hop, and they work offline.</li>
-                <li>Concurrency is capped at four turns so a small box stays responsive; extra callers wait in a fair queue rather than degrading everyone.</li>
-                <li>RAG holds one document at a time, and the prompt / preset / document state is process-global rather than per-session &mdash; deliberately minimal for a single-user demo.</li>
+                <li>
+                    Push-to-talk instead of voice-activity endpointing &mdash;
+                    you decide when a turn ends, which keeps the interaction
+                    predictable and the server simple.
+                </li>
+                <li>
+                    The LLM is hosted (Groq) for speed and quality, but STT and
+                    TTS run locally in the backend process &mdash; no
+                    per-request cost, no extra network hop, and they work
+                    offline.
+                </li>
+                <li>
+                    Concurrency is capped at four turns so a small box stays
+                    responsive; extra callers wait in a fair queue rather than
+                    degrading everyone.
+                </li>
+                <li>
+                    RAG holds one document at a time, and the prompt / preset /
+                    document state is process-global rather than per-session
+                    &mdash; deliberately minimal for a single-user demo.
+                </li>
             </ul>
 
             <h3>Known limitations</h3>
             <ul>
-                <li>The LLM response isn&rsquo;t streamed into TTS yet &mdash; the full reply is generated first, then synthesised. STT already emits partial transcripts, but the live turn still waits for the final text.</li>
-                <li>The RAG index lives in memory, so an uploaded document is lost on a backend restart or redeploy.</li>
-                <li>Single backend replica &mdash; the in-process models and in-memory state don&rsquo;t share across pods.</li>
+                <li>
+                    The LLM response isn&rsquo;t streamed into TTS yet &mdash;
+                    the full reply is generated first, then synthesised. STT
+                    already emits partial transcripts, but the live turn still
+                    waits for the final text.
+                </li>
+                <li>
+                    The RAG index lives in memory, so an uploaded document is
+                    lost on a backend restart or redeploy.
+                </li>
+                <li>
+                    Single backend replica &mdash; the in-process models and
+                    in-memory state don&rsquo;t share across pods.
+                </li>
                 <li>Voices are English-only.</li>
             </ul>
 
             <h3>Future work</h3>
             <ul>
-                <li>Feed partial STT hypotheses straight into the turn so generation can start before you finish speaking.</li>
-                <li>Stream LLM tokens into TTS sentence-by-sentence to cut time-to-first-audio.</li>
-                <li>Per-session prompt and document state; multi-document RAG.</li>
-                <li>Horizontal autoscaling with shared state pulled out of the process.</li>
+                <li>
+                    Feed partial STT hypotheses straight into the turn so
+                    generation can start before you finish speaking.
+                </li>
+                <li>
+                    Stream LLM tokens into TTS sentence-by-sentence to cut
+                    time-to-first-audio.
+                </li>
+                <li>
+                    Per-session prompt and document state; multi-document RAG.
+                </li>
+                <li>
+                    Horizontal autoscaling with shared state pulled out of the
+                    process.
+                </li>
             </ul>
 
             <h3>Credits &amp; links</h3>
             <p>
-                The models and tools are all free and keyless: Moonshine (STT), Piper
-                (TTS), <code>gpt-oss-20b</code> served by Groq, and open APIs for weather
-                (Open-Meteo), currency (Frankfurter), Wikipedia, dictionary, and world
-                time.
+                The models and tools are all free and keyless: Moonshine (STT),
+                Piper (TTS), <code>gpt-oss-20b</code> served by Groq, and open
+                APIs for weather (Open-Meteo), currency (Frankfurter),
+                Wikipedia, dictionary, and world time.
             </p>
             <p class="endlinks">
-                <a href="https://github.com/qharo/voice_agent" target="_blank" rel="noopener">Source on GitHub</a>
+                <a
+                    href="https://github.com/qharo/voice_agent"
+                    target="_blank"
+                    rel="noopener"
+                    >Source on GitHub</a
+                >
                 &nbsp;&middot;&nbsp;
-                <a href="https://qharo-voice-agent.duckdns.org" target="_blank" rel="noopener">Live demo</a>
+                <a
+                    href="https://qharo-voice-agent.duckdns.org"
+                    target="_blank"
+                    rel="noopener"
+                    >Live demo</a
+                >
             </p>
         </div>
     </body>

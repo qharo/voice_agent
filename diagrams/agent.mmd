@@ -1,0 +1,31 @@
+%%{init: {'flowchart': {'curve': 'stepBefore'}}}%%
+flowchart TD
+    A["A · Turn input"] --> B["B · LLM"]
+    B --> C{"C · Tool calls?"}
+    C -->|yes| D["D · Execute tool"]
+    D -->|result appended| B
+    C -->|no| E["E · Final text"]
+    E --> F["F · Speak reply"]
+
+    subgraph LOOP["Agent loop · up to 5 iterations"]
+        B
+        C
+        D
+    end
+    subgraph TOOLS["G · Tool picker"]
+        G["weather · calculator · wikipedia · dictionary · exchange_rate · world_time · search_document"]
+    end
+    subgraph RAG["H · Document search"]
+        H["PDF ≤ 10 pages · 1000-char chunks · bge-small · top-4"]
+    end
+    C -.->|picks from| TOOLS
+    TOOLS -.->|search_document| RAG
+
+    classDef input fill:#eef6ee,stroke:#000;
+    classDef model fill:#ffffff,stroke:#2e7d32,stroke-width:2px;
+    classDef dec fill:#fffbe6,stroke:#8a7c1a;
+    classDef panel fill:#ffffff,stroke:#2e7d32;
+    class A,E input;
+    class B,D model;
+    class C dec;
+    class TOOLS,RAG panel;
