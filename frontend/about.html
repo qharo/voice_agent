@@ -355,14 +355,7 @@
             </p>
 
             <span class="eyebrow">Pipeline</span>
-            <p>
-                One turn, from the moment you press Space to the first audio
-                coming back. Speech is streamed to the server as raw audio over
-                a single WebSocket; transcription, generation, and synthesis are
-                chained so stages overlap: the transcript streams while you
-                speak, and playback starts while the voice is still being
-                synthesised.
-            </p>
+
             <figure class="gantt">
                 <div
                     class="gantt"
@@ -446,6 +439,12 @@
                     marks first audio, end-to-end ≈&nbsp;1–2&nbsp;s.
                 </figcaption>-->
             </figure>
+            <p>
+                Speech is streamed to the server as raw audio over a single
+                WebSocket; transcription, generation, and synthesis are chained
+                so stages overlap: the transcript streams while you speak, and
+                playback starts while the voice is still being synthesised.
+            </p>
 
             <span class="eyebrow">Agent</span>
             <!--<p>
@@ -1545,7 +1544,7 @@
                     </g>
                 </svg>
             </figure>
-            <ol type="A" class="diagram-legend">
+            <ol class="diagram-legend">
                 <li>
                     <strong>Turn input</strong> &mdash; the transcript, plus the
                     last 20 messages, the active system prompt (custom, preset,
@@ -1558,31 +1557,23 @@
                     <code>gpt-oss-20b</code>).
                 </li>
                 <li>
-                    <strong>Decision:</strong> did the model emit tool calls?
-                </li>
-                <li>
-                    <strong>Execute the chosen tool</strong> and append its
-                    result, then loop back to B &mdash; at most five iterations
-                    per turn, otherwise a fallback reply.
-                </li>
-                <li>
-                    <strong>Final answer text</strong> &mdash; no more tool
-                    calls.
+                    <strong>Tool execution loop:</strong> If the model emits
+                    tool calls, execute the chosen tool and append its result,
+                    then loop back to the LLM &mdash; at most five iterations
+                    per turn, otherwise a fallback reply. When no more tool
+                    calls are needed, proceed to the final answer.
                 </li>
                 <li>
                     <strong>Speak the reply:</strong>
                     <code>strip_markdown</code>, then Piper TTS.
                 </li>
                 <li>
-                    <strong>Tool picker:</strong> 7 free, keyless tools &mdash;
-                    weather, calculator, Wikipedia, dictionary, exchange rate,
-                    world time, document search.
-                </li>
-                <li>
-                    <strong>Document search (RAG):</strong> PDF &le; 10 pages /
-                    20&nbsp;MB &rarr; 1000-char chunks with 150 overlap &rarr;
-                    <code>bge-small-en-v1.5</code> embeddings &rarr; top-4 by
-                    cosine.
+                    <strong>Available tools:</strong> 7 free, keyless tools
+                    (weather, calculator, Wikipedia, dictionary, exchange rate,
+                    world time) plus <strong>document search</strong> (RAG): PDF
+                    &le; 10 pages / 20&nbsp;MB &rarr; 1000-char chunks with 150
+                    overlap &rarr; <code>bge-small-en-v1.5</code> embeddings
+                    &rarr; top-4 by cosine.
                 </li>
             </ol>
 
