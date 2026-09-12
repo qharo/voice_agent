@@ -1544,84 +1544,89 @@
                     </g>
                 </svg>
             </figure>
-            <ol class="diagram-legend">
+            <ul class="diagram-legend">
                 <li>
-                    <strong>Turn input</strong> &mdash; the transcript, plus the
+                    <strong>A · Turn input:</strong> The transcript, plus the
                     last 20 messages, the active system prompt (custom, preset,
                     or default), and an &ldquo;a PDF is uploaded&rdquo; note
                     when a document is loaded.
                 </li>
                 <li>
-                    <strong>LLM call</strong> with
-                    <code>tool_choice = auto</code> (Groq
-                    <code>gpt-oss-20b</code>).
+                    <strong>B · LLM:</strong> Inference call with
+                    <code>tool_choice = auto</code> using Groq
+                    <code>gpt-oss-20b</code>.
                 </li>
                 <li>
-                    <strong>Tool execution loop:</strong> If the model emits
-                    tool calls, execute the chosen tool and append its result,
-                    then loop back to the LLM &mdash; at most five iterations
-                    per turn, otherwise a fallback reply. When no more tool
-                    calls are needed, proceed to the final answer.
+                    <strong>C · Decision:</strong> Evaluates if the model
+                    emitted tool calls. If <em>no</em>, the flow proceeds
+                    directly to <strong>E</strong>.
                 </li>
                 <li>
-                    <strong>Speak the reply:</strong>
-                    <code>strip_markdown</code>, then Piper TTS.
+                    <strong>D · Execute tool:</strong> Runs the chosen tool and
+                    appends the result, looping back to <strong>B</strong>.
+                    Capped at 5 iterations per turn (otherwise triggers a
+                    fallback reply).
                 </li>
                 <li>
-                    <strong>Available tools:</strong> 7 free, keyless tools
-                    (weather, calculator, Wikipedia, dictionary, exchange rate,
-                    world time) plus <strong>document search</strong> (RAG): PDF
-                    &le; 10 pages / 20&nbsp;MB &rarr; 1000-char chunks with 150
-                    overlap &rarr; <code>bge-small-en-v1.5</code> embeddings
-                    &rarr; top-4 by cosine.
-                </li>
-            </ol>
-
-            <span class="eyebrow">Delivery</span>
-            <ul>
-                <li>
-                    A push to <code>main</code> triggers GitHub Actions
-                    (<code>.github/workflows/deploy.yml</code>).
-                    <code>dorny/paths-filter</code> looks at what changed and
-                    builds only the affected part &mdash; backend, frontend, or
-                    the Helm chart.
+                    <strong>E · Final text:</strong> The resolved answer text
+                    generated once no further tool calls are needed.
                 </li>
                 <li>
-                    Backend and frontend build as
-                    <code>linux/amd64</code> Docker images and are pushed to
-                    GHCR (<code>ghcr.io/qharo/voice-agent-*</code>), using the
-                    Actions layer cache to keep rebuilds fast.
+                    <strong>F · Speak reply:</strong> Cleans the final text via
+                    <code>strip_markdown</code>, then synthesizes speech using
+                    Piper TTS.
                 </li>
                 <li>
-                    The deploy job loads a kubeconfig from a secret, runs
-                    <code>helm upgrade</code> when the chart changed, otherwise
-                    <code>kubectl rollout restart</code> for just the changed
-                    Deployment, then waits on rollout status.
+                    <strong>G · Tool picker:</strong> The agent&rsquo;s registry
+                    of 7 free, keyless tools (weather, calculator, Wikipedia,
+                    dictionary, exchange rate, world time, and document search).
                 </li>
                 <li>
-                    The cluster is K3s. The Helm chart
-                    <code>helm/voice-agent</code>
-                    carries the namespace, both Deployments and Services, and an
-                    ingress-nginx Ingress with cert-manager (Let&rsquo;s
-                    Encrypt) TLS at
-                    <code>qharo-voice-agent.duckdns.org</code>,
-                    WebSocket-friendly timeouts, and a 20&nbsp;MB upload cap.
-                </li>
-                <li>
-                    The <code>GROQ_API_KEY</code> ships in the repo as a Bitnami
-                    <strong>SealedSecret</strong> &mdash; encrypted, safe to
-                    commit, decryptable only in-cluster.
-                </li>
-                <li>
-                    The backend exposes Prometheus metrics at
-                    <code>/metrics</code>; a
-                    <strong>ServiceMonitor</strong> scrapes them every
-                    15&nbsp;seconds and a
-                    <strong>Grafana dashboard</strong> ships as a ConfigMap
-                    &mdash; active sessions, queue depth, STT / LLM / TTS
-                    latencies, tool calls, and error counts.
+                    <strong>H · Document search (RAG):</strong> The
+                    <code>search_document</code> tool pipeline: PDF (&le; 10
+                    pages / 20&nbsp;MB) &rarr; 1000-char chunks (150 overlap)
+                    &rarr; <code>bge-small-en-v1.5</code> embeddings &rarr;
+                    top-4 retrieval by cosine similarity.
                 </li>
             </ul>
+
+            <span class="eyebrow">Delivery</span>
+            <p>
+                A push to <code>main</code> triggers a path-filtered GitHub
+                Actions workflow (<code>.github/workflows/deploy.yml</code>).
+                Using <code>dorny/paths-filter</code>, the pipeline
+                intelligently builds only the affected components &mdash;
+                backend, frontend, or the Helm chart. Both application images
+                are built for <code>linux/amd64</code> and pushed to the GitHub
+                Container Registry (GHCR), leveraging the Actions layer cache to
+                keep rebuilds fast and efficient.
+            </p>
+            <p>
+                The application runs on a K3s cluster, orchestrated by the
+                <code>helm/voice-agent</code> chart. This chart provisions the
+                namespace, Deployments, and Services, alongside an
+                <code>ingress-nginx</code> Ingress configured with
+                <code>cert-manager</code> for automated Let&rsquo;s Encrypt TLS
+                at <code>qharo-voice-agent.duckdns.org</code>. The Ingress is
+                explicitly tuned with WebSocket-friendly timeouts and a
+                20&nbsp;MB upload cap. Sensitive credentials like the
+                <code>GROQ_API_KEY</code> are safely committed to the repository
+                as a Bitnami <strong>SealedSecret</strong>, remaining encrypted
+                until decrypted in-cluster. During deployment, the workflow
+                applies changes efficiently: it runs
+                <code>helm upgrade</code> if the chart itself changed, or falls
+                back to a targeted <code>kubectl rollout restart</code> for the
+                specific Deployment, waiting for the rollout to stabilize.
+            </p>
+            <p>
+                For observability, the backend exposes Prometheus metrics at
+                <code>/metrics</code>. A <strong>ServiceMonitor</strong> scrapes
+                these endpoints every 15&nbsp;seconds, feeding a comprehensive
+                Grafana dashboard that is shipped directly as a Kubernetes
+                ConfigMap. This provides real-time visibility into active
+                sessions, queue depth, per-stage latencies (STT, LLM, TTS), tool
+                call rates, and error counts.
+            </p>
 
             <span class="eyebrow">Reference</span>
             <div class="table-scroll">
