@@ -51,10 +51,35 @@
                 color: var(--black);
                 text-decoration: none;
             }
+            .nav-link {
+                display: flex;
+                align-items: center;
+                min-height: 34px;
+                padding: 0 12px;
+                font-size: 16px;
+                font-weight: 500;
+                letter-spacing: 0.2px;
+                color: var(--black);
+                text-decoration: none;
+                white-space: nowrap;
+                border-radius: 999px;
+                opacity: 0.65;
+                transition: opacity 0.3s ease;
+            }
+            .nav-link:hover {
+                opacity: 1;
+                text-decoration: underline;
+                text-underline-offset: 4px;
+            }
+            .nav-link:focus-visible {
+                opacity: 1;
+                outline: 2px solid currentColor;
+                outline-offset: 2px;
+            }
             .topbar-actions {
                 display: flex;
                 align-items: center;
-                gap: 4px;
+                gap: 8px;
             }
             .corner-btn {
                 display: flex;
@@ -330,6 +355,14 @@
         <header id="topbar">
             <a class="brand" href="index.html">Voice Agent</a>
             <nav class="topbar-actions">
+                <a
+                    href="https://github.com/qharo/voice_agent"
+                    class="nav-link"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Voice Agent source code on GitHub"
+                    >GitHub</a
+                >
                 <a
                     href="index.html"
                     id="homeLink"

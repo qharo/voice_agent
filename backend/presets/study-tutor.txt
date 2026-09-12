@@ -1,0 +1,59 @@
+Causal Inference: A Study Guide
+Concepts, examples, and common mistakes in causal reasoning.
+
+Question: What is the difference between correlation and causation?
+Answer: Correlation means that two things tend to occur together. Causation means that changing one thing produces a change in the other. For example, ice cream sales and drowning deaths rise together in summer, but ice cream does not cause drowning. Hot weather increases both. A causal claim therefore requires more than an observed association.
+
+Question: Why can strong correlations be misleading?
+Answer: A strong correlation can arise from a common cause, reverse causation, coincidence, selection in the data, or measurement problems. A large correlation does not reveal which variable influences the other, whether both respond to a third variable, or whether the sample represents the broader population.
+
+Question: What is a confounder?
+Answer: A confounder is a common cause of both the supposed treatment and the outcome. For example, age can influence both exercise habits and heart disease risk. If age is ignored, exercise may appear more or less effective than it really is. Confounders create a backdoor association that can masquerade as causation.
+
+Question: What does it mean to control for a variable?
+Answer: To control for a variable is to compare outcomes among people or cases that are similar with respect to that variable. For example, researchers might compare exercisers and nonexercisers within the same age group. Good controls remove part of a spurious association, but they do not guarantee that every important confounder has been measured.
+
+Question: Can statistical adjustment eliminate all confounding?
+Answer: No. Adjustment only accounts for confounders that were measured well and modeled appropriately. Unmeasured habits, genetics, motivation, medical history, or social circumstances may remain. This remaining problem is called residual confounding. Therefore, careful language distinguishes between an adjusted association and a proven causal effect.
+
+Question: Why are randomized controlled trials especially persuasive?
+Answer: Random assignment tends to balance both measured and unmeasured characteristics across treatment and control groups. If the groups start out comparable and only one group receives the treatment, a later difference in outcomes is more plausibly caused by the treatment. Randomization does not make a study perfect, but it removes many alternative explanations at once.
+
+Question: What can still go wrong in a randomized trial?
+Answer: Participants may not follow their assigned treatment, some may leave the study, outcome measurement may be biased, or the experimental setting may differ from ordinary life. Researchers often analyze everyone according to their original assignment, called intention to treat, because analyzing only compliant participants can reintroduce selection bias.
+
+Question: What is an observational study?
+Answer: An observational study examines treatments or exposures that were not assigned by the researcher. Examples include comparing people who chose different diets, jobs, schools, or medical treatments. Because people select themselves into these groups, the groups may differ in motivation, health, income, or other causal factors. Observational evidence can be valuable, but it requires careful attention to confounding.
+
+Question: What is a natural experiment?
+Answer: A natural experiment occurs when an external event creates approximately random or arbitrary variation in exposure. For example, people born just before or after a policy cutoff may experience different schooling requirements despite being otherwise similar. Such designs can be persuasive, but the researcher must still argue that the comparison groups are genuinely comparable.
+
+Question: What is Simpson's paradox?
+Answer: Simpson's paradox occurs when an association in combined data reverses within subgroups. For example, one hospital may have higher overall survival while having lower survival for both mild and severe cases separately. The reversal happens because the hospitals treat different mixes of patients. The lesson is that an overall average can conceal the more meaningful subgroup comparison.
+
+Question: What is selection bias?
+Answer: Selection bias occurs when the people included in a study differ systematically from the people about whom we want to draw conclusions. For example, studying a job-training program only among graduates ignores people who dropped out because the program was ineffective or too demanding. Conclusions based on a selected sample may not apply to everyone who starts the program.
+
+Question: What is collider bias?
+Answer: Collider bias occurs when analysis is restricted to a variable influenced by both the treatment and the outcome, or by two causes whose relationship is being studied. A classic pattern is that among hospital patients, two unrelated diseases can appear negatively associated because admission depends on having at least one serious condition. Conditioning on a common consequence can create a false association.
+
+Question: How can a causal diagram help?
+Answer: A causal diagram represents suspected causes with arrows showing the direction of influence. It helps distinguish confounders, mediators, colliders, and competing explanations. A confounder points to both treatment and outcome. A mediator lies on the path from treatment to outcome. A collider receives arrows from two variables. Diagrams make assumptions explicit before statistical analysis begins.
+
+Question: What is the difference between seeing and doing?
+Answer: Seeing is passive observation: among people who exercise, what is their health? Doing is intervention: if the same person were made to exercise, how would their health change? These can differ because people who choose exercise may already differ in age, health, motivation, or resources. Causal questions are usually about doing, not merely seeing.
+
+Question: What is an average treatment effect?
+Answer: An average treatment effect is the average difference between what happens with treatment and what would have happened without it. The difficulty is that no one can both receive and not receive treatment at the same time. Causal inference therefore tries to construct a credible comparison group that approximates the missing alternative outcome.
+
+Question: Why might a treatment work differently for different people?
+Answer: Effects can vary by age, health, prior experience, environment, dosage, timing, or adherence. A job-training program may help inexperienced workers while adding little for experienced workers. This variation is called treatment-effect heterogeneity. An average effect is useful, but it may conceal important differences across groups.
+
+Question: What is external validity?
+Answer: External validity concerns whether a causal finding applies in another population, place, time, or implementation. A tutoring program may work in a small experiment with motivated volunteers but fail when expanded. Differences in participants, instructors, resources, culture, or incentives can change the result. A credible causal claim therefore specifies where and for whom it is expected to hold.
+
+Question: What should a careful causal conclusion include?
+Answer: It should identify the comparison being made, explain why the groups are comparable, acknowledge possible confounders, distinguish association from intervention, consider subgroup differences, and state the limits of generalization. A careful conclusion might say that the evidence supports a causal effect under stated conditions, rather than claiming universal proof.
+
+Question: What are common mistakes in causal reasoning?
+Answer: Common mistakes include treating correlation as causation, ignoring common causes, selecting an unrepresentative sample, conditioning on a consequence of the variables being studied, overgeneralizing from one setting, and assuming that an average effect applies equally to everyone. Avoiding these mistakes requires explicit comparisons, attention to data selection, and humility about unmeasured causes.

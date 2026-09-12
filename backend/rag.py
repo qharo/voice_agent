@@ -10,6 +10,9 @@ CHUNK_OVERLAP = 150
 TOP_K = 4
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 MAX_FILE_BYTES = 20 * 1024 * 1024
+PDF_MEDIA_TYPE = "application/pdf"
+TXT_MEDIA_TYPE = "text/plain; charset=utf-8"
+SUPPORTED_EXTENSIONS = (".pdf", ".txt")
 
 _embedding: Optional[TextEmbedding] = None
 _doc: Optional[dict] = None
@@ -50,10 +53,13 @@ def _cosine(a, b) -> float:
     return dot / (na * nb)
 
 
-def load_document(filename: str, data: bytes) -> dict:
-    if len(data) > MAX_FILE_BYTES:
-        raise ValueError(f"File exceeds the {MAX_FILE_BYTES // (1024 * 1024)} MB limit")
+def _media_type_for_filename(filename: str) -> str:
+    if filename.lower().endswith(".pdf"):
+        return PDF_MEDIA_TYPE
+    return TXT_MEDIA_TYPE
 
+
+def _extract_pdf_text(data: bytes) -> tuple[str, int]:
     reader = PdfReader(io.BytesIO(data))
     pages = min(MAX_PAGES, len(reader.pages))
 
@@ -61,10 +67,31 @@ def load_document(filename: str, data: bytes) -> dict:
     for i in range(pages):
         text = reader.pages[i].extract_text() or ""
         parts.append(f"[Page {i + 1}]\n{text}")
-    full = "\n\n".join(parts).strip()
+    return "\n\n".join(parts).strip(), pages
 
-    if not full:
-        raise ValueError("No extractable text found in the first pages. The PDF may be scanned or image-based.")
+
+def _decode_text_document(data: bytes) -> str:
+    try:
+        return data.decode("utf-8-sig").strip()
+    except UnicodeDecodeError as e:
+        raise ValueError("Could not decode that TXT file. Please use UTF-8 text.") from e
+
+
+def load_document(filename: str, data: bytes) -> dict:
+    if not filename.lower().endswith(SUPPORTED_EXTENSIONS):
+        raise ValueError("Only PDF and TXT files are supported")
+    if len(data) > MAX_FILE_BYTES:
+        raise ValueError(f"File exceeds the {MAX_FILE_BYTES // (1024 * 1024)} MB limit")
+
+    if filename.lower().endswith(".pdf"):
+        full, pages = _extract_pdf_text(data)
+        if not full:
+            raise ValueError("No extractable text found in the first pages. The PDF may be scanned or image-based.")
+    else:
+        full = _decode_text_document(data)
+        pages = 1
+        if not full:
+            raise ValueError("No text found in that TXT file.")
 
     chunks = _chunk(full)
     model = _get_embedding()
@@ -73,6 +100,8 @@ def load_document(filename: str, data: bytes) -> dict:
     global _doc
     _doc = {
         "filename": filename,
+        "media_type": _media_type_for_filename(filename),
+        "data": bytes(data),
         "pages": pages,
         "chunks": [
             {"text": chunk, "emb": emb}
@@ -102,6 +131,16 @@ def get_doc_info() -> Optional[dict]:
         "filename": _doc["filename"],
         "pages": _doc["pages"],
         "chunks": len(_doc["chunks"]),
+    }
+
+
+def get_download() -> Optional[dict]:
+    if not _doc or not _doc.get("data"):
+        return None
+    return {
+        "filename": _doc["filename"],
+        "media_type": _doc.get("media_type", PDF_MEDIA_TYPE),
+        "data": _doc["data"],
     }
 
 

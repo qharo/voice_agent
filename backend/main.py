@@ -1,5 +1,7 @@
 import os
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, HTTPException
+from pathlib import Path
+from urllib.parse import quote
+from fastapi import FastAPI, Response, WebSocket, WebSocketDisconnect, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from stt import STT
 import rag
@@ -47,20 +49,43 @@ else:
 def health():
     return {"status": "ok"}
 
+def _safe_download_filename(filename: str) -> str:
+    safe = Path(filename or "document").name.strip()
+    safe = "".join(ch if ch.isprintable() and ch not in {'"', "\\"} else "_" for ch in safe)
+    return safe or "document"
+
+
 @app.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(400, "Only PDF files are supported")
+    if not file.filename.lower().endswith((".pdf", ".txt")):
+        raise HTTPException(400, "Only PDF and TXT files are supported")
     data = await file.read()
     try:
         info = rag.load_document(file.filename, data)
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception:
-        raise HTTPException(400, "Could not parse that PDF")
+        raise HTTPException(400, "Could not parse that document")
     global active_preset
     active_preset = None
     return info
+
+@app.get("/document/download")
+def download_document():
+    download = rag.get_download()
+    if not download:
+        raise HTTPException(404, "No document is loaded")
+    filename = _safe_download_filename(download["filename"])
+    return Response(
+        content=download["data"],
+        media_type=download["media_type"],
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{filename}"; '
+                f"filename*=UTF-8''{quote(filename)}"
+            )
+        },
+    )
 
 @app.delete("/upload")
 async def clear_document():
@@ -97,6 +122,8 @@ async def activate_preset(body: dict):
         raise HTTPException(400, f"Unknown preset: {slug}")
     try:
         info = rag.load_document(preset["document"], presets.read_document(slug))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
     except Exception:
         raise HTTPException(500, "Could not load the preset document")
     custom_prompt = preset["prompt"]
