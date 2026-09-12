@@ -1581,6 +1581,41 @@
             </ul>
 
             <span class="eyebrow">Delivery</span>
+
+            <p>
+                A GitHub Actions workflow is set up to identify affected
+                components and rebuild only what has changed. Both the backend
+                and frontend are containerized (compatible with Docker Compose)
+                and built for <code>linux/amd64</code>, leveraging the GitHub
+                Actions layer cache to keep rebuilds fast and efficient.
+            </p>
+            <p>
+                The application is hosted on a Hetzner server, running a K3s
+                cluster orchestrated by the <code>voice-agent</code> Helm chart.
+                This chart provisions the namespace, Deployments, and Services,
+                alongside an <code>ingress-nginx</code> Ingress configured with
+                <code>cert-manager</code> for automated Let&rsquo;s Encrypt TLS
+                at <code>qharo-voice-agent.duckdns.org</code>. The Ingress is
+                explicitly tuned with WebSocket-friendly timeouts and a
+                20&nbsp;MB upload cap. Sensitive credentials like the
+                <code>GROQ_API_KEY</code> are safely committed to the repository
+                as a Bitnami <strong>SealedSecret</strong>, remaining encrypted
+                until decrypted in-cluster. During deployment, the workflow
+                applies changes efficiently: it runs <code>helm upgrade</code>
+                if the chart itself changed, or falls back to a targeted
+                <code>kubectl rollout restart</code> for the specific
+                Deployment, waiting for the rollout to stabilize.
+            </p>
+            <p>
+                For observability, the backend exposes Prometheus metrics at
+                <code>/metrics</code>. A <strong>ServiceMonitor</strong> scrapes
+                these endpoints every 15&nbsp;seconds, feeding a comprehensive
+                Grafana dashboard that is shipped directly as a Kubernetes
+                ConfigMap. This provides real-time visibility into active
+                sessions, queue depth, per-stage latencies (STT, LLM, TTS), tool
+                call rates, and error counts.
+            </p>
+
             <p>
                 A push to <code>main</code> triggers a path-filtered GitHub
                 Actions workflow (<code>.github/workflows/deploy.yml</code>).
