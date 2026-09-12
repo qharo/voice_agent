@@ -355,15 +355,14 @@
             </p>
 
             <span class="eyebrow">Pipeline</span>
-            <!--<p>
-                One turn, from the moment you press Space to the first audio coming back.
-                Speech is streamed to the server as raw audio over a single WebSocket;
-                transcription, generation, and synthesis are chained so stages overlap:
-                the transcript streams while you speak, and playback starts while the
-                voice is still being synthesised. Time runs left to right (a rough turn,
-                not measured averages &mdash; see the <strong>Agent</strong> section for
-                the tool-calling loop).
-            </p>-->
+            <p>
+                One turn, from the moment you press Space to the first audio
+                coming back. Speech is streamed to the server as raw audio over
+                a single WebSocket; transcription, generation, and synthesis are
+                chained so stages overlap: the transcript streams while you
+                speak, and playback starts while the voice is still being
+                synthesised.
+            </p>
             <figure class="gantt">
                 <div
                     class="gantt"
@@ -406,10 +405,9 @@
                         <div
                             class="gantt-bar model"
                             style="--start: 0.318; --end: 0.682; --i: 2"
-                            title="Groq openai/gpt-oss-20b · first token ≈ 250–450 ms · short reply ≈ 0.5–1.2 s (+ a tool round-trip if a tool is called)"
+                            title="Groq openai/gpt-oss-20b · first token ≈ 250–450 ms"
                         >
-                            LLM · Groq gpt-oss-20b &middot; first token
-                            ≈250–450&nbsp;ms
+                            Groq LLM Call
                         </div>
                     </div>
 
@@ -418,10 +416,9 @@
                         <div
                             class="gantt-bar model"
                             style="--start: 0.682; --end: 0.864; --i: 3"
-                            title="Piper en_US-amy-medium (streaming subprocess) · first audio ≈ 150–350 ms, then faster than real time"
+                            title="Piper English (streaming subprocess) · first audio ≈ 150–350 ms, then faster than real-time"
                         >
-                            TTS · Piper amy-medium &middot; first audio
-                            ≈150–350&nbsp;ms
+                            Piper TTS
                         </div>
                     </div>
 
@@ -458,18 +455,1135 @@
                 system prompt is active (your own, a preset, or the default).
             </p>-->
             <figure class="diagram">
-            <!-- source: diagrams/agent.mmd -- re-render via POST https://kroki.io/mermaid/svg -->
-<svg id="container" width="495.8046875" xmlns="http://www.w3.org/2000/svg" class="flowchart diagram-svg" height="1162.546875" viewBox="4 4 495.8046875 1162.546875" role="graphics-document document" aria-roledescription="flowchart-elk"><style>#container{font-family:Roboto;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#container .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#container .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#container .error-icon{fill:hsl(220.5882352941, 100%, 98.3333333333%);}#container .error-text{fill:rgb(8.5000000002, 5.7500000001, 0);stroke:rgb(8.5000000002, 5.7500000001, 0);}#container .edge-thickness-normal{stroke-width:1px;}#container .edge-thickness-thick{stroke-width:3.5px;}#container .edge-pattern-solid{stroke-dasharray:0;}#container .edge-thickness-invisible{stroke-width:0;fill:none;}#container .edge-pattern-dashed{stroke-dasharray:3;}#container .edge-pattern-dotted{stroke-dasharray:2;}#container .marker{fill:#000000;stroke:#000000;}#container .marker.cross{stroke:#000000;}#container svg{font-family:Roboto;font-size:16px;}#container p{margin:0;}#container .label{font-family:Roboto;color:#000000;}#container .cluster-label text{fill:rgb(8.5000000002, 5.7500000001, 0);}#container .cluster-label span{color:rgb(8.5000000002, 5.7500000001, 0);}#container .cluster-label span p{background-color:transparent;}#container .label text,#container span{fill:#000000;color:#000000;}#container .node rect,#container .node circle,#container .node ellipse,#container .node polygon,#container .node path{fill:#fff4dd;stroke:hsl(40.5882352941, 60%, 83.3333333333%);stroke-width:1px;}#container .rough-node .label text,#container .node .label text,#container .image-shape .label,#container .icon-shape .label{text-anchor:middle;}#container .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#container .rough-node .label,#container .node .label,#container .image-shape .label,#container .icon-shape .label{text-align:center;}#container .node.clickable{cursor:pointer;}#container .root .anchor path{fill:#000000!important;stroke-width:0;stroke:#000000;}#container .arrowheadPath{fill:#0b0b0b;}#container .edgePath .path{stroke:#000000;stroke-width:1px;}#container .flowchart-link{stroke:#000000;fill:none;}#container .edgeLabel{background-color:#ffffff;text-align:center;}#container .edgeLabel p{background-color:#ffffff;}#container .edgeLabel rect{opacity:0.5;background-color:#ffffff;fill:#ffffff;}#container .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#container .cluster rect{fill:hsl(220.5882352941, 100%, 98.3333333333%);stroke:hsl(220.5882352941, 60%, 88.3333333333%);stroke-width:1px;}#container .cluster text{fill:rgb(8.5000000002, 5.7500000001, 0);}#container .cluster span{color:rgb(8.5000000002, 5.7500000001, 0);}#container div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Roboto;font-size:12px;background:hsl(220.5882352941, 100%, 98.3333333333%);border:1px solid hsl(220.5882352941, 60%, 88.3333333333%);border-radius:2px;pointer-events:none;z-index:100;}#container .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#container rect.text{fill:none;stroke-width:0;}#container .icon-shape,#container .image-shape{background-color:#ffffff;text-align:center;}#container .icon-shape p,#container .image-shape p{background-color:#ffffff;padding:2px;}#container .icon-shape .label rect,#container .image-shape .label rect{opacity:0.5;background-color:#ffffff;fill:#ffffff;}#container .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#container .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#container .node .neo-node{stroke:hsl(40.5882352941, 60%, 83.3333333333%);}#container [data-look="neo"].node rect,#container [data-look="neo"].cluster rect,#container [data-look="neo"].node polygon{stroke:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].swimlane.cluster rect{filter:none;}#container [data-look="neo"].node path{stroke:url(#container-gradient);stroke-width:1px;}#container [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].node .neo-line path{stroke:hsl(40.5882352941, 60%, 83.3333333333%);filter:none;}#container [data-look="neo"].node circle{stroke:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].node circle .state-start{fill:#000000;}#container [data-look="neo"].icon-shape .icon{fill:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].icon-shape .icon-neo path{stroke:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#container .input&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .input span{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .input tspan{fill:rgb(0, 0, 0)!important;}#container .model&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .model span{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .model tspan{fill:rgb(0, 0, 0)!important;}#container .dec&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .dec span{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .dec tspan{fill:rgb(0, 0, 0)!important;}#container .panel&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .panel span{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .panel tspan{fill:rgb(0, 0, 0)!important;}</style><g><marker id="container_flowchart-elk-pointEnd" class="marker flowchart-elk" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-elk-pointStart" class="marker flowchart-elk" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-elk-pointEnd-margin" class="marker flowchart-elk" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-elk-pointStart-margin" class="marker flowchart-elk" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="container_flowchart-elk-circleEnd" class="marker flowchart-elk" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-elk-circleStart" class="marker flowchart-elk" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-elk-circleEnd-margin" class="marker flowchart-elk" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-elk-circleStart-margin" class="marker flowchart-elk" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="container_flowchart-elk-crossEnd" class="marker cross flowchart-elk" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-elk-crossStart" class="marker cross flowchart-elk" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="container_flowchart-elk-crossEnd-margin" class="marker cross flowchart-elk" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="container_flowchart-elk-crossStart-margin" class="marker cross flowchart-elk" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker></g><defs><filter id="container-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="container-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="container-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(40.5882352941, 60%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(-79.4117647059, 60%, 83.3333333333%)" stop-opacity="1"></stop></linearGradient><g class="subgraphs"><g class="subgraph"><g class="cluster" id="[object Object]" data-look="classic"><rect style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="207.8046875" y="1029.546875" width="284" height="129"></rect><g class="cluster-label" transform="translate(275.3359375, 1029.546875)"><foreignObject width="148.9375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel" style="color:#000000 !important"><p>H · Document search</p></span></div></foreignObject></g></g></g><g class="subgraph"><g class="cluster" id="[object Object]" data-look="classic"><rect style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="207.8046875" y="679.546875" width="284" height="201"></rect><g class="cluster-label" transform="translate(298.78125, 679.546875)"><foreignObject width="102.046875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel" style="color:#000000 !important"><p>G · Tool picker</p></span></div></foreignObject></g></g></g><g class="subgraph"><g class="cluster" id="[object Object]" data-look="classic"><rect style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="44.69921875" y="113.5" width="323.625" height="447.046875"></rect><g class="cluster-label" transform="translate(99.27734375, 113.5)"><foreignObject width="214.46875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel" style="color:#000000 !important"><p>Agent loop · up to 5 iterations</p></span></div></foreignObject></g></g></g></g><g class="nodes"><g class="node default panel" id="container-flowchart-H-7" data-look="classic" transform="translate(349.8046875, 1107.546875)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="color:#000000 !important" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div style="color: rgb(0, 0, 0) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>PDF ≤ 10 pages · 1000-char chunks · bge-small · top-4</p></span></div></foreignObject></g></g><g class="node default panel" id="container-flowchart-G-6" data-look="classic" transform="translate(349.8046875, 793.546875)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="-130" y="-75" width="260" height="150"></rect><g class="label" style="color:#000000 !important" transform="translate(-100, -60)"><rect></rect><foreignObject width="200" height="120"><div style="color: rgb(0, 0, 0) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>weather · calculator · wikipedia · dictionary · exchange_rate · world_time · search_document</p></span></div></foreignObject></g></g><g class="node default model" id="container-flowchart-B-1" data-look="classic" transform="translate(150.10286458333331, 203.5)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="-55.140625" y="-27" width="110.28125" height="54"></rect><g class="label" style="color:#000000 !important" transform="translate(-25.140625, -12)"><rect></rect><foreignObject width="50.28125" height="24"><div style="color: rgb(0, 0, 0) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>B · LLM</p></span></div></foreignObject></g></g><g class="node default dec" id="container-flowchart-C-2" data-look="classic" transform="translate(131.72265625, 335.5234375)"><polygon points="75.0234375,0 150.046875,-75.0234375 75.0234375,-150.046875 0,-75.0234375" class="label-container" transform="translate(-74.5234375, 75.0234375)" style="fill:#ffffff !important;stroke:#000000 !important;stroke-width:2px !important"></polygon><g class="label" style="color:#000000 !important" transform="translate(-48.0234375, -12)"><rect></rect><foreignObject width="96.046875" height="24"><div style="color: rgb(0, 0, 0) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>C · Tool calls?</p></span></div></foreignObject></g></g><g class="node default model" id="container-flowchart-D-3" data-look="classic" transform="translate(233.58984375, 521.546875)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#2e7d32 !important;stroke-width:2px !important" x="-85.8671875" y="-27" width="171.734375" height="54"></rect><g class="label" style="color:#000000 !important" transform="translate(-55.8671875, -12)"><rect></rect><foreignObject width="111.734375" height="24"><div style="color: rgb(0, 0, 0) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>D · Execute tool</p></span></div></foreignObject></g></g><g class="node default input" id="container-flowchart-A-0" data-look="classic" transform="translate(150.10286458333331, 39)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#000000 !important;stroke-width:2px !important" x="-78.359375" y="-27" width="156.71875" height="54"></rect><g class="label" style="color:#000000 !important" transform="translate(-48.359375, -12)"><rect></rect><foreignObject width="96.71875" height="24"><div style="color: rgb(0, 0, 0) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>A · Turn input</p></span></div></foreignObject></g></g><g class="node default input" id="container-flowchart-E-4" data-look="classic" transform="translate(94.2109375, 780.046875)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#000000 !important;stroke-width:2px !important" x="-73.59375" y="-27" width="147.1875" height="54"></rect><g class="label" style="color:#000000 !important" transform="translate(-43.59375, -12)"><rect></rect><foreignObject width="87.1875" height="24"><div style="color: rgb(0, 0, 0) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>E · Final text</p></span></div></foreignObject></g></g><g class="node default input" id="container-flowchart-F-5" data-look="classic" transform="translate(94.2109375, 955.046875)"><rect class="basic label-container" style="fill:#ffffff !important;stroke:#000000 !important;stroke-width:2px !important" x="-82.2109375" y="-27" width="164.421875" height="54"></rect><g class="label" style="color:#000000 !important" transform="translate(-52.2109375, -12)"><rect></rect><foreignObject width="104.421875" height="24"><div style="color: rgb(0, 0, 0) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#000000 !important" class="nodeLabel"><p>F · Speak reply</p></span></div></foreignObject></g></g></g><g class="edges edgePaths"><path d="M150.10286458333331,66L150.10286458333331,106L150.10286458333331,172.5" id="container-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MTUwLjEwMjg2NDU4MzMzMzMxLCJ5Ijo2Nn0seyJ4IjoxNTAuMTAyODY0NTgzMzMzMzEsInkiOjEwNn0seyJ4IjoxNTAuMTAyODY0NTgzMzMzMzEsInkiOjE3Ni41fV0=" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M131.72265625,230.5L131.72265625,256.5" id="container-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6MTMxLjcyMjY1NjI1LCJ5IjoyMzAuNX0seyJ4IjoxMzEuNzIyNjU2MjUsInkiOjI2MC41fV0=" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M156.73046875000003,385.5390625L165.8802730337503,403.8386710675006Q169.234375,410.546875 169.234375,418.046875L169.234375,418.4758071881345Q169.234375,425.546875 176.30544281186548,425.546875L197.89638010480118,425.546875Q204.96744791666666,425.546875 204.96744791666666,432.6179428118655L204.96744791666666,490.546875" id="container-L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6MTU2LjczMDQ2ODc1MDAwMDAzLCJ5IjozODUuNTM5MDYyNX0seyJ4IjoxNjkuMjM0Mzc1LCJ5Ijo0MTAuNTQ2ODc1fSx7IngiOjE2OS4yMzQzNzUsInkiOjQyNS41NDY4NzV9LHsieCI6MjA0Ljk2NzQ0NzkxNjY2NjY2LCJ5Ijo0MjUuNTQ2ODc1fSx7IngiOjIwNC45Njc0NDc5MTY2NjY2NiwieSI6NDk0LjU0Njg3NX1d" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M106.71484374999999,385.5390625L100.462890625,398.04296875Q94.2109375,410.546875 94.2109375,424.52666717964223L94.2109375,568.046875L94.2109375,749.046875" id="container-L_C_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_E_0" data-points="W3sieCI6MTA2LjcxNDg0Mzc0OTk5OTk5LCJ5IjozODUuNTM5MDYyNX0seyJ4Ijo5NC4yMTA5Mzc1LCJ5Ijo0MTAuNTQ2ODc1fSx7IngiOjk0LjIxMDkzNzUsInkiOjU2OC4wNDY4NzV9LHsieCI6OTQuMjEwOTM3NSwieSI6NzUzLjA0Njg3NX1d" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M94.2109375,807.046875L94.2109375,924.046875" id="container-L_E_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6OTQuMjEwOTM3NSwieSI6ODA3LjA0Njg3NX0seyJ4Ijo5NC4yMTA5Mzc1LCJ5Ijo5MjguMDQ2ODc1fV0=" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M262.2122395833333,494.546875L262.2122395833333,486.6179428118655Q262.2122395833333,479.546875 269.2833073951988,479.546875L289.6750259381345,479.546875Q296.74609375,479.546875 296.74609375,472.4758071881345L296.74609375,252.57106781186548Q296.74609375,245.5 289.6750259381345,245.5L173.98307291666669,245.5Q168.48307291666669,245.5 168.48307291666669,240L168.48307291666669,234.5" id="container-L_D_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_B_0" data-points="W3sieCI6MjYyLjIxMjIzOTU4MzMzMzMsInkiOjQ5NC41NDY4NzV9LHsieCI6MjYyLjIxMjIzOTU4MzMzMzMsInkiOjQ3OS41NDY4NzV9LHsieCI6Mjk2Ljc0NjA5Mzc1LCJ5Ijo0NzkuNTQ2ODc1fSx7IngiOjI5Ni43NDYwOTM3NSwieSI6MjQ1LjV9LHsieCI6MTY4LjQ4MzA3MjkxNjY2NjY5LCJ5IjoyNDUuNX0seyJ4IjoxNjguNDgzMDcyOTE2NjY2NjksInkiOjIzMC41fV0=" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M131.72265625,410.546875L131.72265625,568.046875L131.72265625,580.9758071881345Q131.72265625,588.046875 138.79372406186548,588.046875L342.7336196881345,588.046875Q349.8046875,588.046875 349.8046875,595.1179428118655L349.8046875,672.046875L349.8046875,714.546875" id="container-L_C_G_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_G_0" data-points="W3sieCI6MTMxLjcyMjY1NjI1LCJ5Ijo0MTAuNTQ2ODc1fSx7IngiOjEzMS43MjI2NTYyNSwieSI6NTY4LjA0Njg3NX0seyJ4IjoxMzEuNzIyNjU2MjUsInkiOjU4OC4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjU4OC4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjY3Mi4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjcxOC41NDY4NzV9XQ==" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path><path d="M349.8046875,868.546875L349.8046875,888.046875L349.8046875,1022.046875L349.8046875,1064.546875" id="container-L_G_H_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_G_H_0" data-points="W3sieCI6MzQ5LjgwNDY4NzUsInkiOjg2OC41NDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjg4OC4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjEwMjIuMDQ2ODc1fSx7IngiOjM0OS44MDQ2ODc1LCJ5IjoxMDY4LjU0Njg3NX1d" data-look="classic" marker-end="url(#container_flowchart-elk-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(204.47526041666666, 452.546875)"><g class="label" data-id="L_C_D_0" transform="translate(-12.0078125, -12)"><foreignObject width="24.015625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>yes</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(94.078125, 620.046875)"><g class="label" data-id="L_C_E_0" transform="translate(-9.3671875, -12)"><foreignObject width="18.734375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>no</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_F_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(296.53515625, 335.5234375)"><g class="label" data-id="L_D_B_0" transform="translate(-59.7890625, -12)"><foreignObject width="119.578125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>result appended</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(349.609375, 620.046875)"><g class="label" data-id="L_C_G_0" transform="translate(-37.8046875, -12)"><foreignObject width="75.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>picks from</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(349.6875, 955.046875)"><g class="label" data-id="L_G_H_0" transform="translate(-64.3828125, -12)"><foreignObject width="128.765625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>search_document</p></span></div></foreignObject></g></g></g></svg>
+                <!-- source: diagrams/agent.mmd -- re-render via POST https://kroki.io/mermaid/svg -->
+                <svg
+                    id="container"
+                    width="495.8046875"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="flowchart diagram-svg"
+                    height="1162.546875"
+                    viewBox="4 4 495.8046875 1162.546875"
+                    role="graphics-document document"
+                    aria-roledescription="flowchart-elk"
+                >
+                    <style>
+                        #container{font-family:Roboto;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#container .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#container .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#container .error-icon{fill:hsl(220.5882352941, 100%, 98.3333333333%);}#container .error-text{fill:rgb(8.5000000002, 5.7500000001, 0);stroke:rgb(8.5000000002, 5.7500000001, 0);}#container .edge-thickness-normal{stroke-width:1px;}#container .edge-thickness-thick{stroke-width:3.5px;}#container .edge-pattern-solid{stroke-dasharray:0;}#container .edge-thickness-invisible{stroke-width:0;fill:none;}#container .edge-pattern-dashed{stroke-dasharray:3;}#container .edge-pattern-dotted{stroke-dasharray:2;}#container .marker{fill:#000000;stroke:#000000;}#container .marker.cross{stroke:#000000;}#container svg{font-family:Roboto;font-size:16px;}#container p{margin:0;}#container .label{font-family:Roboto;color:#000000;}#container .cluster-label text{fill:rgb(8.5000000002, 5.7500000001, 0);}#container .cluster-label span{color:rgb(8.5000000002, 5.7500000001, 0);}#container .cluster-label span p{background-color:transparent;}#container .label text,#container span{fill:#000000;color:#000000;}#container .node rect,#container .node circle,#container .node ellipse,#container .node polygon,#container .node path{fill:#fff4dd;stroke:hsl(40.5882352941, 60%, 83.3333333333%);stroke-width:1px;}#container .rough-node .label text,#container .node .label text,#container .image-shape .label,#container .icon-shape .label{text-anchor:middle;}#container .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#container .rough-node .label,#container .node .label,#container .image-shape .label,#container .icon-shape .label{text-align:center;}#container .node.clickable{cursor:pointer;}#container .root .anchor path{fill:#000000!important;stroke-width:0;stroke:#000000;}#container .arrowheadPath{fill:#0b0b0b;}#container .edgePath .path{stroke:#000000;stroke-width:1px;}#container .flowchart-link{stroke:#000000;fill:none;}#container .edgeLabel{background-color:#ffffff;text-align:center;}#container .edgeLabel p{background-color:#ffffff;}#container .edgeLabel rect{opacity:0.5;background-color:#ffffff;fill:#ffffff;}#container .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#container .cluster rect{fill:hsl(220.5882352941, 100%, 98.3333333333%);stroke:hsl(220.5882352941, 60%, 88.3333333333%);stroke-width:1px;}#container .cluster text{fill:rgb(8.5000000002, 5.7500000001, 0);}#container .cluster span{color:rgb(8.5000000002, 5.7500000001, 0);}#container div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Roboto;font-size:12px;background:hsl(220.5882352941, 100%, 98.3333333333%);border:1px solid hsl(220.5882352941, 60%, 88.3333333333%);border-radius:2px;pointer-events:none;z-index:100;}#container .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#container rect.text{fill:none;stroke-width:0;}#container .icon-shape,#container .image-shape{background-color:#ffffff;text-align:center;}#container .icon-shape p,#container .image-shape p{background-color:#ffffff;padding:2px;}#container .icon-shape .label rect,#container .image-shape .label rect{opacity:0.5;background-color:#ffffff;fill:#ffffff;}#container .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#container .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#container .node .neo-node{stroke:hsl(40.5882352941, 60%, 83.3333333333%);}#container [data-look="neo"].node rect,#container [data-look="neo"].cluster rect,#container [data-look="neo"].node polygon{stroke:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].swimlane.cluster rect{filter:none;}#container [data-look="neo"].node path{stroke:url(#container-gradient);stroke-width:1px;}#container [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].node .neo-line path{stroke:hsl(40.5882352941, 60%, 83.3333333333%);filter:none;}#container [data-look="neo"].node circle{stroke:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].node circle .state-start{fill:#000000;}#container [data-look="neo"].icon-shape .icon{fill:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container [data-look="neo"].icon-shape .icon-neo path{stroke:url(#container-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#container :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#container .input&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .input span{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .input tspan{fill:rgb(0, 0, 0)!important;}#container .model&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .model span{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .model tspan{fill:rgb(0, 0, 0)!important;}#container .dec&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .dec span{fill:rgb(255, 255, 255)!important;stroke:rgb(0, 0, 0)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .dec tspan{fill:rgb(0, 0, 0)!important;}#container .panel&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .panel span{fill:rgb(255, 255, 255)!important;stroke:rgb(46, 125, 50)!important;stroke-width:2px!important;color:rgb(0, 0, 0)!important;}#container .panel tspan{fill:rgb(0, 0, 0)!important;}
+                    </style>
+                    <g>
+                        <marker
+                            id="container_flowchart-elk-pointEnd"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 10 10"
+                            refX="5"
+                            refY="5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="8"
+                            markerHeight="8"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 0 0 L 10 5 L 0 10 z"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 1; stroke-dasharray: 1, 0"
+                            ></path>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-pointStart"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 10 10"
+                            refX="4.5"
+                            refY="5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="8"
+                            markerHeight="8"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 0 5 L 10 10 L 10 0 z"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 1; stroke-dasharray: 1, 0"
+                            ></path>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-pointEnd-margin"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 11.5 14"
+                            refX="11.5"
+                            refY="7"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="10.5"
+                            markerHeight="14"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 0 0 L 11.5 7 L 0 14 z"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 0; stroke-dasharray: 1, 0"
+                            ></path>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-pointStart-margin"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 11.5 14"
+                            refX="1"
+                            refY="7"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="11.5"
+                            markerHeight="14"
+                            orient="auto"
+                        >
+                            <polygon
+                                points="0,7 11.5,14 11.5,0"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 0; stroke-dasharray: 1, 0"
+                            ></polygon>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-circleEnd"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 10 10"
+                            refX="11"
+                            refY="5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="11"
+                            markerHeight="11"
+                            orient="auto"
+                        >
+                            <circle
+                                cx="5"
+                                cy="5"
+                                r="5"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 1; stroke-dasharray: 1, 0"
+                            ></circle>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-circleStart"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 10 10"
+                            refX="-1"
+                            refY="5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="11"
+                            markerHeight="11"
+                            orient="auto"
+                        >
+                            <circle
+                                cx="5"
+                                cy="5"
+                                r="5"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 1; stroke-dasharray: 1, 0"
+                            ></circle>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-circleEnd-margin"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 10 10"
+                            refY="5"
+                            refX="12.25"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="14"
+                            markerHeight="14"
+                            orient="auto"
+                        >
+                            <circle
+                                cx="5"
+                                cy="5"
+                                r="5"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 0; stroke-dasharray: 1, 0"
+                            ></circle>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-circleStart-margin"
+                            class="marker flowchart-elk"
+                            viewBox="0 0 10 10"
+                            refX="-2"
+                            refY="5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="14"
+                            markerHeight="14"
+                            orient="auto"
+                        >
+                            <circle
+                                cx="5"
+                                cy="5"
+                                r="5"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 0; stroke-dasharray: 1, 0"
+                            ></circle>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-crossEnd"
+                            class="marker cross flowchart-elk"
+                            viewBox="0 0 11 11"
+                            refX="12"
+                            refY="5.2"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="11"
+                            markerHeight="11"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 1,1 l 9,9 M 10,1 l -9,9"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 2; stroke-dasharray: 1, 0"
+                            ></path>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-crossStart"
+                            class="marker cross flowchart-elk"
+                            viewBox="0 0 11 11"
+                            refX="-1"
+                            refY="5.2"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="11"
+                            markerHeight="11"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 1,1 l 9,9 M 10,1 l -9,9"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 2; stroke-dasharray: 1, 0"
+                            ></path>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-crossEnd-margin"
+                            class="marker cross flowchart-elk"
+                            viewBox="0 0 15 15"
+                            refX="17.7"
+                            refY="7.5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="12"
+                            markerHeight="12"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 1,1 L 14,14 M 1,14 L 14,1"
+                                class="arrowMarkerPath"
+                                style="stroke-width: 2.5"
+                            ></path>
+                        </marker>
+                        <marker
+                            id="container_flowchart-elk-crossStart-margin"
+                            class="marker cross flowchart-elk"
+                            viewBox="0 0 15 15"
+                            refX="-3.5"
+                            refY="7.5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth="12"
+                            markerHeight="12"
+                            orient="auto"
+                        >
+                            <path
+                                d="M 1,1 L 14,14 M 1,14 L 14,1"
+                                class="arrowMarkerPath"
+                                style="
+                                    stroke-width: 2.5;
+                                    stroke-dasharray: 1, 0;
+                                "
+                            ></path>
+                        </marker>
+                    </g>
+                    <defs>
+                        <filter
+                            id="container-drop-shadow"
+                            height="130%"
+                            width="130%"
+                        >
+                            <feDropShadow
+                                dx="4"
+                                dy="4"
+                                stdDeviation="0"
+                                flood-opacity="0.06"
+                                flood-color="#000000"
+                            ></feDropShadow>
+                        </filter>
+                    </defs>
+                    <defs>
+                        <filter
+                            id="container-drop-shadow-small"
+                            height="150%"
+                            width="150%"
+                        >
+                            <feDropShadow
+                                dx="2"
+                                dy="2"
+                                stdDeviation="0"
+                                flood-opacity="0.06"
+                                flood-color="#000000"
+                            ></feDropShadow>
+                        </filter>
+                    </defs>
+                    <linearGradient
+                        id="container-gradient"
+                        gradientUnits="objectBoundingBox"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                    >
+                        <stop
+                            offset="0%"
+                            stop-color="hsl(40.5882352941, 60%, 83.3333333333%)"
+                            stop-opacity="1"
+                        ></stop>
+                        <stop
+                            offset="100%"
+                            stop-color="hsl(-79.4117647059, 60%, 83.3333333333%)"
+                            stop-opacity="1"
+                        ></stop>
+                    </linearGradient>
+                    <g class="subgraphs">
+                        <g class="subgraph">
+                            <g
+                                class="cluster"
+                                id="[object Object]"
+                                data-look="classic"
+                            >
+                                <rect
+                                    style="
+                                        fill: #ffffff !important;
+                                        stroke: #2e7d32 !important;
+                                        stroke-width: 2px !important;
+                                    "
+                                    x="207.8046875"
+                                    y="1029.546875"
+                                    width="284"
+                                    height="129"
+                                ></rect>
+                                <g
+                                    class="cluster-label"
+                                    transform="translate(275.3359375, 1029.546875)"
+                                >
+                                    <foreignObject width="148.9375" height="24"
+                                        ><div
+                                            xmlns="http://www.w3.org/1999/xhtml"
+                                            style="
+                                                display: table-cell;
+                                                white-space: nowrap;
+                                                line-height: 1.5;
+                                            "
+                                        >
+                                            <span
+                                                class="nodeLabel"
+                                                style="
+                                                    color: #000000 !important;
+                                                "
+                                                ><p>
+                                                    H · Document search
+                                                </p></span
+                                            >
+                                        </div></foreignObject
+                                    >
+                                </g>
+                            </g>
+                        </g>
+                        <g class="subgraph">
+                            <g
+                                class="cluster"
+                                id="[object Object]"
+                                data-look="classic"
+                            >
+                                <rect
+                                    style="
+                                        fill: #ffffff !important;
+                                        stroke: #2e7d32 !important;
+                                        stroke-width: 2px !important;
+                                    "
+                                    x="207.8046875"
+                                    y="679.546875"
+                                    width="284"
+                                    height="201"
+                                ></rect>
+                                <g
+                                    class="cluster-label"
+                                    transform="translate(298.78125, 679.546875)"
+                                >
+                                    <foreignObject
+                                        width="102.046875"
+                                        height="24"
+                                        ><div
+                                            xmlns="http://www.w3.org/1999/xhtml"
+                                            style="
+                                                display: table-cell;
+                                                white-space: nowrap;
+                                                line-height: 1.5;
+                                            "
+                                        >
+                                            <span
+                                                class="nodeLabel"
+                                                style="
+                                                    color: #000000 !important;
+                                                "
+                                                ><p>G · Tool picker</p></span
+                                            >
+                                        </div></foreignObject
+                                    >
+                                </g>
+                            </g>
+                        </g>
+                        <g class="subgraph">
+                            <g
+                                class="cluster"
+                                id="[object Object]"
+                                data-look="classic"
+                            >
+                                <rect
+                                    style="
+                                        fill: #ffffff !important;
+                                        stroke: #2e7d32 !important;
+                                        stroke-width: 2px !important;
+                                    "
+                                    x="44.69921875"
+                                    y="113.5"
+                                    width="323.625"
+                                    height="447.046875"
+                                ></rect>
+                                <g
+                                    class="cluster-label"
+                                    transform="translate(99.27734375, 113.5)"
+                                >
+                                    <foreignObject width="214.46875" height="24"
+                                        ><div
+                                            xmlns="http://www.w3.org/1999/xhtml"
+                                            style="
+                                                display: table-cell;
+                                                white-space: nowrap;
+                                                line-height: 1.5;
+                                            "
+                                        >
+                                            <span
+                                                class="nodeLabel"
+                                                style="
+                                                    color: #000000 !important;
+                                                "
+                                                ><p>
+                                                    Agent loop · up to 5
+                                                    iterations
+                                                </p></span
+                                            >
+                                        </div></foreignObject
+                                    >
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g class="nodes">
+                        <g
+                            class="node default panel"
+                            id="container-flowchart-H-7"
+                            data-look="classic"
+                            transform="translate(349.8046875, 1107.546875)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #2e7d32 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-130"
+                                y="-39"
+                                width="260"
+                                height="78"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-100, -24)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="200" height="48"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table;
+                                            white-space: break-spaces;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                            width: 200px;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>
+                                                PDF ≤ 10 pages · 1000-char
+                                                chunks · bge-small · top-4
+                                            </p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default panel"
+                            id="container-flowchart-G-6"
+                            data-look="classic"
+                            transform="translate(349.8046875, 793.546875)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #2e7d32 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-130"
+                                y="-75"
+                                width="260"
+                                height="150"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-100, -60)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="200" height="120"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table;
+                                            white-space: break-spaces;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                            width: 200px;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>
+                                                weather · calculator · wikipedia
+                                                · dictionary · exchange_rate ·
+                                                world_time · search_document
+                                            </p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default model"
+                            id="container-flowchart-B-1"
+                            data-look="classic"
+                            transform="translate(150.10286458333331, 203.5)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #2e7d32 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-55.140625"
+                                y="-27"
+                                width="110.28125"
+                                height="54"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-25.140625, -12)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="50.28125" height="24"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>B · LLM</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default dec"
+                            id="container-flowchart-C-2"
+                            data-look="classic"
+                            transform="translate(131.72265625, 335.5234375)"
+                        >
+                            <polygon
+                                points="75.0234375,0 150.046875,-75.0234375 75.0234375,-150.046875 0,-75.0234375"
+                                class="label-container"
+                                transform="translate(-74.5234375, 75.0234375)"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #000000 !important;
+                                    stroke-width: 2px !important;
+                                "
+                            ></polygon>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-48.0234375, -12)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="96.046875" height="24"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>C · Tool calls?</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default model"
+                            id="container-flowchart-D-3"
+                            data-look="classic"
+                            transform="translate(233.58984375, 521.546875)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #2e7d32 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-85.8671875"
+                                y="-27"
+                                width="171.734375"
+                                height="54"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-55.8671875, -12)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="111.734375" height="24"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>D · Execute tool</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default input"
+                            id="container-flowchart-A-0"
+                            data-look="classic"
+                            transform="translate(150.10286458333331, 39)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #000000 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-78.359375"
+                                y="-27"
+                                width="156.71875"
+                                height="54"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-48.359375, -12)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="96.71875" height="24"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>A · Turn input</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default input"
+                            id="container-flowchart-E-4"
+                            data-look="classic"
+                            transform="translate(94.2109375, 780.046875)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #000000 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-73.59375"
+                                y="-27"
+                                width="147.1875"
+                                height="54"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-43.59375, -12)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="87.1875" height="24"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>E · Final text</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="node default input"
+                            id="container-flowchart-F-5"
+                            data-look="classic"
+                            transform="translate(94.2109375, 955.046875)"
+                        >
+                            <rect
+                                class="basic label-container"
+                                style="
+                                    fill: #ffffff !important;
+                                    stroke: #000000 !important;
+                                    stroke-width: 2px !important;
+                                "
+                                x="-82.2109375"
+                                y="-27"
+                                width="164.421875"
+                                height="54"
+                            ></rect>
+                            <g
+                                class="label"
+                                style="color: #000000 !important"
+                                transform="translate(-52.2109375, -12)"
+                            >
+                                <rect></rect>
+                                <foreignObject width="104.421875" height="24"
+                                    ><div
+                                        style="
+                                            color: rgb(0, 0, 0) !important;
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                    >
+                                        <span
+                                            style="color: #000000 !important"
+                                            class="nodeLabel"
+                                            ><p>F · Speak reply</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                    </g>
+                    <g class="edges edgePaths">
+                        <path
+                            d="M150.10286458333331,66L150.10286458333331,106L150.10286458333331,172.5"
+                            id="container-L_A_B_0"
+                            class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_A_B_0"
+                            data-points="W3sieCI6MTUwLjEwMjg2NDU4MzMzMzMxLCJ5Ijo2Nn0seyJ4IjoxNTAuMTAyODY0NTgzMzMzMzEsInkiOjEwNn0seyJ4IjoxNTAuMTAyODY0NTgzMzMzMzEsInkiOjE3Ni41fV0="
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M131.72265625,230.5L131.72265625,256.5"
+                            id="container-L_B_C_0"
+                            class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_B_C_0"
+                            data-points="W3sieCI6MTMxLjcyMjY1NjI1LCJ5IjoyMzAuNX0seyJ4IjoxMzEuNzIyNjU2MjUsInkiOjI2MC41fV0="
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M156.73046875000003,385.5390625L165.8802730337503,403.8386710675006Q169.234375,410.546875 169.234375,418.046875L169.234375,418.4758071881345Q169.234375,425.546875 176.30544281186548,425.546875L197.89638010480118,425.546875Q204.96744791666666,425.546875 204.96744791666666,432.6179428118655L204.96744791666666,490.546875"
+                            id="container-L_C_D_0"
+                            class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_C_D_0"
+                            data-points="W3sieCI6MTU2LjczMDQ2ODc1MDAwMDAzLCJ5IjozODUuNTM5MDYyNX0seyJ4IjoxNjkuMjM0Mzc1LCJ5Ijo0MTAuNTQ2ODc1fSx7IngiOjE2OS4yMzQzNzUsInkiOjQyNS41NDY4NzV9LHsieCI6MjA0Ljk2NzQ0NzkxNjY2NjY2LCJ5Ijo0MjUuNTQ2ODc1fSx7IngiOjIwNC45Njc0NDc5MTY2NjY2NiwieSI6NDk0LjU0Njg3NX1d"
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M106.71484374999999,385.5390625L100.462890625,398.04296875Q94.2109375,410.546875 94.2109375,424.52666717964223L94.2109375,568.046875L94.2109375,749.046875"
+                            id="container-L_C_E_0"
+                            class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_C_E_0"
+                            data-points="W3sieCI6MTA2LjcxNDg0Mzc0OTk5OTk5LCJ5IjozODUuNTM5MDYyNX0seyJ4Ijo5NC4yMTA5Mzc1LCJ5Ijo0MTAuNTQ2ODc1fSx7IngiOjk0LjIxMDkzNzUsInkiOjU2OC4wNDY4NzV9LHsieCI6OTQuMjEwOTM3NSwieSI6NzUzLjA0Njg3NX1d"
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M94.2109375,807.046875L94.2109375,924.046875"
+                            id="container-L_E_F_0"
+                            class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_E_F_0"
+                            data-points="W3sieCI6OTQuMjEwOTM3NSwieSI6ODA3LjA0Njg3NX0seyJ4Ijo5NC4yMTA5Mzc1LCJ5Ijo5MjguMDQ2ODc1fV0="
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M262.2122395833333,494.546875L262.2122395833333,486.6179428118655Q262.2122395833333,479.546875 269.2833073951988,479.546875L289.6750259381345,479.546875Q296.74609375,479.546875 296.74609375,472.4758071881345L296.74609375,252.57106781186548Q296.74609375,245.5 289.6750259381345,245.5L173.98307291666669,245.5Q168.48307291666669,245.5 168.48307291666669,240L168.48307291666669,234.5"
+                            id="container-L_D_B_0"
+                            class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_D_B_0"
+                            data-points="W3sieCI6MjYyLjIxMjIzOTU4MzMzMzMsInkiOjQ5NC41NDY4NzV9LHsieCI6MjYyLjIxMjIzOTU4MzMzMzMsInkiOjQ3OS41NDY4NzV9LHsieCI6Mjk2Ljc0NjA5Mzc1LCJ5Ijo0NzkuNTQ2ODc1fSx7IngiOjI5Ni43NDYwOTM3NSwieSI6MjQ1LjV9LHsieCI6MTY4LjQ4MzA3MjkxNjY2NjY5LCJ5IjoyNDUuNX0seyJ4IjoxNjguNDgzMDcyOTE2NjY2NjksInkiOjIzMC41fV0="
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M131.72265625,410.546875L131.72265625,568.046875L131.72265625,580.9758071881345Q131.72265625,588.046875 138.79372406186548,588.046875L342.7336196881345,588.046875Q349.8046875,588.046875 349.8046875,595.1179428118655L349.8046875,672.046875L349.8046875,714.546875"
+                            id="container-L_C_G_0"
+                            class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_C_G_0"
+                            data-points="W3sieCI6MTMxLjcyMjY1NjI1LCJ5Ijo0MTAuNTQ2ODc1fSx7IngiOjEzMS43MjI2NTYyNSwieSI6NTY4LjA0Njg3NX0seyJ4IjoxMzEuNzIyNjU2MjUsInkiOjU4OC4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjU4OC4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjY3Mi4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjcxOC41NDY4NzV9XQ=="
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                        <path
+                            d="M349.8046875,868.546875L349.8046875,888.046875L349.8046875,1022.046875L349.8046875,1064.546875"
+                            id="container-L_G_H_0"
+                            class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link"
+                            style=""
+                            data-edge="true"
+                            data-et="edge"
+                            data-id="L_G_H_0"
+                            data-points="W3sieCI6MzQ5LjgwNDY4NzUsInkiOjg2OC41NDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjg4OC4wNDY4NzV9LHsieCI6MzQ5LjgwNDY4NzUsInkiOjEwMjIuMDQ2ODc1fSx7IngiOjM0OS44MDQ2ODc1LCJ5IjoxMDY4LjU0Njg3NX1d"
+                            data-look="classic"
+                            marker-end="url(#container_flowchart-elk-pointEnd)"
+                        ></path>
+                    </g>
+                    <g class="edgeLabels">
+                        <g class="edgeLabel">
+                            <g
+                                class="label"
+                                data-id="L_A_B_0"
+                                transform="translate(0, 0)"
+                            >
+                                <foreignObject width="0" height="0"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"></span></div
+                                ></foreignObject>
+                            </g>
+                        </g>
+                        <g class="edgeLabel">
+                            <g
+                                class="label"
+                                data-id="L_B_C_0"
+                                transform="translate(0, 0)"
+                            >
+                                <foreignObject width="0" height="0"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"></span></div
+                                ></foreignObject>
+                            </g>
+                        </g>
+                        <g
+                            class="edgeLabel"
+                            transform="translate(204.47526041666666, 452.546875)"
+                        >
+                            <g
+                                class="label"
+                                data-id="L_C_D_0"
+                                transform="translate(-12.0078125, -12)"
+                            >
+                                <foreignObject width="24.015625" height="24"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"
+                                            ><p>yes</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="edgeLabel"
+                            transform="translate(94.078125, 620.046875)"
+                        >
+                            <g
+                                class="label"
+                                data-id="L_C_E_0"
+                                transform="translate(-9.3671875, -12)"
+                            >
+                                <foreignObject width="18.734375" height="24"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"><p>no</p></span>
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g class="edgeLabel">
+                            <g
+                                class="label"
+                                data-id="L_E_F_0"
+                                transform="translate(0, 0)"
+                            >
+                                <foreignObject width="0" height="0"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"></span></div
+                                ></foreignObject>
+                            </g>
+                        </g>
+                        <g
+                            class="edgeLabel"
+                            transform="translate(296.53515625, 335.5234375)"
+                        >
+                            <g
+                                class="label"
+                                data-id="L_D_B_0"
+                                transform="translate(-59.7890625, -12)"
+                            >
+                                <foreignObject width="119.578125" height="24"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"
+                                            ><p>result appended</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="edgeLabel"
+                            transform="translate(349.609375, 620.046875)"
+                        >
+                            <g
+                                class="label"
+                                data-id="L_C_G_0"
+                                transform="translate(-37.8046875, -12)"
+                            >
+                                <foreignObject width="75.609375" height="24"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"
+                                            ><p>picks from</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                        <g
+                            class="edgeLabel"
+                            transform="translate(349.6875, 955.046875)"
+                        >
+                            <g
+                                class="label"
+                                data-id="L_G_H_0"
+                                transform="translate(-64.3828125, -12)"
+                            >
+                                <foreignObject width="128.765625" height="24"
+                                    ><div
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        class="labelBkg"
+                                        style="
+                                            display: table-cell;
+                                            white-space: nowrap;
+                                            line-height: 1.5;
+                                            max-width: 200px;
+                                            text-align: center;
+                                        "
+                                    >
+                                        <span class="edgeLabel"
+                                            ><p>search_document</p></span
+                                        >
+                                    </div></foreignObject
+                                >
+                            </g>
+                        </g>
+                    </g>
+                </svg>
             </figure>
             <ol type="A" class="diagram-legend">
-                <li><strong>Turn input</strong> &mdash; the transcript, plus the last 20 messages, the active system prompt (custom, preset, or default), and an &ldquo;a PDF is uploaded&rdquo; note when a document is loaded.</li>
-                <li><strong>LLM call</strong> with <code>tool_choice = auto</code> (Groq <code>gpt-oss-20b</code>).</li>
-                <li><strong>Decision:</strong> did the model emit tool calls?</li>
-                <li><strong>Execute the chosen tool</strong> and append its result, then loop back to B &mdash; at most five iterations per turn, otherwise a fallback reply.</li>
-                <li><strong>Final answer text</strong> &mdash; no more tool calls.</li>
-                <li><strong>Speak the reply:</strong> <code>strip_markdown</code>, then Piper TTS.</li>
-                <li><strong>Tool picker:</strong> 7 free, keyless tools &mdash; weather, calculator, Wikipedia, dictionary, exchange rate, world time, document search.</li>
-                <li><strong>Document search (RAG):</strong> PDF &le; 10 pages / 20&nbsp;MB &rarr; 1000-char chunks with 150 overlap &rarr; <code>bge-small-en-v1.5</code> embeddings &rarr; top-4 by cosine.</li>
+                <li>
+                    <strong>Turn input</strong> &mdash; the transcript, plus the
+                    last 20 messages, the active system prompt (custom, preset,
+                    or default), and an &ldquo;a PDF is uploaded&rdquo; note
+                    when a document is loaded.
+                </li>
+                <li>
+                    <strong>LLM call</strong> with
+                    <code>tool_choice = auto</code> (Groq
+                    <code>gpt-oss-20b</code>).
+                </li>
+                <li>
+                    <strong>Decision:</strong> did the model emit tool calls?
+                </li>
+                <li>
+                    <strong>Execute the chosen tool</strong> and append its
+                    result, then loop back to B &mdash; at most five iterations
+                    per turn, otherwise a fallback reply.
+                </li>
+                <li>
+                    <strong>Final answer text</strong> &mdash; no more tool
+                    calls.
+                </li>
+                <li>
+                    <strong>Speak the reply:</strong>
+                    <code>strip_markdown</code>, then Piper TTS.
+                </li>
+                <li>
+                    <strong>Tool picker:</strong> 7 free, keyless tools &mdash;
+                    weather, calculator, Wikipedia, dictionary, exchange rate,
+                    world time, document search.
+                </li>
+                <li>
+                    <strong>Document search (RAG):</strong> PDF &le; 10 pages /
+                    20&nbsp;MB &rarr; 1000-char chunks with 150 overlap &rarr;
+                    <code>bge-small-en-v1.5</code> embeddings &rarr; top-4 by
+                    cosine.
+                </li>
             </ol>
 
             <span class="eyebrow">Delivery</span>
