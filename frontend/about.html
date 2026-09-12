@@ -1590,12 +1590,13 @@
                 Actions layer cache to keep rebuilds fast and efficient.
             </p>
             <p>
-                The application is hosted on a Hetzner server, running a K3s
-                cluster orchestrated by the <code>voice-agent</code> Helm chart.
-                This chart provisions the namespace, Deployments, and Services,
-                alongside an <code>ingress-nginx</code> Ingress configured with
-                <code>cert-manager</code> for automated Let&rsquo;s Encrypt TLS
-                at <code>qharo-voice-agent.duckdns.org</code>. The Ingress is
+                The application is hosted on a Hetzner CX33 server, running a
+                K3s cluster orchestrated by the <code>voice-agent</code> Helm
+                chart. This chart provisions the namespace, Deployments, and
+                Services, alongside an <code>ingress-nginx</code> Ingress
+                configured with <code>cert-manager</code> for automated
+                Let&rsquo;s Encrypt TLS at
+                <code>qharo-voice-agent.duckdns.org</code>. The Ingress is
                 explicitly tuned with WebSocket-friendly timeouts and a
                 20&nbsp;MB upload cap. Sensitive credentials like the
                 <code>GROQ_API_KEY</code> are safely committed to the repository
@@ -1616,44 +1617,7 @@
                 call rates, and error counts.
             </p>
 
-            <p>
-                A push to <code>main</code> triggers a path-filtered GitHub
-                Actions workflow (<code>.github/workflows/deploy.yml</code>).
-                Using <code>dorny/paths-filter</code>, the pipeline
-                intelligently builds only the affected components &mdash;
-                backend, frontend, or the Helm chart. Both application images
-                are built for <code>linux/amd64</code> and pushed to the GitHub
-                Container Registry (GHCR), leveraging the Actions layer cache to
-                keep rebuilds fast and efficient.
-            </p>
-            <p>
-                The application runs on a K3s cluster, orchestrated by the
-                <code>helm/voice-agent</code> chart. This chart provisions the
-                namespace, Deployments, and Services, alongside an
-                <code>ingress-nginx</code> Ingress configured with
-                <code>cert-manager</code> for automated Let&rsquo;s Encrypt TLS
-                at <code>qharo-voice-agent.duckdns.org</code>. The Ingress is
-                explicitly tuned with WebSocket-friendly timeouts and a
-                20&nbsp;MB upload cap. Sensitive credentials like the
-                <code>GROQ_API_KEY</code> are safely committed to the repository
-                as a Bitnami <strong>SealedSecret</strong>, remaining encrypted
-                until decrypted in-cluster. During deployment, the workflow
-                applies changes efficiently: it runs
-                <code>helm upgrade</code> if the chart itself changed, or falls
-                back to a targeted <code>kubectl rollout restart</code> for the
-                specific Deployment, waiting for the rollout to stabilize.
-            </p>
-            <p>
-                For observability, the backend exposes Prometheus metrics at
-                <code>/metrics</code>. A <strong>ServiceMonitor</strong> scrapes
-                these endpoints every 15&nbsp;seconds, feeding a comprehensive
-                Grafana dashboard that is shipped directly as a Kubernetes
-                ConfigMap. This provides real-time visibility into active
-                sessions, queue depth, per-stage latencies (STT, LLM, TTS), tool
-                call rates, and error counts.
-            </p>
-
-            <span class="eyebrow">Reference</span>
+            <!--<span class="eyebrow">Reference</span>
             <div class="table-scroll">
                 <table class="stats">
                     <thead>
@@ -1764,7 +1728,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </div>-->
 
             <span class="eyebrow">Notes</span>
 
@@ -1777,9 +1741,9 @@
                 </li>
                 <li>
                     The LLM is hosted (Groq) for speed and quality, but STT and
-                    TTS run locally in the backend process &mdash; no
-                    per-request cost, no extra network hop, and they work
-                    offline.
+                    TTS run locally in the backend process &mdash; allows for no
+                    per-request cost, no extra network hop, and offline
+                    inference.
                 </li>
                 <li>
                     Concurrency is capped at four turns so a small box stays
@@ -1805,14 +1769,10 @@
                     The RAG index lives in memory, so an uploaded document is
                     lost on a backend restart or redeploy.
                 </li>
-                <li>
-                    Single backend replica &mdash; the in-process models and
-                    in-memory state don&rsquo;t share across pods.
-                </li>
                 <li>Voices are English-only.</li>
             </ul>
 
-            <h3>Future work</h3>
+            <!--<h3>Future work</h3>
             <ul>
                 <li>
                     Feed partial STT hypotheses straight into the turn so
@@ -1829,7 +1789,7 @@
                     Horizontal autoscaling with shared state pulled out of the
                     process.
                 </li>
-            </ul>
+            </ul>-->
 
             <h3>Credits &amp; links</h3>
             <p>
