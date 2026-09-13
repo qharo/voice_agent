@@ -245,6 +245,18 @@
                 stroke-linecap: round;
                 stroke-linejoin: round;
             }
+            #muteToggle .mute-icon-off {
+                display: none;
+            }
+            #muteToggle.muted .mute-icon-on {
+                display: none;
+            }
+            #muteToggle.muted .mute-icon-off {
+                display: block;
+            }
+            #muteToggle.muted {
+                opacity: 1;
+            }
             body.active .corner-btn {
                 color: var(--white);
             }
@@ -474,8 +486,6 @@
                     min-height: 44px;
                     padding: 0 8px;
                 }
-            }
-            @media (max-width: 360px) {
                 .github-label {
                     display: none;
                 }
@@ -525,6 +535,24 @@
                         </svg>
                         <span class="github-label">GitHub</span></a
                     >
+                    <button
+                        id="muteToggle"
+                        class="corner-btn"
+                        aria-pressed="false"
+                        aria-label="Mute voice"
+                        title="Mute voice"
+                    >
+                        <svg class="mute-icon-on" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M11 5 6 9H2v6h4l5 4z"></path>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                        </svg>
+                        <svg class="mute-icon-off" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M11 5 6 9H2v6h4l5 4z"></path>
+                            <line x1="23" y1="9" x2="17" y2="15"></line>
+                            <line x1="17" y1="9" x2="23" y2="15"></line>
+                        </svg>
+                    </button>
                     <button id="sidebarToggle" class="corner-btn" aria-label="Settings" title="Settings">
                         <svg viewBox="0 0 24 24">
                             <line x1="4" y1="7" x2="20" y2="7"></line>
@@ -581,6 +609,7 @@
             const queueStatus = document.getElementById("queueStatus");
             const fileInput = document.getElementById("fileInput");
             const sidebarToggle = document.getElementById("sidebarToggle");
+            const muteToggle = document.getElementById("muteToggle");
             const sidebarClose = document.getElementById("sidebarClose");
             const sidebarBackdrop = document.getElementById("sidebarBackdrop");
             const promptInput = document.getElementById("promptInput");
@@ -610,6 +639,8 @@
             let isPlayingAudio = false;
             let discardTurn = false;
             let shouldReconnect = true;
+            let muted = false;
+            let turnMuted = false;
             let cancelPendingStart = false;
             let inputMode =
                 window.matchMedia("(pointer: coarse)").matches ||
@@ -721,6 +752,27 @@
                 isPlayingAudio = false;
             }
 
+            function setMuted(on) {
+                muted = on;
+                muteToggle.classList.toggle("muted", on);
+                muteToggle.setAttribute("aria-pressed", String(on));
+                muteToggle.setAttribute("aria-label", on ? "Unmute voice" : "Mute voice");
+                muteToggle.title = on ? "Unmute voice" : "Mute voice";
+                try {
+                    if (on) localStorage.setItem("voiceMute", "1");
+                    else localStorage.removeItem("voiceMute");
+                } catch (e) {}
+                if (on && (player.active || isPlayingAudio)) {
+                    stopAllAudio();
+                }
+            }
+
+            muteToggle.addEventListener("click", () => setMuted(!muted));
+
+            try {
+                setMuted(localStorage.getItem("voiceMute") === "1");
+            } catch (e) {}
+
             function setIdlePrompt(mode) {
                 if (mode === "idle") {
                     idlePrompt.textContent =
@@ -801,7 +853,7 @@
 
                 ws.onmessage = (event) => {
                     if (event.data instanceof ArrayBuffer) {
-                        if (discardTurn) return;
+                        if (turnMuted || muted || discardTurn) return;
                         if (player.active) {
                             player.push(event.data);
                         } else {
@@ -829,8 +881,18 @@
                             setActive(true);
                             setAgent(true);
                             setIdlePrompt("interrupt");
+                            turnMuted = muted;
+                            if (turnMuted) {
+                                isPlayingAudio = true;
+                                return;
+                            }
                             player.start(sr);
                         } else if (text === "[AUDIO_END]") {
+                            if (turnMuted || muted || discardTurn) {
+                                isPlayingAudio = false;
+                                turnMuted = false;
+                                return;
+                            }
                             player.end();
                         } else if (text === "[END]") {
                             if (queueStatus) {
