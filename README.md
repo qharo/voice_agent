@@ -4,19 +4,15 @@ A real-time voice assistant with streaming speech-to-text, a tool-using language
 
 - Live demo: https://qharo-voice-agent.duckdns.org
 - Technical overview: https://qharo-voice-agent.duckdns.org/about.html
-- Repository: https://github.com/qharo/voice_agent
 
 ## Use it
 
-- Hold `Space` to speak, then release to send.
-- On touch screens, touch and hold the background for more than half a second, then release.
+- Hold `Space` to speak, then release to send. On touch screens, touch and hold the background for more than half a second, then release.
 - Speak again during playback to interrupt the assistant.
 - Upload a PDF or TXT file to ask questions about that document.
 - Download the currently loaded document from Settings.
 - Choose a preset for a guided customer-service or study-tutor experience.
 - Customize the assistant prompt or clear the document from Settings.
-
-The interface works with keyboards, mice, touch screens, and responsive mobile through desktop layouts.
 
 ## How it works
 
